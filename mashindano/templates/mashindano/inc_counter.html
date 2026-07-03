@@ -1,0 +1,8 @@
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background: white; padding: 10px; border-radius: 8px;">
+    <span style="font-weight: bold; font-size: 14px; color: #444;">{{ label }}</span>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <button type="button" onclick="badili('{{ name }}', -1)" style="width: 35px; height: 35px; border-radius: 50%; border: 1px solid #ccc; background: #fdfdfd; font-weight: bold; cursor: pointer;">-</button>
+        <input type="number" id="{{ name }}" name="{{ name }}" value="{{ value|default:0 }}" readonly style="width: 40px; text-align: center; border: none; font-size: 18px; font-weight: bold; background: none;">
+        <button type="button" onclick="badili('{{ name }}', 1)" style="width: 35px; height: 35px; border-radius: 50%; border: 1px solid #2E7D32; background: #2E7D32; color: white; font-weight: bold; cursor: pointer;">+</button>
+    </div>
+</div>

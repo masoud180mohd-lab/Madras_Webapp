@@ -1,0 +1,153 @@
+{% extends 'usimamizi/base.html' %}
+
+{% block maudhui %}
+<style>
+    :root {
+        --card-bg: #ffffff;
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --border-color: #e2e8f0;
+        --table-header: #f8fafc;
+    }
+    body.dark-mode {
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-muted: #a0aec0;
+        --border-color: #333333;
+        --table-header: #222222;
+    }
+
+    .report-card { max-width: 900px; margin: auto; background-color: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+    .report-header { text-align: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 25px; }
+    .report-header h2 { margin: 0; color: var(--text-main); font-size: 24px; text-transform: uppercase; }
+    .report-header p { margin: 8px 0 0 0; color: var(--text-muted); font-size: 15px; }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { background-color: var(--table-header); padding: 12px; text-align: left; font-size: 13px; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+    .data-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 14px; }
+
+    .rank-circle { display: inline-flex; justify-content: center; align-items: center; width: 30px; height: 30px; border-radius: 50%; background-color: var(--table-header); font-weight: bold; font-size: 13px; color: var(--text-muted); }
+    .rank-top { background-color: #FFD700; color: #555; }
+    .grade-badge { padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; color: white; display: inline-block; text-align: center; min-width: 30px; }
+
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: #0288D1; text-decoration: none; font-weight: bold; margin-bottom: 20px; font-size: 14px; }
+    .back-link:hover { text-decoration: underline; }
+
+    /* ====== CSS MPYA YA VIDOTO VITATU NA PDF ====== */
+    .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+    .btn-download-pdf { background-color: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+    .btn-download-pdf:hover { background-color: #b71c1c; }
+
+    .dropdown-wrapper { position: relative; display: inline-block; }
+    .dots-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); font-size: 18px; font-weight: bold; cursor: pointer; padding: 3px 12px; border-radius: 6px; transition: 0.2s; }
+    .dots-btn:hover { background-color: var(--table-header); }
+
+    .dropdown-menu { display: none; position: absolute; right: 0; top: 100%; margin-top: 5px; background-color: var(--card-bg); min-width: 180px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid var(--border-color); border-radius: 8px; z-index: 100; padding: 10px; }
+    .dropdown-menu label { display: block; padding: 8px 10px; color: var(--text-main); font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.2s; }
+    .dropdown-menu label:hover { background-color: var(--table-header); }
+    .menu-header { font-size: 12px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; padding-left: 5px; }
+</style>
+
+<div style="max-width: 900px; margin: auto; padding: 20px;">
+
+    <a href="{% url 'somo_detail' somo.id %}" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Rudi Kwenye Somo
+    </a>
+
+    <div class="report-card">
+        <div class="report-header">
+            <h2>Ripoti ya Matokeo</h2>
+            <p>Somo: <b>{{ somo.jina }}</b> | Mtihani: <b>{{ mtihani.jina_la_mtihani }}</b></p>
+            <p style="font-size: 13px;">Wanafunzi Waliofanya: <b>{{ idadi_waliofanya }}</b></p>
+        </div>
+
+        <div class="table-controls">
+            <a href="{% url 'pakua_pdf_matokeo' mtihani.id %}" class="btn-download-pdf">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download PDF
+            </a>
+
+            <div class="dropdown-wrapper">
+                <button class="dots-btn" onclick="toggleMenu('menu-matokeo', event)" title="Chuja Nguzo">&#8942;</button>
+                <div id="menu-matokeo" class="dropdown-menu">
+                    <div class="menu-header">Onyesha Nguzo</div>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-matokeo', 0, this)"> Nafasi</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-matokeo', 1, this)"> Mwanafunzi</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-matokeo', 2, this)"> Maksi</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-matokeo', 3, this)"> Daraja</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-matokeo', 4, this)"> Maelezo</label>
+                </div>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table id="tbl-matokeo" class="data-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60px; text-align: center;">Nafasi</th>
+                        <th>Jina la Mwanafunzi</th>
+                        <th style="text-align: center;">Maksi (100%)</th>
+                        <th style="text-align: center;">Daraja</th>
+                        <th>Maelezo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in matokeo %}
+                    <tr onmouseover="this.style.backgroundColor='var(--table-header)'" onmouseout="this.style.backgroundColor='transparent'">
+                        <td style="text-align: center;">
+                            <span class="rank-circle {% if m.nafasi == 1 %}rank-top{% endif %}">{{ m.nafasi }}</span>
+                        </td>
+                        <td style="font-weight: 600;">{{ m.mwanafunzi.jina_kamili }}</td>
+                        <td style="text-align: center; font-size: 16px; font-weight: bold;">{{ m.maksi|floatformat:"0" }}</td>
+                        <td style="text-align: center;">
+                            <span class="grade-badge" style="background-color: {{ m.rangi }};">{{ m.daraja }}</span>
+                        </td>
+                        <td style="font-size: 13px; color: var(--text-muted);">{{ m.maelezo }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted); font-style: italic;">
+                            Hakuna matokeo yaliyojazwa kwa mtihani huu bado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function toggleMenu(menuId, event) {
+        event.stopPropagation();
+        var menu = document.getElementById(menuId);
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function toggleCol(tableId, colIdx, checkbox) {
+        var table = document.getElementById(tableId);
+        var rows = table.rows;
+        var displayStyle = checkbox.checked ? '' : 'none';
+
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i].cells.length > colIdx) {
+                rows[i].cells[colIdx].style.display = displayStyle;
+            }
+        }
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.matches('.dots-btn')) {
+            var dropdowns = document.getElementsByClassName("dropdown-menu");
+            for (var i = 0; i < dropdowns.length; i++) {
+                if (dropdowns[i].style.display === 'block') {
+                    dropdowns[i].style.display = 'none';
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}

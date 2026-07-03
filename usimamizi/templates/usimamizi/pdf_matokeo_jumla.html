@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Matokeo ya Jumla — {{ darasa.jina }}</title>
+    <style>
+        @page { size: A4 landscape; margin: 1.1cm; }
+        body { font-family: Helvetica, sans-serif; font-size: 9px; color: #13263a; }
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 8px 0 9px;
+            border-top: 3px solid #2E7D32;
+            border-bottom: 1px solid #b8c6d6;
+        }
+        .school-name {
+            color: #1b5e20;
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .school-location { margin: 2px 0 7px; font-size: 10px; color: #5d6d7e; text-transform: uppercase; }
+        .report-title {
+            display: inline-block;
+            margin: 0 0 5px;
+            padding: 4px 14px;
+            background-color: #f1f8e9;
+            color: #1b5e20;
+            border: 1px solid #c8e6c9;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .meta { margin: 2px 0 0; font-size: 9px; color: #34495e; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        th { background-color: #2E7D32; color: white; padding: 5px 3px; text-align: center; font-size: 8px; text-transform: uppercase; border: 1px solid #1b5e20; }
+        td { padding: 4px 3px; border: 1px solid #ccc; text-align: center; font-size: 8px; }
+        td.name { text-align: left; font-weight: bold; white-space: nowrap; }
+        td.avg { background-color: #f1f8e9; font-weight: bold; }
+        th.avg { background-color: #1b5e20; color: white; }
+        .summary-title { margin: 8px 0 4px; font-size: 10px; font-weight: bold; color: #13263a; }
+        .summary-table { width: 36%; margin: 0 0 10px; }
+        .summary-table th {
+            background-color: #f1f8e9;
+            color: #1b5e20;
+            border: 1px solid #9ccc9c;
+            padding: 5px 8px;
+            font-size: 8px;
+        }
+        .summary-table td {
+            border: 1px solid #9ccc9c;
+            padding: 5px 8px;
+            font-size: 9px;
+        }
+        .summary-table td:first-child { font-weight: bold; }
+        .main-table { margin-top: 10px; }
+        .footer { margin-top: 15px; font-size: 8px; color: #777; text-align: center; border-top: 1px solid #ddd; padding-top: 6px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 class="school-name">AL-MADRASATUL RASULILLAH</h1>
+        <p class="school-location">MWERA, ZANZIBAR</p>
+        <p class="report-title">Ripoti ya Matokeo ya Jumla</p>
+        <p class="meta">Darasa: <b>{{ darasa.jina }}</b> &nbsp;|&nbsp; Mtihani: <b>{{ mseto.jina }}</b></p>
+    </div>
+
+    <div class="summary-title">Muhtasari wa Grade kwa Jinsia</div>
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>Jinsia</th>
+                {% for grade in grade_order %}
+                    <th>{{ grade }}</th>
+                {% endfor %}
+                <th>Jumla</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in grade_summary %}
+                <tr>
+                    <td><b>{{ row.jinsia }}</b></td>
+                    {% for count in row.grade_counts %}
+                        <td>{{ count }}</td>
+                    {% endfor %}
+                    <td><b>{{ row.total }}</b></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="main-table">
+        <thead>
+            <tr>
+                <th style="width: 4%;">Naf.</th>
+                <th style="width: 14%;">Mwanafunzi</th>
+                {% for somo in masomo %}
+                    <th>{{ somo.jina }}</th>
+                {% endfor %}
+                <th class="avg">Wast.</th>
+                <th class="avg">Dar.</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in matokeo_wanafunzi %}
+            <tr>
+                <td><b>{{ row.nafasi }}</b></td>
+                <td class="name">{{ row.mwanafunzi.jina_kamili }}</td>
+                {% for somo_data in row.masomo %}
+                    <td>
+                        {% if somo_data.imejazwa %}
+                            {{ somo_data.maksi|floatformat:"0" }} ({{ somo_data.daraja }})
+                        {% else %}-{% endif %}
+                    </td>
+                {% endfor %}
+                <td class="avg">{% if row.wastani is not None %}{{ row.wastani }}{% else %}-{% endif %}</td>
+                <td class="avg"><b>{{ row.daraja_jumla }}</b></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Imechapishwa: {{ wakati_huu|date:"d M Y, H:i" }} | Al-Madrasatul Rasulillah Management System</p>
+    </div>
+
+</body>
+</html>

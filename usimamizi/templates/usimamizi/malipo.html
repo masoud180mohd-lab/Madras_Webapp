@@ -1,0 +1,281 @@
+{% extends 'usimamizi/base.html' %}
+
+{% block maudhui %}
+<style>
+    /* ----- UI MPYA NA UTATUZI WA DARK MODE ----- */
+    :root {
+        --primary: #2E7D32;
+        --secondary: #0288D1;
+        --danger: #d32f2f;
+        --warning: #f57c00;
+
+        /* Rangi za Mchana (Light Mode) */
+        --bg-body: #f4f4f9;
+        --card-bg: #ffffff;
+        --text-main: #2c3e50;
+        --text-muted: #6c757d;
+        --border-color: #edf2f7;
+        --input-bg: #ffffff;
+        --table-header: #f8f9fa;
+    }
+
+    body.dark-mode {
+        /* Rangi za Usiku (Dark Mode) - Zinabadilika Zenyewe! */
+        --bg-body: #121212;
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-muted: #aaaaaa;
+        --border-color: #333333;
+        --input-bg: #2c2c2c;
+        --table-header: #222222;
+    }
+
+    /* Kadi za KPI na Wrapper Yake */
+    .kpi-wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .finance-card {
+        background-color: var(--card-bg);
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        border: 1px solid var(--border-color);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: transform 0.3s ease;
+    }
+    .finance-card:hover { transform: translateY(-5px); }
+    .finance-icon-bg { position: absolute; right: -10px; bottom: -10px; opacity: 0.1; }
+
+    .kpi-details h3 { margin: 0; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-details h2 { margin: 5px 0 0 0; font-size: 28px; color: var(--text-main); }
+
+    /* Vidhibiti na Fomu */
+    .filter-section {
+        background-color: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center;
+    }
+    .custom-input, .custom-select {
+        padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; background-color: var(--input-bg); color: var(--text-main); outline: none; transition: 0.2s;
+    }
+    .custom-input:focus, .custom-select:focus { border-color: var(--primary); }
+
+    /* Vidhibiti vya Kuchagua Wanafunzi (Tabs) */
+    .filter-tab {
+        display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 30px; text-decoration: none; font-weight: bold; font-size: 14px; transition: all 0.3s ease; border: 1px solid transparent;
+    }
+
+    /* Kitufe Kikuu (Primary Button) */
+    .btn-action-main {
+        background-color: var(--primary); color: white; padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; transition: 0.3s; text-decoration: none;
+    }
+    .btn-action-main:hover { background-color: #1b5e20; transform: scale(1.02); color: white; }
+
+    /* Fomu ya Malipo ya Haraka inayo Fichwa/Kuonyeshwa */
+    .quick-pay-box {
+        background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 25px; display: none; border-left: 6px solid var(--primary); animation: slideDown 0.3s ease-out;
+    }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Jedwali */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { background-color: var(--table-header); padding: 15px; text-align: left; font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+    .data-table td { padding: 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; color: var(--text-main); vertical-align: middle; }
+
+    /* RESPONSIVE YA SIMU - SCROLLING YA KADI */
+    @media (max-width: 768px) {
+        .kpi-wrapper {
+            display: flex; /* Hubadili Grid kuwa Flex */
+            overflow-x: auto; /* Inaruhusu kusogeza kulia/kushoto */
+            scroll-snap-type: x mandatory;
+            padding-bottom: 15px;
+            gap: 15px;
+            -webkit-overflow-scrolling: touch; /* Laini kwenye simu */
+        }
+        .finance-card {
+            min-width: 280px; /* Upana wa kadi kwenye simu */
+            flex-shrink: 0; /* MUHIMU: Inazuia kadi isinywe, inaruhusu scroll */
+            scroll-snap-align: center;
+        }
+
+        .data-table thead { display: none; }
+        .data-table, .data-table tbody, .data-table tr, .data-table td { display: block; width: 100%; box-sizing: border-box; }
+        .data-table tr { margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; }
+        .data-table td { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; text-align: right; }
+        .data-table td::before { content: attr(data-label); font-weight: 600; color: var(--text-muted); font-size: 12px; text-transform: uppercase; float: left; }
+    }
+</style>
+
+<div style="max-width: 1200px; margin: auto; padding: 20px;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 30px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="background: rgba(46, 125, 50, 0.1); padding: 15px; border-radius: 12px; color: var(--primary);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+            </div>
+            <div>
+                <h1 style="color: var(--text-main); margin: 0; font-size: 26px;">Malipo na Ada</h1>
+                <p style="font-size: 14px; margin-top: 5px; color: var(--text-muted); margin-bottom: 0;">Fuatilia na dhibiti mapato ya chuo</p>
+            </div>
+        </div>
+
+        <button class="btn-action-main" onclick="toggleQuickPay()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Weka Malipo Mpya
+        </button>
+    </div>
+
+    <div id="quickPayBox" class="quick-pay-box">
+        <h3 style="color: var(--text-main); margin: 0 0 15px 0;">Tafuta Mwanafunzi Kufanya Malipo</h3>
+        <form method="GET" action="" style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <input type="text" name="q" placeholder="Andika Jina la Mwanafunzi hapa..." class="custom-input" style="flex: 2; min-width: 250px;" required>
+
+            <select name="aina" class="custom-select" style="flex: 1; min-width: 150px;">
+                {% for a in aina_za_malipo %}
+                    <option value="{{ a.id }}" {% if aina_teule.id == a.id %}selected{% endif %}>{{ a.jina }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="hidden" name="hali" value="wote">
+
+            <button type="submit" class="btn-action-main">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Tafuta Mwanafunzi
+            </button>
+        </form>
+    </div>
+
+    <form method="GET" class="filter-section">
+        <span style="color: var(--text-main); font-weight: bold; font-size: 15px;">Aina ya Malipo:</span>
+        <select name="aina" class="custom-select" onchange="this.form.submit()" style="flex: 1; font-weight: bold;">
+            {% for a in aina_za_malipo %}
+                <option value="{{ a.id }}" {% if aina_teule.id == a.id %}selected{% endif %}>{{ a.jina }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if aina_teule %}
+    <div class="kpi-wrapper">
+
+        <div class="finance-card" style="border-top: 4px solid var(--secondary);">
+            <div class="kpi-details">
+                <h3>Kiasi Kinachotakiwa</h3>
+                <h2>Tsh {{ aina_teule.kiasi_kinachotakiwa|floatformat:"0" }}</h2>
+            </div>
+            <svg class="finance-icon-bg" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
+
+        <div class="finance-card" style="border-top: 4px solid var(--primary);">
+            <div class="kpi-details">
+                <h3>Iliyokusanywa Mpaka Sasa</h3>
+                <h2>Tsh {{ jumla_iliyokusanywa|floatformat:"0" }}</h2>
+            </div>
+            <svg class="finance-icon-bg" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        </div>
+
+        <div class="finance-card" style="border-top: 4px solid var(--warning);">
+            <div class="kpi-details">
+                <h3>Idadi ya Waliolipa</h3>
+                <h2>{{ idadi_waliolipa }} <span style="font-size: 14px; color: var(--text-muted); font-weight: normal;">Wanafunzi</span></h2>
+            </div>
+            <svg class="finance-icon-bg" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+        </div>
+    </div>
+
+    <div style="background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); text-align: center;">
+
+        <h3 style="color: var(--text-main); margin-top: 0;">Chagua kundi ili kuona orodha ya wanafunzi:</h3>
+
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+            <a href="?aina={{ aina_teule.id }}&hali=wote" class="filter-tab" style="{% if request.GET.hali == 'wote' %}background-color: var(--primary); color: white;{% else %}background-color: var(--bg-body); color: var(--text-muted);{% endif %} border: 1px solid var(--border-color);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                Orodha Yote
+            </a>
+            <a href="?aina={{ aina_teule.id }}&hali=wanaodaiwa" class="filter-tab" style="{% if request.GET.hali == 'wanaodaiwa' %}background-color: var(--danger); color: white;{% else %}background-color: var(--bg-body); color: var(--text-muted);{% endif %} border: 1px solid var(--border-color);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                Wanaodaiwa
+            </a>
+            <a href="?aina={{ aina_teule.id }}&hali=waliokamilisha" class="filter-tab" style="{% if request.GET.hali == 'waliokamilisha' %}background-color: var(--primary); color: white;{% else %}background-color: var(--bg-body); color: var(--text-muted);{% endif %} border: 1px solid var(--border-color);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Waliokamilisha
+            </a>
+        </div>
+
+        {% if request.GET.hali or request.GET.q %}
+        <div style="margin-top: 30px; text-align: left; overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mwanafunzi</th>
+                        <th style="text-align: right;">Alicholipa</th>
+                        <th style="text-align: right;">Deni Linalobaki</th>
+                        <th style="text-align: right;">Hatua</th> </tr>
+                </thead>
+                <tbody>
+                    {% for t in taarifa_wanafunzi %}
+                    <tr>
+                        <td data-label="Mwanafunzi">
+                            <div style="font-weight: bold; color: var(--text-main);">{{ t.mwanafunzi.jina_kamili }}</div>
+                            <div style="font-size: 12px; color: var(--text-muted);">{{ t.mwanafunzi.darasa.jina|default:"-" }}</div>
+                        </td>
+                        <td data-label="Alicholipa" style="text-align: right; font-weight: bold; color: var(--primary);">
+                            {{ t.jumla_yake|floatformat:"0" }} <small style="color: var(--text-muted);">Tsh</small>
+                        </td>
+                        <td data-label="Deni Linalobaki" style="text-align: right; font-weight: bold; color: {% if t.deni > 0 %}var(--danger){% else %}var(--text-muted){% endif %};">
+                            {% if t.deni > 0 %}{{ t.deni|floatformat:"0" }}{% else %}0{% endif %} <small style="color: var(--text-muted);">Tsh</small>
+                        </td>
+                        <td data-label="Hatua" style="text-align: right;">
+                            <a href="{% url 'weka_malipo' t.mwanafunzi.id aina_teule.id %}" class="btn-action-main" style="padding: 8px 15px; font-size: 13px;">
+                                ➕ Weka Malipo
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            Hakuna wanafunzi waliopatikana.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="margin-top: 40px; padding: 30px; color: var(--text-muted); border-top: 1px dashed var(--border-color);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3; margin-bottom: 10px;"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <p style="font-size: 16px;">Tafadhali chagua kundi moja hapo juu au tafuta jina ili kuona orodha.</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+    {% else %}
+    <div style="background-color: var(--card-bg); padding: 60px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); text-align: center; border: 1px dashed var(--border-color);">
+        <h2 style="color: var(--text-main); margin-bottom: 10px; font-size: 20px;">Hakuna Aina ya Malipo Iliyochaguliwa</h2>
+        <p style="color: var(--text-muted); font-size: 15px;">Tafadhali sajili na uchague aina ya malipo kwanza.</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    // JavaScript ya kuficha na kuonyesha fomu ya malipo mpya
+    function toggleQuickPay() {
+        var box = document.getElementById('quickPayBox');
+        if (box.style.display === 'none' || box.style.display === '') {
+            box.style.display = 'block';
+        } else {
+            box.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

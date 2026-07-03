@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Mpangilio wa Karatasi ya A4 */
+        @page {
+            size: a4 portrait;
+            margin: 2cm;
+        }
+        body { font-family: Helvetica, Arial, sans-serif; color: #333; }
+        
+        /* Kichwa cha Shule */
+        .header { text-align: center; border-bottom: 3px solid #2E7D32; padding-bottom: 10px; margin-bottom: 20px; }
+        .header h1 { color: #2E7D32; margin: 0; font-size: 24px; }
+        .header h3 { color: #555; margin: 5px 0 0 0; font-size: 16px; }
+
+        /* Taarifa za Mwanafunzi */
+        .info-table { width: 100%; margin-bottom: 25px; }
+        .info-table td { padding: 5px; font-size: 14px; }
+        
+        /* Majedwali ya Ripoti */
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+        .data-table th { background-color: #f1f8e9; color: #1b5e20; text-align: left; padding: 10px; border: 1px solid #ccc; font-weight: bold; }
+        .data-table td { padding: 10px; border: 1px solid #ccc; font-size: 13px; }
+        
+        .section-title { color: #2E7D32; font-size: 16px; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>MADRASATUL RASULILLAH</h1>
+        <h3>RIPOTI YA MAENDELEO YA MWANAFUNZI</h3>
+    </div>
+
+    <table class="info-table">
+        <tr>
+            <td><b>Jina la Mwanafunzi:</b> {{ mwanafunzi.jina_kamili }}</td>
+            <td style="text-align: right;"><b>Darasa/Ngazi:</b> {{ mwanafunzi.darasa.jina }}</td>
+        </tr>
+        <tr>
+            <td><b>Namba ya Usajili:</b> {{ mwanafunzi.namba_ya_usajili }}</td>
+            <td style="text-align: right;"><b>Tarehe ya Ripoti:</b> {{ tarehe_leo|date:"d/m/Y" }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">1. TAKWIMU ZA MAHUDHURIO</div>
+    <table class="data-table">
+        <tr>
+            <th style="text-align: center;">Wastani wa Mahudhurio</th>
+            <th style="text-align: center;">Jumla ya Siku (Rekodi)</th>
+        </tr>
+        <tr>
+            <td style="text-align: center; font-size: 18px; font-weight: bold;">{{ asilimia }}%</td>
+            <td style="text-align: center; font-size: 18px;">{{ mahudhurio|length }}</td>
+        </tr>
+    </table>
+
+    <div class="section-title">2. HISTORIA YA SABAQ NA MURAJAA (QUR'AN)</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Tarehe</th>
+                <th style="width: 40%;">Sehemu Aliyosoma</th>
+                <th style="width: 40%;">Maoni ya Mwalimu</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sabaq in sabaq_zote %}
+            <tr>
+                <td>{{ sabaq.tarehe|date:"d M Y" }}</td>
+                <td>
+                    <b>{{ sabaq.sura_kuanzia }}</b> ({{ sabaq.aya_kuanzia }}) - 
+                    <b>{{ sabaq.sura_kuishia }}</b> ({{ sabaq.aya_kuishia }})
+                </td>
+                <td>{{ sabaq.maoni|default:"Amesoma vizuri." }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center;">Mwanafunzi huyu bado hajarekodiwa maendeleo yoyote.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 40px; text-align: center; font-size: 12px; color: #888;">
+        <p><i>Ripoti hii imezalishwa kidijitali na mfumo wa Usimamizi wa Madrasatul Rasulillah.</i></p>
+    </div>
+
+</body>
+</html>

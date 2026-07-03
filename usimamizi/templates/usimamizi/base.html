@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madrasatul Rasulillah</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background-color: #f4f4f9; transition: 0.3s; }
+        .header { background-color: #2E7D32; color: white; padding: 15px 20px; display: flex; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10; transition: 0.3s; }
+        .menu-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: white; margin-right: 20px; }
+        .header h2 { margin: 0; font-size: 20px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .sidebar { height: 100%; width: 250px; position: fixed; z-index: 100; top: 0; left: -250px; background-color: #1b5e20; overflow-x: hidden; transition: 0.3s; padding-top: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.2); }
+        
+        /* CSS BORA KWA AJILI YA ICONS NA MPANGILIO WA SIDEBAR */
+        .sidebar a, .sidebar .dropdown-btn { 
+            padding: 15px 25px; 
+            text-decoration: none; 
+            font-size: 16px; /* Nimeshusha kidogo iwe standard */
+            color: #f1f1f1; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            border: none; 
+            background: none; 
+            width: 100%; 
+            box-sizing: border-box; /* Inazuia menu isizidi upana */
+            text-align: left; 
+            cursor: pointer; 
+            outline: none; 
+            transition: 0.2s; 
+            font-weight: 500;
+        }
+        
+        .sidebar a:hover, .dropdown-btn:hover { background-color: #2E7D32; color: white; border-left: 5px solid #FFD700; }
+        .close-btn { position: absolute; top: 0; right: 25px; font-size: 36px; margin-left: 50px; color: white; border: none !important; background: none !important; }
+        .close-btn:hover { border-left: none !important; color: #FFD700; }
+        
+        /* Mpangilio wa Menu za Ndani (Sub-menus) */
+        .dropdown-container { display: none; background-color: #144d18; }
+        .dropdown-container a { padding-left: 45px; font-size: 15px; border-left: none; }
+        .dropdown-container a:hover { border-left: 5px solid #FFD700; }
+        
+        .main-content { padding: 20px; transition: margin-left .3s; }
+
+        .user-actions { display: flex; align-items: center; gap: 10px; }
+        .theme-switch { background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 5px; outline: none; transition: transform 0.2s ease; }
+        .theme-switch:hover { transform: scale(1.1); }
+        .user-greeting { font-weight: 500; font-size: 14px; color: #ffffff; white-space: nowrap; }
+
+        /* Dark Mode Styles */
+        body.dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
+        body.dark-mode .header { background-color: #1a1a1a !important; border-bottom: 1px solid #333; }
+        body.dark-mode .sidebar { background-color: #0a0a0a !important; border-right: 1px solid #222; }
+        body.dark-mode .dropdown-container { background-color: #000 !important; }
+        body.dark-mode .main-content div[style*="background-color: white"],
+        body.dark-mode .main-content div[style*="background: white"] { background-color: #1e1e1e !important; color: #e0e0e0 !important; box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important; border-color: #333 !important; }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode p { color: #e0e0e0 !important; }
+        body.dark-mode td { color: #ccc !important; }
+        body.dark-mode tr[style*="border-bottom"] { border-bottom: 1px solid #333 !important; }
+        body.dark-mode th { background-color: #222 !important; border-color: #444 !important; color: #FFD700 !important; }
+        body.dark-mode table { border-color: #444 !important; }
+        body.dark-mode input, body.dark-mode textarea { background-color: #333 !important; color: white !important; border: 1px solid #555 !important; }
+        body.dark-mode div[style*="background-color: #f1f8e9"], body.dark-mode span[style*="background-color: #f1f8e9"], body.dark-mode span[style*="background: #e8f5e9"] { background-color: #2d372e !important; color: #81c784 !important; }
+
+        @media (max-width: 600px) {
+            .header h2 { font-size: 16px; }
+            .user-greeting { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar" id="mySidebar">
+  <a href="javascript:void(0)" class="close-btn" onclick="closeNav()">×</a>
+  
+  <a href="{% url 'mwanzo' %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      Mwanzo 
+  </a>
+
+  <button class="dropdown-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      <span style="flex: 1;">Idara ya Taaluma</span>
+      <span style="font-size: 12px;">▼</span>
+  </button>
+  
+  <div class="dropdown-container">
+    <a href="{% url 'orodha_walimu' %}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        Orodha ya Walimu
+    </a>
+    <a href="{% url 'orodha_wanafunzi' %}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Orodha ya Wanafunzi
+    </a>
+    <a href="#">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        Kamati & Viongozi
+    </a>
+  </div>
+
+  <a href="{% url 'orodha_masomo' %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+      </svg>
+      Masomo
+  </a>
+
+  <a href="{% url 'orodha_madarasa' %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+      </svg>
+      Madarasa
+  </a>
+
+  <a href="{% url 'malipo' %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+          <line x1="1" y1="10" x2="23" y2="10"></line>
+      </svg>
+      Malipo na Ada
+  </a>
+
+  <a href="{% url 'ripoti_watoro' %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+          <line x1="4" y1="22" x2="4" y2="15"></line>
+      </svg>
+      Watoro wa Wiki
+  </a>
+
+  <hr style="border: 1px solid #144d18; margin: 20px 0;">
+  
+  <a href="{% url 'toka' %}" style="color: #ffcccc;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffcccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      Toka Nje
+  </a>
+</div>
+
+<div class="header">
+    <button class="menu-btn" onclick="openNav()">☰</button>
+    <h2>AL-MADRASATUL RASULILLAH</h2>
+    
+    <div class="user-actions">
+        <span class="user-greeting">Karibu, {{ request.user.username }}</span>
+        <button class="theme-switch" onclick="toggleTheme()" id="themeBtn" title="Badili Muonekano"></button>
+    </div>
+</div>
+
+<div class="main-content" id="main">
+    {% block maudhui %}{% endblock %}
+</div>
+
+<script>
+    function openNav() { document.getElementById("mySidebar").style.left = "0"; }
+    function closeNav() { document.getElementById("mySidebar").style.left = "-250px"; }
+
+    var dropdown = document.getElementsByClassName("dropdown-btn");
+    for (var i = 0; i < dropdown.length; i++) {
+      dropdown[i].addEventListener("click", function() {
+        var dropdownContent = this.nextElementSibling;
+        dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+      });
+    }
+
+    const svgMoon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#ffffff"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>`;
+    const svgSun = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="#ffffff"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 0 0 0-1.41l-1.06-1.06zm1.06-10.96a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg>`;
+
+    const themeBtn = document.getElementById('themeBtn');
+    
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeBtn.innerHTML = svgSun;
+    } else {
+        themeBtn.innerHTML = svgMoon;
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        if(document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+            themeBtn.innerHTML = svgSun;
+        } else {
+            localStorage.setItem('theme', 'light');
+            themeBtn.innerHTML = svgMoon;
+        }
+    }
+</script>
+</body>
+</html>

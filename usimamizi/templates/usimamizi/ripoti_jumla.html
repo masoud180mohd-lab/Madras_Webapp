@@ -1,0 +1,160 @@
+{% extends 'usimamizi/base.html' %}
+
+{% block maudhui %}
+<style>
+    :root {
+        --primary: #2E7D32;
+        --secondary: #0288D1;
+        --card-bg: #ffffff;
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --border-color: #e2e8f0;
+        --table-header: #f8fafc;
+    }
+    body.dark-mode {
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-muted: #a0aec0;
+        --border-color: #333333;
+        --table-header: #222222;
+    }
+    .report-card { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+    .report-header { text-align: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px; }
+    .report-header h2 { margin: 0; color: var(--text-main); font-size: 22px; }
+    .report-header p { margin: 6px 0 0; color: var(--text-muted); font-size: 14px; }
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+    .btn-dl { padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-pdf { background: #d32f2f; color: white; }
+    .btn-csv { background: var(--secondary); color: white; }
+    .btn-back { color: var(--secondary); text-decoration: none; font-weight: 600; font-size: 14px; }
+    .spreadsheet { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .spreadsheet th { background: var(--table-header); padding: 10px 8px; text-align: center; font-size: 11px; color: var(--text-muted); text-transform: uppercase; border: 1px solid var(--border-color); white-space: nowrap; }
+    .spreadsheet td { padding: 10px 8px; border: 1px solid var(--border-color); color: var(--text-main); text-align: center; }
+    .spreadsheet td.name-col { text-align: left; font-weight: 600; white-space: nowrap; }
+    .spreadsheet td.sticky-col { position: sticky; left: 0; background: var(--card-bg); z-index: 1; }
+    .spreadsheet th.sticky-col { position: sticky; left: 0; background: var(--table-header); z-index: 2; }
+    .grade-badge { padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 11px; color: white; display: inline-block; min-width: 22px; }
+    .rank-circle { display: inline-flex; width: 28px; height: 28px; border-radius: 50%; background: var(--table-header); align-items: center; justify-content: center; font-weight: bold; font-size: 12px; }
+    .rank-top { background: #FFD700; color: #555; }
+    .avg-col { background: rgba(46,125,50,0.06); font-weight: bold; }
+    .status-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .status-chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border-color); }
+    .status-ok { background: rgba(46,125,50,0.1); color: var(--primary); }
+    .status-missing { background: rgba(211,47,47,0.08); color: #d32f2f; }
+    .scroll-wrap { overflow-x: auto; }
+    .summary-title { margin: 0 0 10px; color: var(--text-main); font-size: 16px; }
+    .summary-table { width: auto; min-width: 420px; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+    .summary-table th { background: var(--table-header); color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 14px; text-align: center; text-transform: uppercase; }
+    .summary-table td { border: 1px solid var(--border-color); padding: 8px 14px; text-align: center; color: var(--text-main); }
+    .summary-table td:first-child { font-weight: bold; }
+</style>
+
+<div style="max-width: 1200px; margin: auto; padding: 20px;">
+
+    <a href="{% url 'mseto_mitihani_darasa' darasa.id %}" class="btn-back">← Rudi Kwenye Mseto</a>
+
+    <div class="report-card">
+        <div class="report-header">
+            <h2>Ripoti ya Matokeo ya Jumla</h2>
+            <p>Darasa: <b>{{ darasa.jina }}</b> &nbsp;|&nbsp; Mseto: <b>{{ mseto.jina }}</b></p>
+        </div>
+
+        <div class="status-bar">
+            {% for hali in hali_ya_masomo %}
+                {% if hali.imekamilika %}
+                    <span class="status-chip status-ok">{{ hali.somo.jina }} ✓</span>
+                {% else %}
+                    <span class="status-chip status-missing">{{ hali.somo.jina }} — hakuna mtihani</span>
+                {% endif %}
+            {% empty %}
+                <span class="status-chip status-missing">Hakuna masomo yaliyopangwa kwa darasa hili</span>
+            {% endfor %}
+        </div>
+
+        <div class="controls">
+            <a href="{% url 'pakua_pdf_matokeo_jumla' darasa.id mseto.id %}" class="btn-dl btn-pdf">
+                Download PDF
+            </a>
+            <a href="{% url 'pakua_csv_matokeo_jumla' darasa.id mseto.id %}" class="btn-dl btn-csv">
+                Download CSV (Excel)
+            </a>
+        </div>
+
+        <h3 class="summary-title">Muhtasari wa Grade kwa Jinsia</h3>
+        <div class="scroll-wrap">
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Jinsia</th>
+                        {% for grade in grade_order %}
+                            <th>{{ grade }}</th>
+                        {% endfor %}
+                        <th>Jumla</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in grade_summary %}
+                        <tr>
+                            <td>{{ row.jinsia }}</td>
+                            {% for count in row.grade_counts %}
+                                <td>{{ count }}</td>
+                            {% endfor %}
+                            <td><b>{{ row.total }}</b></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="scroll-wrap">
+            <table class="spreadsheet">
+                <thead>
+                    <tr>
+                        <th class="sticky-col" style="width: 50px;">Nafasi</th>
+                        <th class="sticky-col name-col" style="min-width: 160px;">Mwanafunzi</th>
+                        {% for somo in masomo %}
+                            <th>{{ somo.jina }}</th>
+                        {% endfor %}
+                        <th class="avg-col">Wastani</th>
+                        <th class="avg-col">Daraja</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in matokeo_wanafunzi %}
+                    <tr>
+                        <td class="sticky-col">
+                            {% if row.nafasi != '-' %}
+                                <span class="rank-circle {% if row.nafasi == 1 %}rank-top{% endif %}">{{ row.nafasi }}</span>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td class="sticky-col name-col">{{ row.mwanafunzi.jina_kamili }}</td>
+                        {% for somo_data in row.masomo %}
+                            <td>
+                                {% if somo_data.imejazwa %}
+                                    {{ somo_data.maksi|floatformat:"0" }}
+                                    <span class="grade-badge" style="background: {{ somo_data.rangi }};">{{ somo_data.daraja }}</span>
+                                {% else %}
+                                    <span style="color: var(--text-muted);">-</span>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        <td class="avg-col">{% if row.wastani is not None %}{{ row.wastani }}{% else %}-{% endif %}</td>
+                        <td class="avg-col">
+                            {% if row.rangi_jumla %}
+                                <span class="grade-badge" style="background: {{ row.rangi_jumla }};">{{ row.daraja_jumla }}</span>
+                            {% else %}-{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{{ masomo|length|add:4 }}" style="padding: 40px; color: var(--text-muted); font-style: italic;">
+                            Hakuna wanafunzi katika darasa hili.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

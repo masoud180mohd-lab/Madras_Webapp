@@ -1,0 +1,254 @@
+{% extends 'usimamizi/base.html' %}
+
+{% block maudhui %}
+<style>
+    /* ----- UI YA KIPROFESHINALI (BILA ICONS) ----- */
+    :root {
+        --primary: #2c3e50;
+        --secondary: #34495e;
+        --accent: #0288D1;
+        --danger: #e74c3c;
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --bg-body: #f4f7f6;
+        --card-bg: #ffffff;
+        --border-color: #e2e8f0;
+        --table-header: #f8fafc;
+    }
+
+    body.dark-mode {
+        --bg-body: #121212;
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-muted: #a0aec0;
+        --border-color: #333333;
+        --table-header: #222222;
+    }
+
+    /* Mipangilio ya Tabs (Vitufe vya Juu) */
+    .tab-container {
+        display: flex; gap: 10px; margin-bottom: 25px;
+    }
+    .tab-btn {
+        flex: 1; padding: 16px; font-size: 16px; font-weight: 600; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; background-color: var(--card-bg); color: var(--text-muted); transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+        background-color: var(--primary); color: #ffffff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Makasha ya Jedwali */
+    .tab-content {
+        display: none; background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.02); border: 1px solid var(--border-color); animation: fadeIn 0.3s ease;
+    }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Vidhibiti vya Jedwali (Header ya Table na Vidoto Vitatu) */
+    .table-controls {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);
+    }
+    .table-title { font-size: 18px; font-weight: bold; color: var(--text-main); }
+
+    /* Mfumo wa Vidoto Vitatu (Column Toggler) */
+    .dropdown-wrapper { position: relative; display: inline-block; }
+    .dots-btn {
+        background: transparent; border: 1px solid var(--border-color); color: var(--text-main); font-size: 18px; font-weight: bold; cursor: pointer; padding: 5px 12px; border-radius: 6px; transition: 0.2s;
+    }
+    .dots-btn:hover { background-color: var(--table-header); }
+
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%; margin-top: 5px; background-color: var(--card-bg); min-width: 180px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid var(--border-color); border-radius: 8px; z-index: 100; padding: 10px;
+    }
+    .dropdown-menu label {
+        display: block; padding: 8px 10px; color: var(--text-main); font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.2s;
+    }
+    .dropdown-menu label:hover { background-color: var(--table-header); }
+    .dropdown-menu input { margin-right: 10px; cursor: pointer; }
+    .menu-header { font-size: 12px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; padding-left: 5px; }
+
+    /* Mipangilio ya Jedwali lenyewe */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { background-color: var(--table-header); padding: 15px; text-align: left; font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+    .data-table td { padding: 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; color: var(--text-main); vertical-align: middle; transition: 0.2s; }
+    .data-table tbody tr:hover td { background-color: var(--table-header); }
+
+    /* Kitufe cha Download */
+    .btn-download {
+        background-color: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; display: inline-block;
+    }
+    .btn-download:hover { background-color: var(--accent); color: #ffffff; }
+
+    /* Kuweka namba za utoro zionekane vizuri */
+    .utoro-count { font-weight: bold; color: var(--danger); font-size: 15px; }
+</style>
+
+<div style="max-width: 1100px; margin: auto; padding: 20px;">
+
+    <div class="tab-container">
+        <button id="btn-chuoni" class="tab-btn active" onclick="funguaTab('chuoni')">
+            Watoro wa Chuoni (Mchana)
+        </button>
+        <button id="btn-darsa" class="tab-btn" onclick="funguaTab('darsa')">
+            Watoro wa Darsa (Usiku)
+        </button>
+    </div>
+
+    <div id="tab-chuoni" class="tab-content active">
+
+        <div class="table-controls">
+            <span class="table-title">Orodha ya Watoro</span>
+
+            <div class="dropdown-wrapper">
+                <button class="dots-btn" onclick="toggleMenu('menu-chuoni', event)" title="Chuja Nguzo">&#8942;</button>
+                <div id="menu-chuoni" class="dropdown-menu">
+                    <div class="menu-header">Onyesha Nguzo</div>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-chuoni', 0, this)"> Mwanafunzi</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-chuoni', 1, this)"> Darasa Lake</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-chuoni', 2, this)"> Siku Alizokosa</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-chuoni', 3, this)"> Ripoti</label>
+                </div>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table id="tbl-chuoni" class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mwanafunzi</th>
+                        <th>Darasa Lake</th>
+                        <th style="text-align: center;">Siku Alizokosa</th>
+                        <th style="text-align: right;">Ripoti</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in watoro_chuoni %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ m.jina_kamili }}</td>
+                        <td style="color: var(--text-muted);">{{ m.darasa.jina|default:"-" }}</td>
+                        <td style="text-align: center;"><span class="utoro-count">{{ m.idadi_ya_utoro }}</span></td>
+                        <td style="text-align: right;">
+                            <a href="{% url 'ripoti_mwanafunzi' m.id 'Darasa' %}" class="btn-download">Download</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            Hakuna watoro waliorekodiwa wiki hii.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="tab-darsa" class="tab-content">
+
+        <div class="table-controls">
+            <span class="table-title">Orodha ya Watoro</span>
+
+            <div class="dropdown-wrapper">
+                <button class="dots-btn" onclick="toggleMenu('menu-darsa', event)" title="Chuja Nguzo">&#8942;</button>
+                <div id="menu-darsa" class="dropdown-menu">
+                    <div class="menu-header">Onyesha Nguzo</div>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-darsa', 0, this)"> Mwanafunzi</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-darsa', 1, this)"> Somo la Usiku</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-darsa', 2, this)"> Siku Alizokosa</label>
+                    <label><input type="checkbox" checked onchange="toggleCol('tbl-darsa', 3, this)"> Ripoti</label>
+                </div>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table id="tbl-darsa" class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mwanafunzi</th>
+                        <th>Somo la Usiku</th>
+                        <th style="text-align: center;">Siku Alizokosa</th>
+                        <th style="text-align: right;">Ripoti</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in watoro_darsa %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ m.jina_kamili }}</td>
+                        <td style="color: var(--text-muted);">{{ m.programu_ya_usiku.jina|default:"-" }}</td>
+                        <td style="text-align: center;"><span class="utoro-count">{{ m.idadi_ya_utoro }}</span></td>
+                        <td style="text-align: right;">
+                            <a href="{% url 'ripoti_mwanafunzi' m.id 'Usiku' %}" class="btn-download">Download</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            Hakuna watoro waliorekodiwa wiki hii.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // 1. Kazi ya Kubadilisha Tab (Tabs Logic)
+    function funguaTab(jinaLaTab) {
+        // Ficha zote na toa 'active' class kwenye vitufe
+        document.getElementById('tab-chuoni').classList.remove('active');
+        document.getElementById('tab-darsa').classList.remove('active');
+        document.getElementById('btn-chuoni').classList.remove('active');
+        document.getElementById('btn-darsa').classList.remove('active');
+
+        // Washa iliyobonyewa
+        document.getElementById('tab-' + jinaLaTab).classList.add('active');
+        document.getElementById('btn-' + jinaLaTab).classList.add('active');
+    }
+
+    // 2. Kazi ya Kufungua/Kufunga Menu ya Vidoto Vitatu
+    function toggleMenu(menuId, event) {
+        event.stopPropagation(); // Inazuia click isifunge menu hapo hapo
+        var menu = document.getElementById(menuId);
+
+        // Funga menu nyingine zilizowazi
+        var allMenus = document.getElementsByClassName("dropdown-menu");
+        for (var i = 0; i < allMenus.length; i++) {
+            if (allMenus[i].id !== menuId) {
+                allMenus[i].style.display = 'none';
+            }
+        }
+
+        // Fungua/Funga menu husika
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+
+    // 3. Kazi ya Kuficha/Kuonyesha Nguzo za Jedwali (Table Column Toggler)
+    function toggleCol(tableId, colIdx, checkbox) {
+        var table = document.getElementById(tableId);
+        var rows = table.rows;
+        var displayStyle = checkbox.checked ? '' : 'none';
+
+        // Loop kwenye kila mstari wa table na kuficha <th> au <td> husika
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i].cells.length > colIdx) {
+                rows[i].cells[colIdx].style.display = displayStyle;
+            }
+        }
+    }
+
+    // Funga menu ya vidoto ukibofya nje ya menu hiyo
+    window.onclick = function(event) {
+        if (!event.target.matches('.dots-btn')) {
+            var dropdowns = document.getElementsByClassName("dropdown-menu");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.style.display === 'block' && !openDropdown.contains(event.target)) {
+                    openDropdown.style.display = 'none';
+                }
+            }
+        }
+    }
+</script>
+{% endblock %}

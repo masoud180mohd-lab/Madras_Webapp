@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingia - Al-Madrasatul Rasulillah</title>
+    <style>
+        /* ----- PREMIUM LOGIN UI (PAMOJA NA AUTO DARK-MODE) ----- */
+        :root {
+            --primary: #2E7D32;
+            --primary-hover: #1b5e20;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-color: #e2e8f0;
+            --input-bg: #ffffff;
+            --danger-bg: #fde8e8;
+            --danger-text: #c62828;
+            --danger-border: #f8b4b4;
+        }
+
+        /* Inasoma moja kwa moja mpangilio wa Giza wa simu/kompyuta */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --card-bg: #1e1e1e;
+                --text-main: #e0e0e0;
+                --text-muted: #a0aec0;
+                --border-color: #333333;
+                --input-bg: #2c2c2c;
+                --danger-bg: rgba(211, 47, 47, 0.1);
+                --danger-text: #f87171;
+                --danger-border: rgba(211, 47, 47, 0.3);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-top: 6px solid var(--primary);
+        }
+
+        .login-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            object-fit: cover;
+            border: 3px solid var(--border-color);
+        }
+
+        .login-title {
+            margin: 0 0 8px 0;
+            color: var(--text-main);
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .login-subtitle {
+            color: var(--text-muted);
+            margin: 0 0 30px 0;
+            font-size: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+        }
+
+        .btn-login {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+        }
+
+        .btn-login:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .alert-error {
+            background-color: var(--danger-bg);
+            color: var(--danger-text);
+            border: 1px solid var(--danger-border);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+        }
+
+        .footer-text {
+            margin-top: 25px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <img src="{% static 'usimamizi/images/logo.png' %}" alt="Logo ya Madrasa" class="login-logo">
+        
+        <h2 class="login-title">Karibu Ndani</h2>
+        <p class="login-subtitle">Weka taarifa zako za kiutawala kuingia kwenye mfumo.</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert-error">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="input-group">
+                <label>Jina la Kuingilia (Username)</label>
+                <input type="text" name="username" required placeholder="Mfano: Ustadh_Mwalimu">
+            </div>
+            <div class="input-group">
+                <label>Neno la Siri (Password)</label>
+                <input type="password" name="password" required placeholder="••••••••">
+            </div>
+            
+            <button type="submit" class="btn-login">
+                Ingia Kwenye Mfumo
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            </button>
+        </form>
+    </div>
+    
+    <div class="footer-text" style="text-align: center;">
+        &copy; 2024 Al-Madrasatul Rasulillah. Haki Zote Zimehifadhiwa.
+    </div>
+</div>
+
+</body>
+</html>

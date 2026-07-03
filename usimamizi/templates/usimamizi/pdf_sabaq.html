@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if aina == 'Usiku' %}Ripoti ya Sabaq na Murajaa{% else %}Ripoti ya Sabaq{% endif %}</title>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #333; }
+        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
+        .title { color: #2E7D32; font-size: 22px; font-weight: bold; }
+        .info { font-size: 13px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background-color: #e8f5e9; color: #1b5e20; padding: 8px; text-align: left; border: 1px solid #ddd; font-weight: bold; }
+        td { padding: 8px; border: 1px solid #ddd; vertical-align: top; }
+        .footer { text-align: center; margin-top: 30px; font-size: 11px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="title">AL-MADRASATUL RASULILLAH</div>
+        <div>Ripoti Rasmi ya {% if aina == 'Usiku' %}Maendeleo ya Usomaji{% else %}Sabaq{% endif %} ({{ aina }})</div>
+    </div>
+
+    <div class="info">
+        <b>Jina la Mwanafunzi:</b> {{ mwanafunzi.jina_kamili }} <br>
+        <b>Namba ya Usajili:</b> {{ mwanafunzi.namba_ya_usajili }}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: {% if aina == 'Usiku' %}20%{% else %}30%{% endif %};">Tarehe & Mwalimu</th>
+                <th style="width: {% if aina == 'Usiku' %}40%{% else %}70%{% endif %};">{% if aina == 'Usiku' %}Sabaq (Mpya){% else %}Sabaq{% endif %}</th>
+                
+                {% if aina == 'Usiku' %}
+                <th style="width: 40%;">Murajaa / Pande</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in sabaq %}
+            <tr>
+                <td>
+                    <b>{{ s.tarehe|date:"d M Y" }}</b><br>
+                    {% if s.mwalimu %}
+                        <span style="font-size: 11px; color: #555;">(Mwl: {{ s.mwalimu.jina_kamili }})</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if s.sabaq_sura %}
+                        <b>Sura/Mada:</b> {{ s.sabaq_sura }} <br>
+                        <b>Kuanzia:</b> {{ s.sabaq_aya_kuanzia|default:"-" }} hadi {{ s.sabaq_aya_kuishia|default:"-" }}<br>
+                        <b>Hali:</b> {{ s.sabaq_hali|default:"-" }}
+                    {% else %}
+                        <i>Hakusoma sabaq</i>
+                    {% endif %}
+                </td>
+                
+                {% if aina == 'Usiku' %}
+                <td>
+                    {% if s.mapande.all %}
+                        {% for pande in s.mapande.all %}
+                            • {{ pande.sura }} ({{ pande.aya_kuanzia|default:"-" }} - {{ pande.aya_kuishia|default:"-" }}) [{{ pande.hali }}]<br>
+                        {% endfor %}
+                    {% else %}
+                        <i>Hakuna Murajaa</i>
+                    {% endif %}
+                </td>
+                {% endif %}
+            </tr>
+            
+            {% if s.maoni_ya_mwalimu %}
+            <tr>
+                <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" style="background-color: #f9f9f9; font-style: italic; font-size: 12px; color: #555;">
+                    <b>Maoni ya Jumla:</b> {{ s.maoni_ya_mwalimu }}
+                </td>
+            </tr>
+            {% endif %}
+            
+            {% empty %}
+            <tr>
+                <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" style="text-align: center;">Hakuna rekodi bado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Imetolewa na Mfumo wa Usimamizi | Tarehe ya Uchapishaji: {{ wakati_huu|date:"d M Y, H:i:s" }}
+    </div>
+
+</body>
+</html>

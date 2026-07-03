@@ -1,0 +1,126 @@
+{% extends 'usimamizi/base.html' %}
+
+{% block maudhui %}
+<style>
+    :root {
+        --primary: #2E7D32;
+        --secondary: #0288D1;
+        --card-bg: #ffffff;
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --border-color: #e2e8f0;
+        --table-header: #f8fafc;
+        --input-bg: #ffffff;
+    }
+    body.dark-mode {
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-muted: #a0aec0;
+        --border-color: #333333;
+        --table-header: #222222;
+        --input-bg: #2c2c2c;
+    }
+    .page-header {
+        background: var(--card-bg); padding: 25px 30px; border-radius: 12px;
+        border: 1px solid var(--border-color); border-left: 6px solid var(--secondary);
+        margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+    }
+    .page-header h1 { margin: 0; color: var(--text-main); font-size: 22px; }
+    .page-header p { margin: 5px 0 0; color: var(--text-muted); font-size: 14px; }
+    .card { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 25px; }
+    .card h3 { margin: 0 0 20px; color: var(--text-main); font-size: 18px; }
+    .styled-form p { margin-bottom: 15px; }
+    .styled-form label { display: block; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; font-size: 13px; }
+    .styled-form input, .styled-form textarea, .styled-form select {
+        width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
+        background: var(--input-bg); color: var(--text-main); box-sizing: border-box;
+    }
+    .btn-primary { background: var(--secondary); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-back { color: var(--secondary); text-decoration: none; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 20px; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { background: var(--table-header); padding: 12px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+    .data-table td { padding: 14px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 14px; }
+    .badge-ok { background: rgba(46,125,50,0.1); color: var(--primary); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .badge-partial { background: rgba(245,124,0,0.1); color: #f57c00; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .btn-report { background: var(--primary); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; }
+    .btn-report:hover { background: #1b5e20; }
+    .alert-success { background: rgba(46,125,50,0.1); color: var(--primary); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--primary); }
+    .help-box { background: rgba(2,136,209,0.08); border: 1px solid rgba(2,136,209,0.2); padding: 15px; border-radius: 8px; color: var(--text-muted); font-size: 13px; line-height: 1.6; margin-bottom: 20px; }
+</style>
+
+<div style="max-width: 900px; margin: auto; padding: 20px;">
+
+    <a href="{% url 'wanafunzi_darasa' darasa.id %}" class="btn-back">← Rudi Kwenye Darasa</a>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="page-header">
+        <div>
+            <h1>Mseto wa Mitihani — {{ darasa.jina }}</h1>
+            <p>Unda muhula/mseto, kisha unganisha mitihani ya kila somo kwenye mseto huo.</p>
+        </div>
+    </div>
+
+    <div class="help-box">
+        <b>Jinsi inavyofanya kazi:</b><br>
+        1. Unda mseto (mfano: <i>Muhula wa 1 - 2026</i>)<br>
+        2. Kwa kila somo, ongeza mtihani na uchague mseto huo kwenye fomu ya mtihani<br>
+        3. Jaza maksi kama kawaida, kisha rudi hapa kuona <b>Ripoti ya Jumla</b>
+    </div>
+
+    <div class="card">
+        <h3>Unda Mseto Mpya</h3>
+        <form method="POST" class="styled-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-primary">Hifadhi Mseto</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Mseto Uliopo ({{ mseto_na_hali|length }})</h3>
+        {% if mseto_na_hali %}
+        <div style="overflow-x: auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Jina la Mseto</th>
+                        <th>Tarehe</th>
+                        <th>Mitihani Iliyounganishwa</th>
+                        <th>Kitendo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in mseto_na_hali %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ item.mseto.jina }}</td>
+                        <td>{{ item.mseto.tarehe|date:"d M Y"|default:"-" }}</td>
+                        <td>
+                            {% if item.mitihani_iliyounganishwa == item.jumla_masomo and item.jumla_masomo > 0 %}
+                                <span class="badge-ok">{{ item.mitihani_iliyounganishwa }}/{{ item.jumla_masomo }} — Kamili</span>
+                            {% elif item.mitihani_iliyounganishwa > 0 %}
+                                <span class="badge-partial">{{ item.mitihani_iliyounganishwa }}/{{ item.jumla_masomo }} — Bado</span>
+                            {% else %}
+                                <span class="badge-partial">0/{{ item.jumla_masomo }} — Hakuna mtihani</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'ripoti_jumla' darasa.id item.mseto.id %}" class="btn-report">Angalia Ripoti ya Jumla</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p style="color: var(--text-muted); font-style: italic;">Hakuna mseto ulioundwa bado. Tumia fomu hapo juu kuunda mseto wa kwanza.</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <title>Risiti ya Malipo</title>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333; }
+        .receipt-box { border: 2px dashed #0288D1; padding: 30px; border-radius: 10px; max-width: 800px; margin: auto; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0288D1; padding-bottom: 15px; }
+        .title { color: #0288D1; font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .subtitle { font-size: 14px; color: #555; }
+        .receipt-title { text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; background-color: #e1f5fe; padding: 10px; border-radius: 5px; }
+        
+        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .details-table td { padding: 8px; border-bottom: 1px solid #eee; }
+        .label { font-weight: bold; color: #555; width: 30%; }
+        
+        .amount-box { background-color: #e8f5e9; padding: 15px; text-align: center; border-radius: 8px; border: 1px solid #4CAF50; margin-bottom: 20px; }
+        .amount-title { color: #2E7D32; font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .amount-value { color: #1b5e20; font-size: 26px; font-weight: bold; }
+        
+        .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #888; border-top: 1px dashed #ccc; padding-top: 15px; }
+        .signature { margin-top: 40px; text-align: right; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="receipt-box">
+        <div class="header">
+            <div class="title">AL-MADRASATUL RASULILLAH</div>
+            <div class="subtitle">Risiti Rasmi ya Malipo (Official Receipt)</div>
+        </div>
+
+        <div class="receipt-title">RISITI NAMBA: #REC-00{{ malipo.id }}</div>
+
+        <table class="details-table">
+            <tr>
+                <td class="label">Tarehe ya Malipo:</td>
+                <td>{{ malipo.tarehe_ya_malipo|date:"d M Y" }}</td>
+            </tr>
+            <tr>
+                <td class="label">Imepokelewa Kutoka Kwa:</td>
+                <td style="font-size: 16px;"><b>{{ malipo.mwanafunzi.jina_kamili }}</b> ({{ malipo.mwanafunzi.namba_ya_usajili }})</td>
+            </tr>
+            <tr>
+                <td class="label">Aina ya Malipo:</td>
+                <td><b>{{ malipo.aina_ya_malipo.jina }}</b></td>
+            </tr>
+            <tr>
+                <td class="label">Njia ya Malipo:</td>
+                <td>{{ malipo.njia_ya_malipo }}</td>
+            </tr>
+            {% if malipo.maelezo_ya_ziada %}
+            <tr>
+                <td class="label">Maelezo:</td>
+                <td><i>{{ malipo.maelezo_ya_ziada }}</i></td>
+            </tr>
+            {% endif %}
+        </table>
+
+        <div class="amount-box">
+            <div class="amount-title">KIASI KILICHOLIPWA (TSH)</div>
+            <div class="amount-value">{{ malipo.kiasi_kilicholipwa }}/=</div>
+        </div>
+
+        <table class="details-table" style="background-color: #f9f9f9;">
+            <tr>
+                <td class="label">Kiasi Kinachotakiwa:</td>
+                <td>Tsh {{ malipo.aina_ya_malipo.kiasi_kinachotakiwa }}/=</td>
+            </tr>
+            <tr>
+                <td class="label" style="color: #c62828;">Deni Lililobaki (Salio):</td>
+                <td style="color: #c62828; font-weight: bold;">Tsh {{ deni_lililobaki }}/=</td>
+            </tr>
+        </table>
+
+        <div class="signature">
+            Imepokelewa na (Mwalimu/Keshia):<br>
+            <b>{{ malipo.mpokeaji.jina_kamili|default:"Utawala" }}</b>
+        </div>
+
+        <div class="footer">
+            Hati hii imetengenezwa na Mfumo wa Usimamizi Al-Madrasatul Rasulillah.<br>
+            Muda wa Uchapishaji: {{ wakati_huu|date:"d M Y, H:i:s" }}
+        </div>
+    </div>
+
+</body>
+</html>
