@@ -1,35 +1,41 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/rekodi_maendeleo.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<div style="max-width: 500px; margin: auto; padding: 20px;">
-    <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 5px solid #2E7D32;">
-        <h2 style="color: #2E7D32; text-align: center; margin-bottom: 5px;">Kumbukumbu ya Sabaq</h2>
-        <p style="text-align: center; color: #666; margin-bottom: 20px;"><b>Mwanafunzi:</b> {{ mwanafunzi.jina_kamili }}</p>
+<div class="rekodi_maendeleo-inline-1">
+    <div class="rekodi_maendeleo-inline-2">
+        <h2 class="rekodi_maendeleo-inline-3">Kumbukumbu ya Sabaq</h2>
+        <p class="rekodi_maendeleo-inline-4"><b>Mwanafunzi:</b> {{ mwanafunzi.jina_kamili }}</p>
         
         <form method="POST">
             {% csrf_token %}
             
-            <div style="background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                <label style="color: #1b5e20; font-weight: bold;">📖 Amesoma Kuanzia:</label>
+            <div class="rekodi_maendeleo-inline-5">
+                <label class="rekodi_maendeleo-inline-6">📖 Amesoma Kuanzia:</label>
                 {{ form.sura_kuanzia }}
                 {{ form.aya_kuanzia }}
             </div>
 
-            <div style="background: #f1f8e9; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                <label style="color: #1b5e20; font-weight: bold;">🏁 Mpaka:</label>
+            <div class="rekodi_maendeleo-inline-7">
+                <label class="rekodi_maendeleo-inline-6">🏁 Mpaka:</label>
                 {{ form.sura_kuishia }}
                 {{ form.aya_kuishia }}
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: bold;">📝 Maoni / Mapendekezo:</label>
+            <div class="rekodi_maendeleo-inline-8">
+                <label class="rekodi_maendeleo-inline-9">📝 Maoni / Mapendekezo:</label>
                 {{ form.maoni }}
             </div>
 
-            <button type="submit" style="width: 100%; background: #2E7D32; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer;">
+            <button type="submit" class="rekodi_maendeleo-inline-10">
                 ✅ Hifadhi Maendeleo ya Leo
             </button>
-            <a href="{% url 'orodha_wanafunzi' %}" style="display: block; text-align: center; margin-top: 15px; color: #888; text-decoration: none;">Hairisha</a>
+            <a href="{% url 'orodha_wanafunzi' %}" class="rekodi_maendeleo-inline-11">Hairisha</a>
         </form>
     </div>
 </div>

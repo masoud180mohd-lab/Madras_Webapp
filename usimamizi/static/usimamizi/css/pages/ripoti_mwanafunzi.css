@@ -1,0 +1,110 @@
+/* ----- PREMIUM UI KWA AJILI YA RIPOTI YA MWANAFUNZI ----- */
+    :root {
+        --primary: #2E7D32;
+        --secondary: #0288D1;
+        --accent: #673ab7;
+        --danger: #d32f2f;
+        --warning: #f57c00;
+        --success: #388e3c;
+        
+        --bg-body: #f4f7f6;
+        --card-bg: #ffffff;
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --border-color: #e2e8f0;
+        --table-header: #f8fafc;
+        --input-bg: #ffffff;
+    }
+
+    body.dark-mode {
+        --bg-body: #121212;
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-muted: #a0aec0;
+        --border-color: #333333;
+        --table-header: #222222;
+        --input-bg: #2c2c2c;
+    }
+
+    /* Kichwa cha Ukurasa */
+    .page-header {
+        background-color: var(--card-bg); padding: 25px 30px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 6px solid var(--secondary); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+    }
+    .page-header h1 { margin: 0 0 5px 0; color: var(--text-main); font-size: 24px; font-weight: 700; }
+    .page-header p { margin: 0; color: var(--text-muted); font-size: 15px; font-weight: 500; }
+
+    .btn-icon-back {
+        display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-main); transition: 0.2s; text-decoration: none;
+    }
+    .btn-icon-back:hover { background-color: var(--table-header); border-color: var(--text-muted); }
+
+    /* Modern Tabs Navigation */
+    .tabs-nav {
+        display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 0;
+    }
+    .tab-btn {
+        background: transparent; border: none; padding: 12px 20px; font-size: 15px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; border-bottom: 3px solid transparent; margin-bottom: -2px;
+    }
+    .tab-btn:hover { color: var(--text-main); }
+    .tab-btn.active { color: var(--secondary); border-bottom-color: var(--secondary); }
+
+    /* Content Cards */
+    .tab-content {
+        background-color: var(--card-bg); padding: 30px; border-radius: 0 12px 12px 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: none;
+    }
+
+    /* Toolbar (Filters na Download PDF) */
+    .toolbar {
+        display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
+    }
+    .filter-form { display: flex; align-items: center; gap: 10px; }
+    .filter-label { font-weight: 600; font-size: 14px; color: var(--text-muted); }
+    
+    .custom-select {
+        padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; cursor: pointer; transition: 0.2s;
+    }
+    .custom-select:focus { border-color: var(--secondary); }
+
+    .btn-download {
+        background-color: transparent; border: 1px solid var(--secondary); color: var(--secondary); padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-download:hover { background-color: var(--secondary); color: white; }
+
+    /* Tables */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { background-color: var(--table-header); padding: 12px 15px; text-align: left; font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+    .data-table td { padding: 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; color: var(--text-main); vertical-align: top; }
+    .data-table tbody tr:hover td { background-color: var(--table-header); }
+
+    /* Badges za Kisasa */
+    .status-badge {
+        padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .badge-success { background-color: rgba(56, 142, 60, 0.1); color: var(--success); }
+    .badge-danger { background-color: rgba(211, 47, 47, 0.1); color: var(--danger); }
+    .badge-warning { background-color: rgba(245, 124, 0, 0.1); color: var(--warning); }
+
+    .pande-list { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.6; color: var(--text-muted); }
+    
+    /* Maoni Box */
+    .maoni-box { background-color: rgba(2, 136, 209, 0.05); padding: 10px 15px; border-left: 3px solid var(--secondary); border-radius: 4px; font-size: 13px; color: var(--text-muted); margin-top: 5px; }
+
+.ripoti_mwanafunzi-inline-1 { max-width: 1100px; margin: auto; padding: 20px; }
+.ripoti_mwanafunzi-inline-2 { color: var(--secondary); }
+.ripoti_mwanafunzi-inline-3 { display: block; }
+.ripoti_mwanafunzi-inline-4 { overflow-x: auto; max-height: 500px; }
+.ripoti_mwanafunzi-inline-5 { position: sticky; top: 0; z-index: 1; }
+.ripoti_mwanafunzi-inline-6 { width: 150px; }
+.ripoti_mwanafunzi-inline-7 { text-align: center; width: 150px; }
+.ripoti_mwanafunzi-inline-8 { font-weight: 500; }
+.ripoti_mwanafunzi-inline-9 { text-align: center; }
+.ripoti_mwanafunzi-inline-10 { color: var(--text-muted); }
+.ripoti_mwanafunzi-inline-11 { padding: 40px; text-align: center; font-style: italic; color: var(--text-muted); }
+.ripoti_mwanafunzi-inline-12 { width: 180px; }
+.ripoti_mwanafunzi-inline-13 { font-weight: 600; }
+.ripoti_mwanafunzi-inline-14 { font-size: 13px; color: var(--text-muted); margin: 3px 0; }
+.ripoti_mwanafunzi-inline-15 { margin-top: 4px; }
+.ripoti_mwanafunzi-inline-16 { color: var(--text-muted); font-style: italic; font-size: 13px; }
+.pande-status-pass { color: var(--success); }
+.pande-status-warning { color: var(--warning); }
+.pande-status-danger { color: var(--danger); }

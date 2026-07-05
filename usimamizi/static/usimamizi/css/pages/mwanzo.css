@@ -1,0 +1,37 @@
+/* Tunatumia CSS Variables ili kusupport Light/Dark Mode bila kuharibu sura ya asili */
+    :root {
+        --primary-color: #2E7D32;
+        --title-color: #1b5e20;
+        --subtitle-color: #666666;
+        --text-normal: #444444;
+        --text-faint: #888888;
+        --card-bg: #ffffff;
+        --tangazo-bg: #f1f8e9;
+        --shadow-color: rgba(0,0,0,0.1);
+    }
+
+    body.dark-mode {
+        --primary-color: #4CAF50;
+        --title-color: #81C784;
+        --subtitle-color: #a0aec0;
+        --text-normal: #e0e0e0;
+        --text-faint: #999999;
+        --card-bg: #1e1e1e;
+        --tangazo-bg: rgba(46, 125, 50, 0.15); /* Kijani iliyofifia kwa Dark Mode */
+        --shadow-color: rgba(0,0,0,0.3);
+    }
+
+.mwanzo-inline-1 { text-align: center; margin-top: 20px; }
+.mwanzo-inline-2 { width: 200px; height: auto; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.mwanzo-inline-3 { color: var(--primary-color); margin-top: 20px; margin-bottom: 5px; font-size: 32px; }
+.mwanzo-inline-4 { color: var(--subtitle-color); margin-top: 0; }
+.mwanzo-inline-5 { border: 1px solid var(--primary-color); width: 60%; margin: 20px auto; opacity: 0.5; }
+.mwanzo-inline-6 { display: flex; justify-content: center; margin-top: 30px; }
+.mwanzo-inline-7 { background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow-color); width: 85%; border-top: 5px solid #FFD700; }
+.mwanzo-inline-8 { color: var(--title-color); margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; }
+.mwanzo-inline-9 { margin-right: 10px; display: flex; align-items: center; }
+.mwanzo-inline-10 { background-color: var(--tangazo-bg); padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--primary-color); }
+.mwanzo-inline-11 { margin: 0 0 8px 0; color: var(--title-color); font-size: 18px; }
+.mwanzo-inline-12 { margin: 0; color: var(--text-normal); line-height: 1.5; }
+.mwanzo-inline-13 { font-size: 12px; color: var(--text-faint); display: flex; align-items: center; gap: 5px; margin-top: 10px; }
+.mwanzo-inline-14 { text-align: center; color: var(--text-faint); padding: 20px; }

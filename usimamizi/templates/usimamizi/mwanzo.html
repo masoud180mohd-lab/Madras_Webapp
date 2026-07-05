@@ -1,46 +1,25 @@
 {% extends 'usimamizi/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mwanzo.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<style>
-    /* Tunatumia CSS Variables ili kusupport Light/Dark Mode bila kuharibu sura ya asili */
-    :root {
-        --primary-color: #2E7D32;
-        --title-color: #1b5e20;
-        --subtitle-color: #666666;
-        --text-normal: #444444;
-        --text-faint: #888888;
-        --card-bg: #ffffff;
-        --tangazo-bg: #f1f8e9;
-        --shadow-color: rgba(0,0,0,0.1);
-    }
-
-    body.dark-mode {
-        --primary-color: #4CAF50;
-        --title-color: #81C784;
-        --subtitle-color: #a0aec0;
-        --text-normal: #e0e0e0;
-        --text-faint: #999999;
-        --card-bg: #1e1e1e;
-        --tangazo-bg: rgba(46, 125, 50, 0.15); /* Kijani iliyofifia kwa Dark Mode */
-        --shadow-color: rgba(0,0,0,0.3);
-    }
-</style>
-
-<div style="text-align: center; margin-top: 20px;">
-    <img src="{% static 'usimamizi/images/logo.png' %}" alt="Logo ya Madrasa" style="width: 200px; height: auto; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+<div class="mwanzo-inline-1">
+    <img src="{% static 'usimamizi/images/logo.png' %}" alt="Logo ya Madrasa" class="mwanzo-inline-2">
     
-    <h1 style="color: var(--primary-color); margin-top: 20px; margin-bottom: 5px; font-size: 32px;">AL-MADRASATUL RASULILLAH</h1>
-    <h3 style="color: var(--subtitle-color); margin-top: 0;">MWERA, ZANZIBAR</h3>
+    <h1 class="mwanzo-inline-3">AL-MADRASATUL RASULILLAH</h1>
+    <h3 class="mwanzo-inline-4">MWERA, ZANZIBAR</h3>
     
-    <hr style="border: 1px solid var(--primary-color); width: 60%; margin: 20px auto; opacity: 0.5;">
+    <hr class="mwanzo-inline-5">
 </div>
 
-<div style="display: flex; justify-content: center; margin-top: 30px;">
-    <div style="background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow-color); width: 85%; border-top: 5px solid #FFD700;">
+<div class="mwanzo-inline-6">
+    <div class="mwanzo-inline-7">
         
-        <h3 style="color: var(--title-color); margin-top: 0; margin-bottom: 20px; display: flex; align-items: center;">
-            <span style="margin-right: 10px; display: flex; align-items: center;">
+        <h3 class="mwanzo-inline-8">
+            <span class="mwanzo-inline-9">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
                     <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
@@ -50,12 +29,12 @@
         </h3>
         
         {% for tangazo in matangazo %}
-        <div style="background-color: var(--tangazo-bg); padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--primary-color);">
-            <h4 style="margin: 0 0 8px 0; color: var(--title-color); font-size: 18px;">{{ tangazo.kichwa_cha_habari }}</h4>
-            <p style="margin: 0; color: var(--text-normal); line-height: 1.5;">
+        <div class="mwanzo-inline-10">
+            <h4 class="mwanzo-inline-11">{{ tangazo.kichwa_cha_habari }}</h4>
+            <p class="mwanzo-inline-12">
                 {{ tangazo.maelezo }}
             </p>
-            <span style="font-size: 12px; color: var(--text-faint); display: flex; align-items: center; gap: 5px; margin-top: 10px;">
+            <span class="mwanzo-inline-13">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -66,7 +45,7 @@
             </span>
         </div>
         {% empty %}
-        <div style="text-align: center; color: var(--text-faint); padding: 20px;">
+        <div class="mwanzo-inline-14">
             <p>Hakuna matangazo yoyote mapya kwa sasa.</p>
         </div>
         {% endfor %}

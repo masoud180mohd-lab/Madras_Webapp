@@ -1,84 +1,13 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mahudhurio_darasa.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<style>
-    /* ----- UI KIPROFESHINALI KWA MAHUDHURIO (DARASA) ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --danger: #d32f2f;
-        --warning: #f57c00;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-        --input-bg: #ffffff;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-        --input-bg: #2c2c2c;
-    }
-
-    /* Kichwa cha Ukurasa */
-    .page-header {
-        background-color: var(--card-bg); padding: 25px 30px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 6px solid var(--primary); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
-    }
-    .page-header h1 { margin: 0 0 5px 0; color: var(--text-main); font-size: 24px; font-weight: 700; }
-    .page-header p { margin: 0; color: var(--text-muted); font-size: 14px; font-weight: 500; }
-
-    .btn-back {
-        background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
-    }
-    .btn-back:hover { background-color: var(--table-header); }
-
-    /* Fomu na Jedwali */
-    .form-card {
-        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-    }
-
-    .data-table { width: 100%; border-collapse: collapse; }
-    .data-table th { background-color: var(--table-header); padding: 15px; text-align: left; font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); }
-    .data-table td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; color: var(--text-main); vertical-align: middle; }
-    
-    .data-table tbody tr:hover { background-color: var(--table-header); }
-
-    /* Checkbox & Inputs */
-    .custom-checkbox { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary); }
-    
-    .custom-input {
-        width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s; box-sizing: border-box;
-    }
-    .custom-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1); }
-
-    .btn-submit {
-        background-color: var(--primary); color: white; border: none; padding: 14px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center; margin-top: 25px;
-    }
-    .btn-submit:hover { background-color: #1b5e20; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2); }
-
-    /* Maelezo ya Chini */
-    .bottom-note {
-        margin-top: 20px; padding: 15px; background-color: var(--table-header); border-radius: 8px; border-left: 4px solid var(--primary); display: flex; gap: 12px; align-items: flex-start;
-    }
-    .bottom-note p { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
-
-    /* Alert ya Kuzuia Kurudia */
-    .alert-warning {
-        background-color: rgba(245, 124, 0, 0.1); color: var(--warning); padding: 25px; border-radius: 12px; border: 1px solid rgba(245, 124, 0, 0.3); text-align: center; margin-bottom: 25px;
-    }
-    .alert-warning h3 { margin: 0 0 10px 0; }
-    .alert-warning p { margin: 0; font-size: 15px; }
-</style>
-
-<div style="max-width: 900px; margin: auto; padding: 20px;">
+<div class="mahudhurio_darasa-inline-1">
 
     <div class="page-header">
         <div>
@@ -93,10 +22,10 @@
 
     {% if tayari_yapo %}
         <div class="alert-warning">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mahudhurio_darasa-inline-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             <h3>Mahudhurio Tayari Yamechukuliwa!</h3>
             <p>Mahudhurio ya darasa hili kwa siku ya leo yameshasajiliwa kwenye mfumo. Huruhusiwi kuchukua mara mbili kwa siku moja.</p>
-            <a href="{% url 'wanafunzi_darasa' darasa.id %}" class="btn-back" style="margin-top: 20px; background: var(--card-bg);">Rudi Nyuma</a>
+            <a href="{% url 'wanafunzi_darasa' darasa.id %}" class="btn-back mahudhurio_darasa-inline-3">Rudi Nyuma</a>
         </div>
     {% else %}
     
@@ -104,22 +33,22 @@
             <form method="POST">
                 {% csrf_token %}
                 
-                <div style="overflow-x: auto;">
+                <div class="mahudhurio_darasa-inline-4">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Jina la Mwanafunzi</th>
-                                <th style="text-align: center; width: 80px;">Yupo?</th>
+                                <th class="mahudhurio_darasa-inline-5">Yupo?</th>
                                 <th>Sababu (Kama Hayupo)</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for mwanafunzi in wanafunzi %}
                             <tr>
-                                <td style="font-weight: 600;">
+                                <td class="mahudhurio_darasa-inline-6">
                                     {{ mwanafunzi.jina_kamili }}
                                 </td>
-                                <td style="text-align: center;">
+                                <td class="mahudhurio_darasa-inline-7">
                                     <input type="checkbox" name="yupo_{{ mwanafunzi.id }}" checked class="custom-checkbox">
                                 </td>
                                 <td>
@@ -128,7 +57,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="3" style="text-align: center; padding: 40px; color: var(--text-muted); font-style: italic;">
+                                <td colspan="3" class="mahudhurio_darasa-inline-8">
                                     Hakuna wanafunzi waliosajiliwa kwenye darasa hili bado.
                                 </td>
                             </tr>

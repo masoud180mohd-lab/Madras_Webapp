@@ -1,105 +1,18 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/ripoti_mwanafunzi.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<style>
-    /* ----- PREMIUM UI KWA AJILI YA RIPOTI YA MWANAFUNZI ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --accent: #673ab7;
-        --danger: #d32f2f;
-        --warning: #f57c00;
-        --success: #388e3c;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-        --input-bg: #ffffff;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-        --input-bg: #2c2c2c;
-    }
-
-    /* Kichwa cha Ukurasa */
-    .page-header {
-        background-color: var(--card-bg); padding: 25px 30px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 6px solid var(--secondary); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
-    }
-    .page-header h1 { margin: 0 0 5px 0; color: var(--text-main); font-size: 24px; font-weight: 700; }
-    .page-header p { margin: 0; color: var(--text-muted); font-size: 15px; font-weight: 500; }
-
-    .btn-icon-back {
-        display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-main); transition: 0.2s; text-decoration: none;
-    }
-    .btn-icon-back:hover { background-color: var(--table-header); border-color: var(--text-muted); }
-
-    /* Modern Tabs Navigation */
-    .tabs-nav {
-        display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color); padding-bottom: 0;
-    }
-    .tab-btn {
-        background: transparent; border: none; padding: 12px 20px; font-size: 15px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; border-bottom: 3px solid transparent; margin-bottom: -2px;
-    }
-    .tab-btn:hover { color: var(--text-main); }
-    .tab-btn.active { color: var(--secondary); border-bottom-color: var(--secondary); }
-
-    /* Content Cards */
-    .tab-content {
-        background-color: var(--card-bg); padding: 30px; border-radius: 0 12px 12px 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: none;
-    }
-
-    /* Toolbar (Filters na Download PDF) */
-    .toolbar {
-        display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
-    }
-    .filter-form { display: flex; align-items: center; gap: 10px; }
-    .filter-label { font-weight: 600; font-size: 14px; color: var(--text-muted); }
-    
-    .custom-select {
-        padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; cursor: pointer; transition: 0.2s;
-    }
-    .custom-select:focus { border-color: var(--secondary); }
-
-    .btn-download {
-        background-color: transparent; border: 1px solid var(--secondary); color: var(--secondary); padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
-    }
-    .btn-download:hover { background-color: var(--secondary); color: white; }
-
-    /* Tables */
-    .data-table { width: 100%; border-collapse: collapse; }
-    .data-table th { background-color: var(--table-header); padding: 12px 15px; text-align: left; font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
-    .data-table td { padding: 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; color: var(--text-main); vertical-align: top; }
-    .data-table tbody tr:hover td { background-color: var(--table-header); }
-
-    /* Badges za Kisasa */
-    .status-badge {
-        padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;
-    }
-    .badge-success { background-color: rgba(56, 142, 60, 0.1); color: var(--success); }
-    .badge-danger { background-color: rgba(211, 47, 47, 0.1); color: var(--danger); }
-    .badge-warning { background-color: rgba(245, 124, 0, 0.1); color: var(--warning); }
-
-    .pande-list { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.6; color: var(--text-muted); }
-    
-    /* Maoni Box */
-    .maoni-box { background-color: rgba(2, 136, 209, 0.05); padding: 10px 15px; border-left: 3px solid var(--secondary); border-radius: 4px; font-size: 13px; color: var(--text-muted); margin-top: 5px; }
-</style>
-
-<div style="max-width: 1100px; margin: auto; padding: 20px;">
+<div class="ripoti_mwanafunzi-inline-1">
     
     <div class="page-header">
         <div>
             <h1>Ripoti ya {{ aina }}</h1>
-            <p>Mwanafunzi: <b style="color: var(--secondary);">{{ mwanafunzi.jina_kamili }}</b></p>
+            <p>Mwanafunzi: <b class="ripoti_mwanafunzi-inline-2">{{ mwanafunzi.jina_kamili }}</b></p>
         </div>
         <a href="{% url 'mwanafunzi_profile' mwanafunzi.id %}" class="btn-icon-back" title="Rudi Kwenye Profile">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -117,7 +30,7 @@
         </button>
     </div>
 
-    <div id="tab-mahudhurio" class="tab-content" style="display: block;">
+    <div id="tab-mahudhurio" class="tab-content ripoti_mwanafunzi-inline-3">
         <div class="toolbar">
             <form method="GET" class="filter-form">
                 <input type="hidden" name="tab" value="mahudhurio">
@@ -135,20 +48,20 @@
             </a>
         </div>
 
-        <div style="overflow-x: auto; max-height: 500px;">
+        <div class="ripoti_mwanafunzi-inline-4">
             <table class="data-table">
-                <thead style="position: sticky; top: 0; z-index: 1;">
+                <thead class="ripoti_mwanafunzi-inline-5">
                     <tr>
-                        <th style="width: 150px;">Tarehe</th>
-                        <th style="text-align: center; width: 150px;">Hali</th>
+                        <th class="ripoti_mwanafunzi-inline-6">Tarehe</th>
+                        <th class="ripoti_mwanafunzi-inline-7">Hali</th>
                         <th>Sababu (Kama Hayupo)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for h in mahudhurio %}
                     <tr>
-                        <td style="font-weight: 500;">{{ h.tarehe|date:"d M Y" }}</td>
-                        <td style="text-align: center;">
+                        <td class="ripoti_mwanafunzi-inline-8">{{ h.tarehe|date:"d M Y" }}</td>
+                        <td class="ripoti_mwanafunzi-inline-9">
                             {% if h.yupo %}
                                 <span class="status-badge badge-success">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -161,10 +74,10 @@
                                 </span>
                             {% endif %}
                         </td>
-                        <td style="color: var(--text-muted);">{{ h.sababu_kama_hayupo|default:"-" }}</td>
+                        <td class="ripoti_mwanafunzi-inline-10">{{ h.sababu_kama_hayupo|default:"-" }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="3" style="padding: 40px; text-align: center; font-style: italic; color: var(--text-muted);">Hakuna rekodi za mahudhurio kwa muda huu.</td></tr>
+                    <tr><td colspan="3" class="ripoti_mwanafunzi-inline-11">Hakuna rekodi za mahudhurio kwa muda huu.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -189,11 +102,11 @@
             </a>
         </div>
 
-        <div style="overflow-x: auto; max-height: 500px;">
+        <div class="ripoti_mwanafunzi-inline-4">
             <table class="data-table">
-                <thead style="position: sticky; top: 0; z-index: 1;">
+                <thead class="ripoti_mwanafunzi-inline-5">
                     <tr>
-                        <th style="width: 180px;">Tarehe</th>
+                        <th class="ripoti_mwanafunzi-inline-12">Tarehe</th>
                         <th>{% if aina == 'Usiku' %}Sabaq (Mpya){% else %}Sabaq{% endif %}</th>
                         {% if aina == 'Usiku' %}
                         <th>Murajaa / Pande</th>
@@ -204,24 +117,24 @@
                     {% for s in sabaq %}
                     <tr>
                         <td>
-                            <b style="font-weight: 600;">{{ s.tarehe|date:"d M Y" }}</b><br>
-                            {% if s.mwalimu %}<small style="color: var(--text-muted);">Mwalimu: {{ s.mwalimu.jina_kamili }}</small>{% endif %}
+                            <b class="ripoti_mwanafunzi-inline-13">{{ s.tarehe|date:"d M Y" }}</b><br>
+                            {% if s.mwalimu %}<small class="ripoti_mwanafunzi-inline-10">Mwalimu: {{ s.mwalimu.jina_kamili }}</small>{% endif %}
                         </td>
                         <td>
                             {% if s.sabaq_sura %}
-                                <div style="font-weight: 500;">{{ s.sabaq_sura }}</div>
-                                <div style="font-size: 13px; color: var(--text-muted); margin: 3px 0;">Aya: {{ s.sabaq_aya_kuanzia|default:"-" }} mpaka {{ s.sabaq_aya_kuishia|default:"-" }}</div>
+                                <div class="ripoti_mwanafunzi-inline-8">{{ s.sabaq_sura }}</div>
+                                <div class="ripoti_mwanafunzi-inline-14">Aya: {{ s.sabaq_aya_kuanzia|default:"-" }} mpaka {{ s.sabaq_aya_kuishia|default:"-" }}</div>
                                 
                                 {% if s.sabaq_hali == 'Kajua' %}
-                                    <span class="status-badge badge-success" style="margin-top: 4px;">Ameijua</span>
+                                    <span class="status-badge badge-success ripoti_mwanafunzi-inline-15">Ameijua</span>
                                 {% elif s.sabaq_hali == 'Hajajua' %}
-                                    <span class="status-badge badge-danger" style="margin-top: 4px;">Hajaijua</span>
+                                    <span class="status-badge badge-danger ripoti_mwanafunzi-inline-15">Hajaijua</span>
                                 {% else %}
-                                    <span class="status-badge badge-warning" style="margin-top: 4px;">Hajasikilizwa</span>
+                                    <span class="status-badge badge-warning ripoti_mwanafunzi-inline-15">Hajasikilizwa</span>
                                 {% endif %}
                                 
                             {% else %}
-                                <span style="color: var(--text-muted); font-style: italic; font-size: 13px;">Hakusoma Sabaq</span>
+                                <span class="ripoti_mwanafunzi-inline-16">Hakusoma Sabaq</span>
                             {% endif %}
 
                             {% if s.maoni_ya_mwalimu %}
@@ -236,21 +149,21 @@
                                 {% for pande in s.mapande.all %}
                                     <li>
                                         {{ pande.sura }} ({{ pande.aya_kuanzia|default:"-" }} - {{ pande.aya_kuishia|default:"-" }}) 
-                                        <b style="color: {% if pande.hali == 'Pasi' %}var(--success){% elif pande.hali == 'Makosa' %}var(--warning){% else %}var(--danger){% endif %};">
+                                        <b class="pande-status {% if pande.hali == 'Pasi' %}pande-status-pass{% elif pande.hali == 'Makosa' %}pande-status-warning{% else %}pande-status-danger{% endif %}">
                                             [{{ pande.hali }}]
                                         </b>
                                     </li>
                                 {% endfor %}
                                 </ul>
                             {% else %}
-                                <span style="color: var(--text-muted); font-style: italic; font-size: 13px;">Hakuna Murajaa</span>
+                                <span class="ripoti_mwanafunzi-inline-16">Hakuna Murajaa</span>
                             {% endif %}
                         </td>
                         {% endif %}
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" style="padding: 40px; text-align: center; font-style: italic; color: var(--text-muted);">
+                        <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" class="ripoti_mwanafunzi-inline-11">
                             Hakuna rekodi za Sabaq kwa muda huu.
                         </td>
                     </tr>

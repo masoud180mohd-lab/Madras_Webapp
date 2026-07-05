@@ -1,16 +1,22 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mahudhurio.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<div style="background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 900px; margin: 20px auto;">
+<div class="mahudhurio-inline-1">
     
-    <div style="border-bottom: 2px solid #2E7D32; margin-bottom: 20px; padding-bottom: 10px;">
-        <h2 style="color: #2E7D32; text-align: center; margin-bottom: 5px;">Daftari la Mahudhurio</h2>
-        <p style="text-align: center; color: #666;">Tarehe: <strong>{{ leo }}</strong></p>
+    <div class="mahudhurio-inline-2">
+        <h2 class="mahudhurio-inline-3">Daftari la Mahudhurio</h2>
+        <p class="mahudhurio-inline-4">Tarehe: <strong>{{ leo }}</strong></p>
     </div>
 
     {% if messages %}
         {% for message in messages %}
-            <div style="padding: 15px; background-color: #d4edda; color: #155724; margin-bottom: 20px; border-radius: 8px; border-left: 5px solid #2E7D32;">
+            <div class="mahudhurio-inline-5">
                 {{ message }}
             </div>
         {% endfor %}
@@ -18,27 +24,27 @@
 
     <form method="POST">
         {% csrf_token %}
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; border: 1px solid #eee;">
+        <div class="mahudhurio-inline-6">
+            <table class="mahudhurio-inline-7">
                 <thead>
-                    <tr style="background-color: #2E7D32; color: white;">
-                        <th style="padding: 15px; text-align: left; border: 1px solid #1b5e20;">Jina Kamili</th>
-                        <th style="padding: 15px; text-align: left; border: 1px solid #1b5e20;">Juzuu</th>
-                        <th style="padding: 15px; text-align: center; border: 1px solid #1b5e20;">Yupo?</th>
-                        <th style="padding: 15px; text-align: left; border: 1px solid #1b5e20;">Sababu (Kama hayupo)</th>
+                    <tr class="mahudhurio-inline-8">
+                        <th class="mahudhurio-inline-9">Jina Kamili</th>
+                        <th class="mahudhurio-inline-9">Juzuu</th>
+                        <th class="mahudhurio-inline-10">Yupo?</th>
+                        <th class="mahudhurio-inline-9">Sababu (Kama hayupo)</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for mwanafunzi in wanafunzi %}
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 12px; font-weight: bold; color: #333;">{{ mwanafunzi.jina_kamili }}</td>
-                        <td style="padding: 12px; color: #555;">Juzuu {{ mwanafunzi.juzuu_aliyohifadhi }}</td>
-                        <td style="padding: 12px; text-align: center;">
-                            <input type="checkbox" name="yupo_{{ mwanafunzi.id }}" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #2E7D32;">
+                    <tr class="mahudhurio-inline-11">
+                        <td class="mahudhurio-inline-12">{{ mwanafunzi.jina_kamili }}</td>
+                        <td class="mahudhurio-inline-13">Juzuu {{ mwanafunzi.juzuu_aliyohifadhi }}</td>
+                        <td class="mahudhurio-inline-14">
+                            <input type="checkbox" name="yupo_{{ mwanafunzi.id }}" checked class="mahudhurio-inline-15">
                         </td>
-                        <td style="padding: 12px;">
+                        <td class="mahudhurio-inline-16">
                             <input type="text" name="sababu_{{ mwanafunzi.id }}" placeholder="Maelezo kidogo..." 
-                                   style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; outline-color: #2E7D32;">
+                                   class="mahudhurio-inline-17">
                         </td>
                     </tr>
                     {% endfor %}
@@ -46,20 +52,9 @@
             </table>
         </div>
 
-        <button type="submit" style="background-color: #2E7D32; color: white; padding: 15px; border: none; border-radius: 8px; cursor: pointer; margin-top: 25px; width: 100%; font-size: 18px; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 6px rgba(46, 125, 50, 0.2);">
+        <button type="submit" class="mahudhurio-inline-18">
             💾 HIFADHI MAHUDHURIO YA LEO
         </button>
     </form>
 </div>
-
-<style>
-    /* Urembo kidogo wa jedwali wakati mouse inapita juu yake */
-    tbody tr:hover {
-        background-color: #f1f8e9;
-    }
-    button:hover {
-        background-color: #1b5e20 !important;
-        transform: translateY(-2px);
-    }
-</style>
 {% endblock %}

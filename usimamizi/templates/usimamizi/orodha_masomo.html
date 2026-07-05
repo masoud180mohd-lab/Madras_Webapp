@@ -1,9 +1,15 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_masomo.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<div style="padding: 20px; max-width: 1000px; margin: auto;">
+<div class="orodha_masomo-inline-1">
     
-    <h2 style="color: #2E7D32; border-bottom: 2px solid #FFD700; padding-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+    <h2 class="orodha_masomo-inline-2">
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
@@ -11,14 +17,14 @@
         Masomo Yanayofundishwa
     </h2>
     
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+    <div class="orodha_masomo-inline-3">
         {% for somo in masomo %}
-        <a href="{% url 'somo_detail' somo.id %}" style="text-decoration: none;">
-            <div style="background-color: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid {% if somo.ni_la_hifdhu %}#0288D1{% else %}#2E7D32{% endif %}; transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+        <a href="{% url 'somo_detail' somo.id %}" class="orodha_masomo-inline-4">
+            <div class="subject-card {% if somo.ni_la_hifdhu %}subject-card-hifdhu{% else %}subject-card-kawaida{% endif %}">
                 
-                <h2 style="color: #1b5e20; margin: 0; margin-bottom: 10px;">{{ somo.jina }}</h2>
+                <h2 class="orodha_masomo-inline-5">{{ somo.jina }}</h2>
                 
-                <p style="color: #666; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 20px;">
+                <p class="orodha_masomo-inline-6">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
@@ -27,14 +33,14 @@
                 </p>
                 
                 {% if somo.ni_la_hifdhu %}
-                    <span style="background: #e3f2fd; color: #0288D1; padding: 6px 12px; border-radius: 15px; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                    <span class="orodha_masomo-inline-7">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                         </svg>
                         Zamu ya Usiku (Hifdhu)
                     </span>
                 {% else %}
-                    <span style="background: #f1f8e9; color: #2E7D32; padding: 6px 12px; border-radius: 15px; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 6px;">
+                    <span class="orodha_masomo-inline-8">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="5"></circle>
                             <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -52,8 +58,8 @@
             </div>
         </a>
         {% empty %}
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888; background: white; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border: 1px dashed #ccc;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px;">
+        <div class="orodha_masomo-inline-9">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="orodha_masomo-inline-10">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <line x1="9" y1="9" x2="15" y2="9"></line>
                 <line x1="9" y1="13" x2="15" y2="13"></line>

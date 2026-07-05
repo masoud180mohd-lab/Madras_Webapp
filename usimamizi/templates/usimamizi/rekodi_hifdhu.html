@@ -1,95 +1,18 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/rekodi_hifdhu.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<style>
-    /* ----- PREMIUM UI FORM KWA AJILI YA SABAQ & MURAJAA ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --accent: #673ab7;
-        --danger: #d32f2f;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-        --input-bg: #ffffff;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-        --input-bg: #2c2c2c;
-    }
-
-    /* Kichwa cha Ukurasa */
-    .page-header {
-        background-color: var(--card-bg); padding: 25px 30px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 6px solid var(--primary); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
-    }
-    .page-header h1 { margin: 0 0 5px 0; color: var(--text-main); font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-    .page-header p { margin: 0; color: var(--text-muted); font-size: 14px; }
-    
-    .btn-icon-back {
-        display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-main); transition: 0.2s; text-decoration: none;
-    }
-    .btn-icon-back:hover { background-color: var(--table-header); border-color: var(--text-muted); }
-
-    /* Kadi za Fomu */
-    .form-section {
-        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01); margin-bottom: 25px;
-    }
-    .section-title {
-        color: var(--text-main); font-size: 18px; margin: 0 0 20px 0; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px; font-weight: 600;
-    }
-
-    /* Inputs na Selects */
-    .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
-    .input-group label { display: block; font-weight: 600; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
-    .custom-input, .custom-select {
-        width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s; box-sizing: border-box;
-    }
-    .custom-input:focus, .custom-select:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(2, 136, 209, 0.1); }
-
-    /* Radio Buttons za Kisasa */
-    .radio-wrapper { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px; }
-    .radio-label {
-        display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; color: var(--text-main); font-weight: 600; font-size: 14px; transition: 0.2s; background: var(--input-bg);
-    }
-    .radio-label:hover { border-color: var(--secondary); }
-    .radio-label input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
-
-    /* Kitufe cha Kuongeza na Kufuta Pande */
-    .btn-outline-add {
-        background: transparent; border: 1px solid var(--secondary); color: var(--secondary); padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s;
-    }
-    .btn-outline-add:hover { background: var(--secondary); color: white; }
-
-    .pande-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 15px; align-items: center; background-color: var(--table-header); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); }
-    
-    .btn-delete-row {
-        background: transparent; border: 1px solid var(--danger); color: var(--danger); width: 40px; height: 40px; border-radius: 6px; display: inline-flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
-    }
-    .btn-delete-row:hover { background: var(--danger); color: white; }
-
-    /* Kitufe Kikuu cha Kusave */
-    .btn-submit {
-        background-color: var(--primary); color: white; border: none; padding: 16px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2); margin-top: 10px;
-    }
-    .btn-submit:hover { background-color: #1b5e20; transform: translateY(-2px); }
-</style>
-
-<div style="max-width: 900px; margin: auto; padding: 20px;">
+<div class="rekodi_hifdhu-inline-1">
 
     <div class="page-header">
         <div>
             <h1>Tathmini ya {{ aina }}</h1>
-            <p>Mwanafunzi: <b style="color: var(--secondary);">{{ mwanafunzi.jina_kamili }}</b> | 
+            <p>Mwanafunzi: <b class="rekodi_hifdhu-inline-2">{{ mwanafunzi.jina_kamili }}</b> | 
                 {% if aina == 'Darasa' %}
                     Darasa: <b>{{ darasa.jina }}</b>
                 {% else %}
@@ -133,7 +56,7 @@
                 </div>
             </div>
 
-            <div class="input-group" style="margin-top: 15px;">
+            <div class="input-group rekodi_hifdhu-inline-3">
                 <label>Tathmini ya Mwalimu:</label>
                 <div class="radio-wrapper">
                     <label class="radio-label">
@@ -154,8 +77,8 @@
 
         {% if aina == 'Usiku' %}
         <div class="form-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                <h3 class="section-title" style="border: none; margin: 0; padding: 0;">
+            <div class="rekodi_hifdhu-inline-4">
+                <h3 class="section-title rekodi_hifdhu-inline-5">
                     Mapande (Murajaa)
                 </h3>
                 <button type="button" onclick="ongezaPande()" class="btn-outline-add">
@@ -166,16 +89,16 @@
 
             <div id="mapande-container">
                 <div class="pande-row">
-                    <div style="flex: 2; min-width: 150px;">
+                    <div class="rekodi_hifdhu-inline-6">
                         <input type="text" name="pande_sura[]" placeholder="Jina la Sura" class="custom-input">
                     </div>
-                    <div style="flex: 1; min-width: 90px;">
+                    <div class="rekodi_hifdhu-inline-7">
                         <input type="number" name="pande_aya_kuanzia[]" placeholder="Kuanzia" class="custom-input">
                     </div>
-                    <div style="flex: 1; min-width: 90px;">
+                    <div class="rekodi_hifdhu-inline-7">
                         <input type="number" name="pande_aya_kuishia[]" placeholder="Mpaka" class="custom-input">
                     </div>
-                    <div style="flex: 1.5; min-width: 140px;">
+                    <div class="rekodi_hifdhu-inline-8">
                         <select name="pande_hali[]" class="custom-select">
                             <option value="">-- Tathmini --</option>
                             <option value="Pasi">Amelipata Vyema</option>
@@ -191,7 +114,7 @@
         <div class="form-section">
             <div class="input-group">
                 <label>Maelezo / Maoni ya Mwalimu (Si Lazima):</label>
-                <textarea name="maoni" rows="3" placeholder="Weka maelezo ya ziada ya siku ya leo hapa..." class="custom-input" style="resize: vertical;"></textarea>
+                <textarea name="maoni" rows="3" placeholder="Weka maelezo ya ziada ya siku ya leo hapa..." class="custom-input rekodi_hifdhu-inline-9"></textarea>
             </div>
         </div>
 
@@ -209,16 +132,16 @@
         const container = document.getElementById('mapande-container');
         const rowHTML = `
             <div class="pande-row">
-                <div style="flex: 2; min-width: 150px;">
+                <div class="rekodi_hifdhu-inline-6">
                     <input type="text" name="pande_sura[]" placeholder="Jina la Sura" class="custom-input">
                 </div>
-                <div style="flex: 1; min-width: 90px;">
+                <div class="rekodi_hifdhu-inline-7">
                     <input type="number" name="pande_aya_kuanzia[]" placeholder="Kuanzia" class="custom-input">
                 </div>
-                <div style="flex: 1; min-width: 90px;">
+                <div class="rekodi_hifdhu-inline-7">
                     <input type="number" name="pande_aya_kuishia[]" placeholder="Mpaka" class="custom-input">
                 </div>
-                <div style="flex: 1.5; min-width: 140px;">
+                <div class="rekodi_hifdhu-inline-8">
                     <select name="pande_hali[]" class="custom-select">
                         <option value="">-- Tathmini --</option>
                         <option value="Pasi">Amelipata Vyema</option>

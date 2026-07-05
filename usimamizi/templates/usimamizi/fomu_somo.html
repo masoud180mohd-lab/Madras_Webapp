@@ -1,173 +1,15 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/fomu_somo.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<style>
-    /* ----- PREMIUM MINIMALIST UI - PAKIA NYENZO/MTIHANI ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --danger: #d32f2f;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --input-bg: #ffffff;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --input-bg: #2c2c2c;
-    }
-
-    /* Rangi inabadilika kutegemea Aina (Nyenzo=Kijani, Mtihani=Bluu) */
-    .form-card {
-        background-color: var(--card-bg);
-        padding: 35px 40px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-        border: 1px solid var(--border-color);
-        border-top: 6px solid {% if aina == 'Nyenzo' %}var(--primary){% else %}var(--secondary){% endif %};
-    }
-
-    .form-header {
-        text-align: center;
-        margin-bottom: 25px;
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 15px;
-    }
-    .form-header h2 {
-        color: {% if aina == 'Nyenzo' %}var(--primary){% else %}var(--secondary){% endif %};
-        margin: 0 0 8px 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        font-size: 24px;
-    }
-    .form-header p {
-        color: var(--text-muted);
-        margin: 0;
-        font-size: 15px;
-    }
-
-    /* KUIFORSI FOMU YA DJANGO 'form.as_p' IWE YA KISASA */
-    .styled-form p {
-        margin-bottom: 18px;
-        text-align: left;
-    }
-    .styled-form label {
-        display: block;
-        font-weight: 600;
-        font-size: 13px;
-        color: var(--text-muted);
-        margin-bottom: 8px;
-    }
+<div class="fomu_somo-inline-1">
     
-    .styled-form input[type="text"],
-    .styled-form input[type="number"],
-    .styled-form input[type="date"],
-    .styled-form input[type="file"],
-    .styled-form select,
-    .styled-form textarea {
-        width: 100%;
-        padding: 12px 15px;
-        border-radius: 8px;
-        border: 1px solid var(--border-color);
-        background-color: var(--input-bg);
-        color: var(--text-main);
-        font-size: 14px;
-        outline: none;
-        transition: 0.2s;
-        box-sizing: border-box;
-    }
-    
-    .styled-form input:focus,
-    .styled-form select:focus,
-    .styled-form textarea:focus {
-        border-color: {% if aina == 'Nyenzo' %}var(--primary){% else %}var(--secondary){% endif %};
-        box-shadow: 0 0 0 3px {% if aina == 'Nyenzo' %}rgba(46, 125, 50, 0.1){% else %}rgba(2, 136, 209, 0.1){% endif %};
-    }
-
-    /* File input style */
-    .styled-form input[type="file"] {
-        padding: 9px;
-        cursor: pointer;
-    }
-
-    /* Checkbox (Ikiwa ipo) */
-    .styled-form input[type="checkbox"] {
-        transform: scale(1.3);
-        margin-right: 8px;
-        accent-color: {% if aina == 'Nyenzo' %}var(--primary){% else %}var(--secondary){% endif %};
-        cursor: pointer;
-    }
-
-    /* Error messages za Django */
-    .errorlist {
-        color: var(--danger);
-        list-style: none;
-        padding: 0;
-        margin: -10px 0 10px 0;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .helptext {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-top: 5px;
-        display: block;
-    }
-
-    /* Vitufe */
-    .btn-submit {
-        width: 100%;
-        background-color: {% if aina == 'Nyenzo' %}var(--primary){% else %}var(--secondary){% endif %};
-        color: white;
-        border: none;
-        padding: 15px;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        margin-top: 15px;
-        box-shadow: 0 4px 12px {% if aina == 'Nyenzo' %}rgba(46, 125, 50, 0.2){% else %}rgba(2, 136, 209, 0.2){% endif %};
-    }
-    .btn-submit:hover {
-        opacity: 0.9;
-        transform: translateY(-2px);
-    }
-
-    .btn-cancel {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        margin-top: 20px;
-        color: var(--text-muted);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        transition: 0.2s;
-    }
-    .btn-cancel:hover {
-        color: var(--text-main);
-    }
-</style>
-
-<div style="max-width: 550px; margin: auto; padding: 20px;">
-    
-    <div class="form-card">
+    <div class="form-card {% if aina == 'Nyenzo' %}form-card-nyenzo{% else %}form-card-mtihani{% endif %}">
         
         <div class="form-header">
             <h2>
@@ -179,7 +21,7 @@
                     Ongeza Mtihani
                 {% endif %}
             </h2>
-            <p>Somo: <b style="color: var(--text-main);">{{ somo.jina }}</b></p>
+            <p>Somo: <b class="fomu_somo-inline-2">{{ somo.jina }}</b></p>
         </div>
         
         <form method="POST" enctype="multipart/form-data" class="styled-form">

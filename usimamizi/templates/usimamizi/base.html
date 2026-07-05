@@ -1,94 +1,12 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Madrasatul Rasulillah</title>
-    <style>
-        body { margin: 0; font-family: Arial, sans-serif; background-color: #f4f4f9; transition: 0.3s; }
-        .header { background-color: #2E7D32; color: white; padding: 15px 20px; display: flex; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 10; transition: 0.3s; }
-        .menu-btn { font-size: 24px; cursor: pointer; background: none; border: none; color: white; margin-right: 20px; }
-        .header h2 { margin: 0; font-size: 20px; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        .sidebar { height: 100%; width: 250px; position: fixed; z-index: 100; top: 0; left: -250px; background-color: #1b5e20; overflow-x: hidden; transition: 0.3s; padding-top: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.2); }
-        
-        /* CSS BORA KWA AJILI YA ICONS NA MPANGILIO WA SIDEBAR */
-        .sidebar a, .sidebar .dropdown-btn { 
-            padding: 15px 25px; 
-            text-decoration: none; 
-            font-size: 16px; /* Nimeshusha kidogo iwe standard */
-            color: #f1f1f1; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            border: none; 
-            background: none; 
-            width: 100%; 
-            box-sizing: border-box; /* Inazuia menu isizidi upana */
-            text-align: left; 
-            cursor: pointer; 
-            outline: none; 
-            transition: 0.2s; 
-            font-weight: 500;
-        }
-        
-        .sidebar a:hover, .dropdown-btn:hover { background-color: #2E7D32; color: white; border-left: 5px solid #FFD700; }
-        .close-btn { position: absolute; top: 0; right: 25px; font-size: 36px; margin-left: 50px; color: white; border: none !important; background: none !important; }
-        .close-btn:hover { border-left: none !important; color: #FFD700; }
-        
-        /* Mpangilio wa Menu za Ndani (Sub-menus) */
-        .dropdown-container { display: none; background-color: #144d18; }
-        .dropdown-container a { padding-left: 45px; font-size: 15px; border-left: none; }
-        .dropdown-container a:hover { border-left: 5px solid #FFD700; }
-        
-        .main-content { padding: 20px; transition: margin-left .3s; }
-        .messages-wrap { display: grid; gap: 10px; margin: 0 0 18px; }
-        .message {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 12px 14px;
-            border-radius: 10px;
-            border: 1px solid transparent;
-            font-size: 14px;
-            line-height: 1.4;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        .message .icon { flex: 0 0 auto; margin-top: 1px; font-weight: bold; }
-        .message.success { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
-        .message.error { background: #ffebee; border-color: #ef9a9a; color: #b71c1c; }
-        .message.warning { background: #fff8e1; border-color: #ffe082; color: #8d6e00; }
-        .message.info { background: #e3f2fd; border-color: #90caf9; color: #0d47a1; }
-        body.dark-mode .message.success { background: rgba(46, 125, 50, 0.15); border-color: rgba(129, 199, 132, 0.3); color: #81c784; }
-        body.dark-mode .message.error { background: rgba(198, 40, 40, 0.18); border-color: rgba(239, 154, 154, 0.25); color: #ff8a80; }
-        body.dark-mode .message.warning { background: rgba(245, 124, 0, 0.16); border-color: rgba(255, 204, 128, 0.25); color: #ffcc80; }
-        body.dark-mode .message.info { background: rgba(2, 136, 209, 0.16); border-color: rgba(129, 212, 250, 0.25); color: #81d4fa; }
-
-        .user-actions { display: flex; align-items: center; gap: 10px; }
-        .theme-switch { background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 5px; outline: none; transition: transform 0.2s ease; }
-        .theme-switch:hover { transform: scale(1.1); }
-        .user-greeting { font-weight: 500; font-size: 14px; color: #ffffff; white-space: nowrap; }
-
-        /* Dark Mode Styles */
-        body.dark-mode { background-color: #121212 !important; color: #e0e0e0 !important; }
-        body.dark-mode .header { background-color: #1a1a1a !important; border-bottom: 1px solid #333; }
-        body.dark-mode .sidebar { background-color: #0a0a0a !important; border-right: 1px solid #222; }
-        body.dark-mode .dropdown-container { background-color: #000 !important; }
-        body.dark-mode .main-content div[style*="background-color: white"],
-        body.dark-mode .main-content div[style*="background: white"] { background-color: #1e1e1e !important; color: #e0e0e0 !important; box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important; border-color: #333 !important; }
-        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode p { color: #e0e0e0 !important; }
-        body.dark-mode td { color: #ccc !important; }
-        body.dark-mode tr[style*="border-bottom"] { border-bottom: 1px solid #333 !important; }
-        body.dark-mode th { background-color: #222 !important; border-color: #444 !important; color: #FFD700 !important; }
-        body.dark-mode table { border-color: #444 !important; }
-        body.dark-mode input, body.dark-mode textarea { background-color: #333 !important; color: white !important; border: 1px solid #555 !important; }
-        body.dark-mode div[style*="background-color: #f1f8e9"], body.dark-mode span[style*="background-color: #f1f8e9"], body.dark-mode span[style*="background: #e8f5e9"] { background-color: #2d372e !important; color: #81c784 !important; }
-
-        @media (max-width: 600px) {
-            .header h2 { font-size: 16px; }
-            .user-greeting { font-size: 12px; }
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'usimamizi/css/base.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
@@ -108,8 +26,8 @@
           <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
           <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
       </svg>
-      <span style="flex: 1;">Idara ya Taaluma</span>
-      <span style="font-size: 12px;">▼</span>
+      <span class="nav-label">Idara ya Taaluma</span>
+      <span class="dropdown-caret">▼</span>
   </button>
   
   <div class="dropdown-container">
@@ -164,9 +82,9 @@
       Watoro wa Wiki
   </a>
 
-  <hr style="border: 1px solid #144d18; margin: 20px 0;">
+  <hr class="sidebar-separator">
   
-  <a href="{% url 'toka' %}" style="color: #ffcccc;">
+  <a href="{% url 'toka' %}" class="logout-link">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffcccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
           <polyline points="16 17 21 12 16 7"></polyline>

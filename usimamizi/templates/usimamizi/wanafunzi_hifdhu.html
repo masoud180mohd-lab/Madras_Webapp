@@ -1,77 +1,13 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/wanafunzi_hifdhu.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<style>
-    /* ----- PREMIUM MINIMALIST UI - ORODHA WANAFUNZI HIFDHU ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --accent: #673ab7;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-    }
-
-    /* Kichwa cha Ukurasa - Minimalist & Compact */
-    .page-header {
-        background-color: var(--card-bg); 
-        padding: 20px 25px; 
-        border-radius: 12px; 
-        border: 1px solid var(--border-color); 
-        border-left: 6px solid var(--accent); 
-        margin-bottom: 25px; 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center;
-    }
-    .page-header h1 { margin: 0; color: var(--text-main); font-size: 22px; font-weight: 700; }
-
-    /* Kitufe cha rudi nyuma kama kijisura cha mshale (Kisasa zaidi) */
-    .btn-icon-back {
-        display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-main); transition: 0.2s; text-decoration: none;
-    }
-    .btn-icon-back:hover { background-color: var(--table-header); border-color: var(--text-muted); }
-
-    /* Kadi ya Jedwali */
-    .table-card {
-        background-color: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.01);
-    }
-
-    .data-table { width: 100%; border-collapse: collapse; }
-    .data-table th { background-color: var(--table-header); padding: 12px 15px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); }
-    .data-table td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; color: var(--text-main); vertical-align: middle; }
-    
-    .data-table tbody tr:hover td { background-color: var(--table-header); }
-
-    /* Mpangilio Mpya wa Vitufe (Action Group) */
-    .action-group { display: flex; gap: 6px; justify-content: flex-end; }
-    
-    .btn-action-sm {
-        padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--border-color); background: transparent; color: var(--text-main);
-    }
-    
-    /* Mitindo ya Hover yenye kuvutia na kubadilika kulingana na Kazi */
-    .btn-action-sm.primary-style { color: var(--primary); border-color: var(--primary); }
-    .btn-action-sm.primary-style:hover { background-color: var(--primary); color: white; }
-
-    .btn-action-sm.secondary-style { color: var(--secondary); border-color: var(--secondary); }
-    .btn-action-sm.secondary-style:hover { background-color: var(--secondary); color: white; }
-</style>
-
-<div style="max-width: 950px; margin: auto; padding: 20px;">
+<div class="wanafunzi_hifdhu-inline-1">
 
     <div class="page-header">
         <h1>Wanafunzi: {{ somo.jina }}</h1>
@@ -81,19 +17,19 @@
     </div>
 
     <div class="table-card">
-        <div style="overflow-x: auto;">
+        <div class="wanafunzi_hifdhu-inline-2">
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>Jina Kamili</th>
-                        <th style="text-align: right; width: 200px;">Tathmini</th>
+                        <th class="wanafunzi_hifdhu-inline-3">Tathmini</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for mwanafunzi in wanafunzi %}
                     <tr>
-                        <td style="font-weight: 600;">
-                            <a href="{% url 'mwanafunzi_profile' mwanafunzi.id %}" style="text-decoration: none; color: var(--secondary);">
+                        <td class="wanafunzi_hifdhu-inline-4">
+                            <a href="{% url 'mwanafunzi_profile' mwanafunzi.id %}" class="wanafunzi_hifdhu-inline-5">
                                 {{ mwanafunzi.jina_kamili }}
                             </a>
                         </td>
@@ -114,7 +50,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="2" style="text-align: center; padding: 40px; color: var(--text-muted); font-style: italic;">
+                        <td colspan="2" class="wanafunzi_hifdhu-inline-6">
                             Hakuna mwanafunzi aliyesajiliwa kwenye programu hii ya usiku.
                         </td>
                     </tr>

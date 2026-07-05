@@ -1,0 +1,55 @@
+/* ----- PREMIUM FINTECH STYLE KWA AJILI YA MAKSI ----- */
+    :root {
+        --primary: #2E7D32;
+        --border-color: #e2e8f0;
+        --card-bg: #ffffff;
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --table-header: #f8fafc;
+        --input-bg: #ffffff;
+    }
+
+    body.dark-mode {
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-muted: #a0aec0;
+        --border-color: #333333;
+        --table-header: #222222;
+        --input-bg: #2c2c2c;
+    }
+
+    .marks-container {
+        max-width: 800px; margin: auto; padding: 20px;
+    }
+
+    .marks-header {
+        background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 6px solid var(--primary); margin-bottom: 25px;
+    }
+    .marks-header h2 { margin: 0; color: var(--text-main); font-size: 22px; }
+    .marks-header p { margin: 5px 0 0 0; color: var(--text-muted); font-size: 14px; }
+
+    .marks-card {
+        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .marks-table { width: 100%; border-collapse: collapse; }
+    .marks-table th { background-color: var(--table-header); padding: 15px; text-align: left; font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+    .marks-table td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); font-size: 15px; color: var(--text-main); vertical-align: middle; }
+    .marks-row:hover { background-color: var(--table-header); }
+
+    .input-mark {
+        width: 90px; padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-main); text-align: center; font-size: 15px; font-weight: bold; outline: none; transition: 0.2s;
+    }
+    .input-mark:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+
+    .btn-save-marks {
+        background-color: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-save-marks:hover { background-color: #1b5e20; transform: translateY(-2px); }
+
+.weka_maksi-inline-1 { text-align: center; width: 120px; }
+.weka_maksi-inline-2 { font-weight: 600; }
+.weka_maksi-inline-3 { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.weka_maksi-inline-4 { text-align: center; }
+.weka_maksi-inline-5 { text-align: center; padding: 30px; color: var(--text-muted); font-style: italic; }
+.weka_maksi-inline-6 { margin-top: 30px; text-align: right; }

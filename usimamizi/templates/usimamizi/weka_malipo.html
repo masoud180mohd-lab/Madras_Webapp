@@ -1,51 +1,57 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/weka_malipo.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<div style="max-width: 600px; margin: auto; padding: 20px;">
+<div class="weka_malipo-inline-1">
     
-    <div style="background-color: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid #0288D1;">
-        <h2 style="color: #0288D1; margin-top: 0;">💵 Pokea Malipo Mapya</h2>
-        <p style="font-size: 16px; margin-bottom: 20px; color: #555;">
-            Mwanafunzi: <b style="color: #2E7D32;">{{ mwanafunzi.jina_kamili }}</b><br>
+    <div class="weka_malipo-inline-2">
+        <h2 class="weka_malipo-inline-3">💵 Pokea Malipo Mapya</h2>
+        <p class="weka_malipo-inline-4">
+            Mwanafunzi: <b class="weka_malipo-inline-5">{{ mwanafunzi.jina_kamili }}</b><br>
             Aina ya Malipo: <b>{{ aina_ya_malipo.jina }}</b>
         </p>
 
-        <div style="display: flex; gap: 15px; margin-bottom: 25px;">
-            <div style="flex: 1; background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #4CAF50; text-align: center;">
-                <span style="font-size: 14px; color: #555;">Alicholipa Mpaka Sasa</span><br>
-                <b style="font-size: 20px; color: #2E7D32;">Tsh {{ jumla_yake }}/=</b>
+        <div class="weka_malipo-inline-6">
+            <div class="weka_malipo-inline-7">
+                <span class="weka_malipo-inline-8">Alicholipa Mpaka Sasa</span><br>
+                <b class="weka_malipo-inline-9">Tsh {{ jumla_yake }}/=</b>
             </div>
-            <div style="flex: 1; background: #ffebee; padding: 15px; border-radius: 8px; border: 1px solid #F44336; text-align: center;">
-                <span style="font-size: 14px; color: #555;">Deni / Anachodaiwa</span><br>
-                <b style="font-size: 20px; color: #c62828;">Tsh {{ deni }}/=</b>
+            <div class="weka_malipo-inline-10">
+                <span class="weka_malipo-inline-8">Deni / Anachodaiwa</span><br>
+                <b class="weka_malipo-inline-11">Tsh {{ deni }}/=</b>
             </div>
         </div>
 
         <form method="POST" action="">
             {% csrf_token %}
             
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: bold; font-size: 15px;">Kiasi Anacholipa Sasa Hivi (Tsh):</label>
-                <input type="number" name="kiasi" max="{{ deni }}" required placeholder="Mf. 5000" style="width: 100%; padding: 12px; margin-top: 8px; border: 2px solid #ccc; border-radius: 8px; font-size: 18px; font-weight: bold;">
-                <small style="color: #888;">Hawezi kulipa kiasi kinachozidi deni lake.</small>
+            <div class="weka_malipo-inline-12">
+                <label class="weka_malipo-inline-13">Kiasi Anacholipa Sasa Hivi (Tsh):</label>
+                <input type="number" name="kiasi" max="{{ deni }}" required placeholder="Mf. 5000" class="weka_malipo-inline-14">
+                <small class="weka_malipo-inline-15">Hawezi kulipa kiasi kinachozidi deni lake.</small>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <label style="font-weight: bold; font-size: 15px;">Njia ya Malipo:</label>
-                <select name="njia" required style="width: 100%; padding: 12px; margin-top: 8px; border: 2px solid #ccc; border-radius: 8px; font-size: 16px;">
+            <div class="weka_malipo-inline-12">
+                <label class="weka_malipo-inline-13">Njia ya Malipo:</label>
+                <select name="njia" required class="weka_malipo-inline-16">
                     <option value="Cash">Pesa Taslimu (Cash)</option>
                     <option value="Simu">Mtandao wa Simu / Benki</option>
                 </select>
             </div>
 
-            <div style="margin-bottom: 25px;">
-                <label style="font-weight: bold; font-size: 15px;">Maelezo ya Ziada (Si Lazima):</label>
-                <textarea name="maelezo" rows="2" placeholder="Mf. Amelipa kwa Mpesa namba..." style="width: 100%; padding: 12px; margin-top: 8px; border: 2px solid #ccc; border-radius: 8px; font-size: 15px;"></textarea>
+            <div class="weka_malipo-inline-17">
+                <label class="weka_malipo-inline-13">Maelezo ya Ziada (Si Lazima):</label>
+                <textarea name="maelezo" rows="2" placeholder="Mf. Amelipa kwa Mpesa namba..." class="weka_malipo-inline-18"></textarea>
             </div>
 
-            <div style="display: flex; justify-content: space-between; gap: 10px;">
-                <a href="{% url 'malipo' %}?aina={{ aina_ya_malipo.id }}" style="flex: 1; text-align: center; background-color: #eee; color: #333; padding: 15px; border-radius: 8px; text-decoration: none; font-weight: bold;">Ghairi</a>
-                <button type="submit" style="flex: 2; background-color: #0288D1; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">💾 Hifadhi Malipo</button>
+            <div class="weka_malipo-inline-19">
+                <a href="{% url 'malipo' %}?aina={{ aina_ya_malipo.id }}" class="weka_malipo-inline-20">Ghairi</a>
+                <button type="submit" class="weka_malipo-inline-21">💾 Hifadhi Malipo</button>
             </div>
         </form>
 

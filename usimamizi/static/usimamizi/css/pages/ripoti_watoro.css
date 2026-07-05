@@ -1,0 +1,86 @@
+/* ----- UI YA KIPROFESHINALI (BILA ICONS) ----- */
+    :root {
+        --primary: #2c3e50;
+        --secondary: #34495e;
+        --accent: #0288D1;
+        --danger: #e74c3c;
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --bg-body: #f4f7f6;
+        --card-bg: #ffffff;
+        --border-color: #e2e8f0;
+        --table-header: #f8fafc;
+    }
+
+    body.dark-mode {
+        --bg-body: #121212;
+        --card-bg: #1e1e1e;
+        --text-main: #e0e0e0;
+        --text-muted: #a0aec0;
+        --border-color: #333333;
+        --table-header: #222222;
+    }
+
+    /* Mipangilio ya Tabs (Vitufe vya Juu) */
+    .tab-container {
+        display: flex; gap: 10px; margin-bottom: 25px;
+    }
+    .tab-btn {
+        flex: 1; padding: 16px; font-size: 16px; font-weight: 600; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; background-color: var(--card-bg); color: var(--text-muted); transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+        background-color: var(--primary); color: #ffffff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Makasha ya Jedwali */
+    .tab-content {
+        display: none; background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.02); border: 1px solid var(--border-color); animation: fadeIn 0.3s ease;
+    }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Vidhibiti vya Jedwali (Header ya Table na Vidoto Vitatu) */
+    .table-controls {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);
+    }
+    .table-title { font-size: 18px; font-weight: bold; color: var(--text-main); }
+
+    /* Mfumo wa Vidoto Vitatu (Column Toggler) */
+    .dropdown-wrapper { position: relative; display: inline-block; }
+    .dots-btn {
+        background: transparent; border: 1px solid var(--border-color); color: var(--text-main); font-size: 18px; font-weight: bold; cursor: pointer; padding: 5px 12px; border-radius: 6px; transition: 0.2s;
+    }
+    .dots-btn:hover { background-color: var(--table-header); }
+
+    .dropdown-menu {
+        display: none; position: absolute; right: 0; top: 100%; margin-top: 5px; background-color: var(--card-bg); min-width: 180px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid var(--border-color); border-radius: 8px; z-index: 100; padding: 10px;
+    }
+    .dropdown-menu label {
+        display: block; padding: 8px 10px; color: var(--text-main); font-size: 14px; cursor: pointer; border-radius: 4px; transition: 0.2s;
+    }
+    .dropdown-menu label:hover { background-color: var(--table-header); }
+    .dropdown-menu input { margin-right: 10px; cursor: pointer; }
+    .menu-header { font-size: 12px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; padding-left: 5px; }
+
+    /* Mipangilio ya Jedwali lenyewe */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { background-color: var(--table-header); padding: 15px; text-align: left; font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); }
+    .data-table td { padding: 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; color: var(--text-main); vertical-align: middle; transition: 0.2s; }
+    .data-table tbody tr:hover td { background-color: var(--table-header); }
+
+    /* Kitufe cha Download */
+    .btn-download {
+        background-color: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; display: inline-block;
+    }
+    .btn-download:hover { background-color: var(--accent); color: #ffffff; }
+
+    /* Kuweka namba za utoro zionekane vizuri */
+    .utoro-count { font-weight: bold; color: var(--danger); font-size: 15px; }
+
+.ripoti_watoro-inline-1 { max-width: 1100px; margin: auto; padding: 20px; }
+.ripoti_watoro-inline-2 { overflow-x: auto; }
+.ripoti_watoro-inline-3 { text-align: center; }
+.ripoti_watoro-inline-4 { text-align: right; }
+.ripoti_watoro-inline-5 { font-weight: 600; }
+.ripoti_watoro-inline-6 { color: var(--text-muted); }
+.ripoti_watoro-inline-7 { text-align: center; padding: 40px; color: var(--text-muted); }

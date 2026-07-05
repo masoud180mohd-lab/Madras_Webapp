@@ -1,107 +1,13 @@
 {% extends 'usimamizi/base.html' %}
 
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_wanafunzi.css' %}">
+{% endblock %}
+
 {% block maudhui %}
-<style>
-    /* ----- PREMIUM MINIMALIST UI - ORODHA YA WANAFUNZI WOTE ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --female: #c2185b;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-        --input-bg: #ffffff;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-        --input-bg: #2c2c2c;
-    }
-
-    /* Kichwa cha Ukurasa */
-    .page-header {
-        background-color: var(--card-bg); padding: 25px 30px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 6px solid var(--primary); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
-    }
-    
-    .header-title { display: flex; align-items: center; gap: 12px; }
-    .header-icon { background-color: rgba(46, 125, 50, 0.1); color: var(--primary); padding: 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-    .page-header h1 { margin: 0; color: var(--text-main); font-size: 24px; font-weight: 700; }
-
-    /* Beji za Takwimu */
-    .badge-group { display: flex; gap: 10px; flex-wrap: wrap; }
-    .stat-badge {
-        padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent;
-    }
-    .badge-male { background-color: rgba(2, 136, 209, 0.1); color: var(--secondary); border-color: rgba(2, 136, 209, 0.2); }
-    .badge-female { background-color: rgba(194, 24, 91, 0.1); color: var(--female); border-color: rgba(194, 24, 91, 0.2); }
-    .badge-total { background-color: rgba(46, 125, 50, 0.1); color: var(--primary); border-color: rgba(46, 125, 50, 0.2); }
-
-    /* Kadi ya Utafutaji (Search/Filter) */
-    .filter-card {
-        background-color: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01); margin-bottom: 25px;
-    }
-    
-    .filter-form { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
-    
-    .custom-input, .custom-select {
-        flex: 1; min-width: 200px; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); background-color: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s;
-    }
-    .custom-input:focus, .custom-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1); }
-
-    .btn-search {
-        background-color: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
-    }
-    .btn-search:hover { background-color: #1b5e20; }
-    
-    .btn-clear {
-        background-color: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
-    }
-    .btn-clear:hover { background-color: var(--table-header); color: var(--text-main); }
-
-    .btn-add-student {
-        background-color: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
-    }
-    .btn-add-student:hover { background-color: #1b5e20; color: white; }
-
-    /* Kadi ya Jedwali */
-    .table-card {
-        background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01);
-    }
-
-    .data-table { width: 100%; border-collapse: collapse; }
-    .data-table th { background-color: var(--table-header); padding: 15px; text-align: left; font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border-color); }
-    .data-table td { padding: 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; color: var(--text-main); vertical-align: middle; }
-    
-    .data-table tbody tr:hover td { background-color: var(--table-header); }
-
-    /* Action Button */
-    .btn-action-outline {
-        background: transparent; border: 1px solid var(--secondary); color: var(--secondary); padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
-    }
-    .btn-action-outline:hover { background-color: var(--secondary); color: white; }
-
-    .pagination {
-        display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 22px;
-    }
-    .page-link, .page-current {
-        min-width: 38px; height: 38px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border-color); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-size: 13px; font-weight: 700;
-    }
-    .page-link { color: var(--text-main); background: var(--card-bg); }
-    .page-link:hover { border-color: var(--primary); color: var(--primary); }
-    .page-current { color: white; background: var(--primary); border-color: var(--primary); }
-
-</style>
-
-<div style="max-width: 1100px; margin: auto; padding: 20px;">
+<div class="orodha_wanafunzi-inline-1">
 
     <div class="page-header">
         <div class="header-title">
@@ -134,7 +40,7 @@
         <form method="GET" class="filter-form">
             <input type="text" name="q" value="{{ neno_la_kutafuta }}" placeholder="Tafuta kwa jina..." class="custom-input">
 
-            <select name="jinsia" class="custom-select" style="flex: 0.5;">
+            <select name="jinsia" class="custom-select orodha_wanafunzi-inline-2">
                 <option value="">Jinsia Zote</option>
                 <option value="ME" {% if jinsia_filter == 'ME' %}selected{% endif %}>Wanaume (ME)</option>
                 <option value="KE" {% if jinsia_filter == 'KE' %}selected{% endif %}>Wanawake (KE)</option>
@@ -159,23 +65,23 @@
     </div>
 
     <div class="table-card">
-        <div style="overflow-x: auto;">
+        <div class="orodha_wanafunzi-inline-3">
             <table class="data-table">
                 <thead>
                     <tr>
                         <th>Jina Kamili</th>
-                        <th style="text-align: right;">Ripoti</th>
+                        <th class="orodha_wanafunzi-inline-4">Ripoti</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for mwanafunzi in wanafunzi %}
                     <tr>
-                        <td style="font-weight: 600;">
-                            <a href="{% url 'mwanafunzi_profile' mwanafunzi.id %}" style="text-decoration: none; color: var(--secondary);">
+                        <td class="orodha_wanafunzi-inline-5">
+                            <a href="{% url 'mwanafunzi_profile' mwanafunzi.id %}" class="orodha_wanafunzi-inline-6">
                                 {{ mwanafunzi.jina_kamili }}
                             </a>
                         </td>
-                        <td style="text-align: right;">
+                        <td class="orodha_wanafunzi-inline-4">
                             <a href="{% url 'ripoti_mwanafunzi' mwanafunzi.id 'Darasa' %}" class="btn-action-outline">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path>
@@ -190,7 +96,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="2" style="text-align: center; padding: 40px; color: var(--text-muted); font-style: italic;">
+                        <td colspan="2" class="orodha_wanafunzi-inline-7">
                             Hakuna mwanafunzi aliyepatikana kwa kigezo ulichotafuta.
                         </td>
                     </tr>
