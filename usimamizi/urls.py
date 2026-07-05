@@ -9,6 +9,7 @@ urlpatterns = [
     
     # Madarasa na Wanafunzi
     path('wanafunzi/', views.orodha_wanafunzi, name='orodha_wanafunzi'),
+    path('wanafunzi/sajili/', views.sajili_mwanafunzi, name='sajili_mwanafunzi'),
     path('wanafunzi/hariri/<int:id>/', views.hariri_mwanafunzi, name='hariri_mwanafunzi'), 
     path('walimu/', views.orodha_walimu, name='orodha_walimu'),
     path('madarasa/', views.orodha_madarasa, name='orodha_madarasa'),

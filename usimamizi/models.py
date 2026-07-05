@@ -1,6 +1,41 @@
+from pathlib import Path
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
+
+PICHA_MAX_SIZE = 2 * 1024 * 1024
+PICHA_FORMATS = ("jpg", "jpeg", "png", "webp")
+NYENZO_MAX_SIZE = 10 * 1024 * 1024
+NYENZO_FORMATS = (
+    "pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx", "txt",
+    "jpg", "jpeg", "png", "webp",
+)
+
+
+def _validate_file_size(uploaded_file, max_size, label):
+    if uploaded_file and uploaded_file.size > max_size:
+        max_mb = max_size // (1024 * 1024)
+        raise ValidationError(f"{label} lisizidi {max_mb}MB.")
+
+
+def _validate_file_extension(uploaded_file, allowed_extensions, label):
+    extension = Path(uploaded_file.name).suffix.lower().lstrip(".")
+    if extension not in allowed_extensions:
+        formats = ", ".join(ext.upper() for ext in allowed_extensions)
+        raise ValidationError(f"{label} linapaswa kuwa katika format hizi: {formats}.")
+
+
+def validate_picha(uploaded_file):
+    _validate_file_size(uploaded_file, PICHA_MAX_SIZE, "Picha")
+    _validate_file_extension(uploaded_file, PICHA_FORMATS, "Picha")
+
+
+def validate_nyenzo(uploaded_file):
+    _validate_file_size(uploaded_file, NYENZO_MAX_SIZE, "Faili")
+    _validate_file_extension(uploaded_file, NYENZO_FORMATS, "Faili")
+
 
 class Darasa(models.Model):
     jina = models.CharField(max_length=50, help_text="Mfano: Darasa la Kwanza, Ibtidai, n.k.")
@@ -54,6 +89,7 @@ class Mwanafunzi(models.Model):
     darasa = models.ForeignKey(Darasa, on_delete=models.SET_NULL, null=True, blank=True)
     programu_ya_usiku = models.ForeignKey(Somo, on_delete=models.SET_NULL, null=True, blank=True, related_name='wanafunzi_usiku', help_text="Chagua kama anasoma usiku (Acha wazi kama hasomi usiku)")
     juzuu_aliyohifadhi = models.IntegerField(default=1)
+    picha = models.ImageField(upload_to='picha_za_wanafunzi/', null=True, blank=True, validators=[validate_picha])
     tarehe_ya_kujiunga = models.DateField(auto_now_add=True)
 
     # 3. KODI YA KUPIGA HESABU YA UMRI AUTOMATIKI
@@ -169,7 +205,7 @@ class PandeMurajaa(models.Model):
 class Nyenzo(models.Model):
     somo = models.ForeignKey(Somo, on_delete=models.CASCADE)
     jina_la_faili = models.CharField(max_length=200)
-    faili = models.FileField(upload_to='nyenzo_masomo/')
+    faili = models.FileField(upload_to='nyenzo_masomo/', validators=[validate_nyenzo])
     tarehe_iliyowekwa = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

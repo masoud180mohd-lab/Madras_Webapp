@@ -6,7 +6,6 @@ from django.conf.urls.static import static # Tumeongeza hii
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('madrasa/', include('usimamizi.urls')),
-    path('mashindano/', include('mashindano.urls')),
 ]
 
 # Tumeongeza mstari huu chini kuruhusu picha kuonekana

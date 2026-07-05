@@ -34,6 +34,14 @@
         background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; border-top: 6px solid var(--primary);
     }
     
+    .profile-identity { display: flex; align-items: center; gap: 18px; min-width: 260px; }
+    .student-photo, .student-photo-placeholder {
+        width: 88px; height: 88px; border-radius: 12px; border: 1px solid var(--border-color); flex: 0 0 auto;
+    }
+    .student-photo { object-fit: cover; background-color: var(--table-header); }
+    .student-photo-placeholder {
+        display: flex; align-items: center; justify-content: center; background-color: var(--table-header); color: var(--text-muted);
+    }
     .profile-title h1 { margin: 0 0 5px 0; color: var(--text-main); font-size: 26px; font-weight: 700; }
     .profile-title p { margin: 0; color: var(--text-muted); font-size: 15px; display: flex; align-items: center; gap: 8px; }
     
@@ -117,11 +125,20 @@
 <div style="max-width: 1000px; margin: auto; padding: 20px;">
     
     <div class="profile-header">
-        <div class="profile-title">
-            <h1>Profaili ya Mwanafunzi</h1>
-            <p>
-                Namba ya Usajili: <span class="reg-number">{{ mwanafunzi.namba_ya_usajili }}</span>
-            </p>
+        <div class="profile-identity">
+            {% if mwanafunzi.picha %}
+                <img src="{{ mwanafunzi.picha.url }}" alt="{{ mwanafunzi.jina_kamili }}" class="student-photo">
+            {% else %}
+                <div class="student-photo-placeholder" aria-label="Hakuna picha">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+            {% endif %}
+            <div class="profile-title">
+                <h1>{{ mwanafunzi.jina_kamili }}</h1>
+                <p>
+                    Namba ya Usajili: <span class="reg-number">{{ mwanafunzi.namba_ya_usajili }}</span>
+                </p>
+            </div>
         </div>
         <a href="{% url 'orodha_wanafunzi' %}" class="btn-icon-back" title="Rudi kwenye Orodha">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>

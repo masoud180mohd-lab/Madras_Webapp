@@ -67,6 +67,11 @@
     }
     .btn-clear:hover { background-color: var(--table-header); color: var(--text-main); }
 
+    .btn-add-student {
+        background-color: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
+    }
+    .btn-add-student:hover { background-color: #1b5e20; color: white; }
+
     /* Kadi ya Jedwali */
     .table-card {
         background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01);
@@ -83,6 +88,16 @@
         background: transparent; border: 1px solid var(--secondary); color: var(--secondary); padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
     }
     .btn-action-outline:hover { background-color: var(--secondary); color: white; }
+
+    .pagination {
+        display: flex; justify-content: center; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 22px;
+    }
+    .page-link, .page-current {
+        min-width: 38px; height: 38px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--border-color); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-size: 13px; font-weight: 700;
+    }
+    .page-link { color: var(--text-main); background: var(--card-bg); }
+    .page-link:hover { border-color: var(--primary); color: var(--primary); }
+    .page-current { color: white; background: var(--primary); border-color: var(--primary); }
 
 </style>
 
@@ -105,6 +120,13 @@
             <span class="stat-badge badge-male">Wanaume: {{ wavulana }}</span>
             <span class="stat-badge badge-female">Wanawake: {{ wasichana }}</span>
             <span class="stat-badge badge-total">Jumla: {{ jumla }}</span>
+            <a href="{% url 'sajili_mwanafunzi' %}" class="btn-add-student">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Sajili Mwanafunzi
+            </a>
         </div>
     </div>
 
@@ -176,6 +198,20 @@
                 </tbody>
             </table>
         </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Nyuma</a>
+            {% endif %}
+
+            <span class="page-current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+            {% if page_obj.has_next %}
+                <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}">Mbele</a>
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
 
 </div>

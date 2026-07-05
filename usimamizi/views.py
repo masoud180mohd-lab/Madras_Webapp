@@ -1,6 +1,7 @@
 import csv
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -12,8 +13,16 @@ from xhtml2pdf import pisa
 from django.utils.timezone import localtime
 
 from .models import Mwanafunzi, Hudhurio, Tangazo, Mwalimu, Darasa, Somo, Nyenzo, Mtihani, Matokeo, RekodiHifdhu, PandeMurajaa, AinaMalipo, Malipo, MsetoMtihani
-from .forms import NyenzoForm, MtihaniForm, MsetoMtihaniForm
+from .forms import MwanafunziForm, NyenzoForm, MtihaniForm, MsetoMtihaniForm
 from .utils import hesabu_daraja, jenga_ripoti_jumla
+
+
+def paginate_items(request, items, per_page=20):
+    paginator = Paginator(items, per_page)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    return page_obj, query_params.urlencode()
 
 def ingia(request):
     if request.method == 'POST':
@@ -82,8 +91,12 @@ def orodha_wanafunzi(request):
     if jinsia_filter:
         wanafunzi = wanafunzi.filter(jinsia=jinsia_filter)
 
+    page_obj, pagination_query = paginate_items(request, wanafunzi, per_page=20)
+
     context = {
-        'wanafunzi': wanafunzi,
+        'wanafunzi': page_obj,
+        'page_obj': page_obj,
+        'pagination_query': pagination_query,
         'jumla': wanafunzi.count(),
         'wavulana': wanafunzi.filter(jinsia='ME').count(),
         'wasichana': wanafunzi.filter(jinsia='KE').count(),
@@ -93,30 +106,40 @@ def orodha_wanafunzi(request):
     return render(request, 'usimamizi/orodha_wanafunzi.html', context)
 
 @login_required(login_url='ingia')
+def sajili_mwanafunzi(request):
+    if request.method == 'POST':
+        form = MwanafunziForm(request.POST, request.FILES)
+        if form.is_valid():
+            mwanafunzi = form.save()
+            messages.success(request, f'Mwanafunzi {mwanafunzi.jina_kamili} amesajiliwa kikamilifu!')
+            return redirect('mwanafunzi_profile', mwanafunzi_id=mwanafunzi.id)
+    else:
+        form = MwanafunziForm()
+    return render(request, 'usimamizi/fomu_mwanafunzi.html', {
+        'form': form,
+        'kichwa': 'Sajili Mwanafunzi',
+        'maelezo': 'Jaza taarifa za msingi na picha ya mwanafunzi.',
+        'kitufe': 'Sajili Mwanafunzi',
+    })
+
+@login_required(login_url='ingia')
 def hariri_mwanafunzi(request, id):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=id)
     if request.method == 'POST':
-        mwanafunzi.jina_kamili = request.POST.get('jina')
-
-        # Tunaruhusu ihifadhi Namba ya Usajili kama mtu ataiweka kwa mkono, kama sivyo inabaki na ile ile
-        namba = request.POST.get('namba_usajili')
-        if namba:
-            mwanafunzi.namba_ya_usajili = namba
-
-        mwanafunzi.juzuu_aliyohifadhi = request.POST.get('juzuu')
-        mwanafunzi.mahala_anapoishi = request.POST.get('mahala')
-        mwanafunzi.jina_la_mzazi = request.POST.get('mzazi')
-        mwanafunzi.namba_ya_simu_mzazi = request.POST.get('simu')
-
-        # TUNAPOKEA TAREHE YA KUZALIWA BADALA YA UMRI WA KAWAIDA
-        tarehe = request.POST.get('tarehe_kuzaliwa')
-        if tarehe:
-            mwanafunzi.tarehe_ya_kuzaliwa = tarehe
-
-        mwanafunzi.save()
-        messages.success(request, f'✅ Taarifa za {mwanafunzi.jina_kamili} zimesasishwa!')
-        return redirect('orodha_wanafunzi')
-    return render(request, 'usimamizi/hariri_mwanafunzi.html', {'mwanafunzi': mwanafunzi})
+        form = MwanafunziForm(request.POST, request.FILES, instance=mwanafunzi)
+        if form.is_valid():
+            mwanafunzi = form.save()
+            messages.success(request, f'Taarifa za {mwanafunzi.jina_kamili} zimesasishwa!')
+            return redirect('mwanafunzi_profile', mwanafunzi_id=mwanafunzi.id)
+    else:
+        form = MwanafunziForm(instance=mwanafunzi)
+    return render(request, 'usimamizi/fomu_mwanafunzi.html', {
+        'form': form,
+        'mwanafunzi': mwanafunzi,
+        'kichwa': 'Hariri Taarifa',
+        'maelezo': f'Mwanafunzi: {mwanafunzi.jina_kamili}',
+        'kitufe': 'Hifadhi Mabadiliko',
+    })
 
 @login_required(login_url='ingia')
 def orodha_walimu(request):
@@ -516,12 +539,16 @@ def ukurasa_malipo(request):
                 'hali': hali
             })
 
+    page_obj, pagination_query = paginate_items(request, taarifa_wanafunzi, per_page=20)
+
     context = {
         'aina_za_malipo': aina_za_malipo,
         'aina_teule': aina_teule,
         'jumla_iliyokusanywa': jumla_iliyokusanywa,
         'idadi_waliolipa': idadi_waliolipa,
-        'taarifa_wanafunzi': taarifa_wanafunzi,
+        'taarifa_wanafunzi': page_obj,
+        'page_obj': page_obj,
+        'pagination_query': pagination_query,
         'neno_la_kutafuta': neno_la_kutafuta,
         'hali_teule': hali_teule, # Tunapeleka Hali kwenye HTML
     }
@@ -726,6 +753,8 @@ def pakua_pdf_matokeo_jumla(request, darasa_id, mseto_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
     mseto = get_object_or_404(MsetoMtihani, id=mseto_id, darasa=darasa)
     ripoti = jenga_ripoti_jumla(mseto)
+    for somo in ripoti['masomo']:
+        somo.jina_pdf = somo.jina.replace('_', ' ')
 
     context = {
         'darasa': darasa,
