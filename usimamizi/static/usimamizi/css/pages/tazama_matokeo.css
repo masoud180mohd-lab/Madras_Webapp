@@ -1,19 +1,4 @@
-:root {
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-    }
-    body.dark-mode {
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-    }
-
-    .report-card { max-width: 900px; margin: auto; background-color: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
+.report-card { max-width: 900px; margin: auto; background-color: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid var(--border-color); }
     .report-header { text-align: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 25px; }
     .report-header h2 { margin: 0; color: var(--text-main); font-size: 24px; text-transform: uppercase; }
     .report-header p { margin: 8px 0 0 0; color: var(--text-muted); font-size: 15px; }
@@ -26,19 +11,19 @@
     .rank-circle { display: inline-flex; justify-content: center; align-items: center; width: 30px; height: 30px; border-radius: 50%; background-color: var(--table-header); font-weight: bold; font-size: 13px; color: var(--text-muted); }
     .rank-top { background-color: #FFD700; color: var(--text-muted); }
     .grade-badge { padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; color: white; display: inline-block; text-align: center; min-width: 30px; }
-    .grade-a { background-color: #2E7D32; }
-    .grade-b { background-color: #0288D1; }
-    .grade-c { background-color: #f57c00; }
-    .grade-d { background-color: #c2185b; }
-    .grade-f { background-color: #d32f2f; }
+    .grade-a { background-color: var(--primary); }
+    .grade-b { background-color: var(--secondary); }
+    .grade-c { background-color: var(--warning); }
+    .grade-d { background-color: var(--female); }
+    .grade-f { background-color: var(--danger); }
 
-    .back-link { display: inline-flex; align-items: center; gap: 8px; color: #0288D1; text-decoration: none; font-weight: bold; margin-bottom: 20px; font-size: 14px; }
+    .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--secondary); text-decoration: none; font-weight: bold; margin-bottom: 20px; font-size: 14px; }
     .back-link:hover { text-decoration: underline; }
 
     /* ====== CSS MPYA YA VIDOTO VITATU NA PDF ====== */
     .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 
-    .btn-download-pdf { background-color: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+    .btn-download-pdf { background-color: var(--danger); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
     .btn-download-pdf:hover { background-color: #b71c1c; }
 
     .dropdown-wrapper { position: relative; display: inline-block; }

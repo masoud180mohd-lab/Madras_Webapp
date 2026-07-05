@@ -1,27 +1,5 @@
 /* ----- UI YA KIPROFESHINALI (BILA ICONS) ----- */
-    :root {
-        --primary: #2c3e50;
-        --secondary: #34495e;
-        --accent: #0288D1;
-        --danger: #e74c3c;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-    }
-
-    /* Mipangilio ya Tabs (Vitufe vya Juu) */
+/* Mipangilio ya Tabs (Vitufe vya Juu) */
     .tab-container {
         display: flex; gap: 10px; margin-bottom: 25px;
     }

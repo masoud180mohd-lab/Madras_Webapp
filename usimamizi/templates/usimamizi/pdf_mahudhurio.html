@@ -1,18 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
     <title>Ripoti ya Mahudhurio</title>
-    <style>
-        body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
-        .title { color: #2E7D32; font-size: 24px; font-weight: bold; }
-        .info { font-size: 14px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background-color: #f2f2f2; color: #2E7D32; padding: 10px; text-align: left; border: 1px solid #ddd; font-weight: bold; }
-        td { padding: 10px; border: 1px solid #ddd; }
-        .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
-    </style>
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_mahudhurio.css' %}?v=20260706a">
 </head>
 <body>
 
@@ -35,7 +27,7 @@
         <thead>
             <tr>
                 <th>Tarehe</th>
-                <th style="text-align: center;">Hali</th>
+                <th class="center">Hali</th>
                 <th>Sababu (Kama hayupo)</th>
             </tr>
         </thead>
@@ -43,14 +35,14 @@
             {% for h in mahudhurio %}
             <tr>
                 <td>{{ h.tarehe|date:"d M Y" }}</td>
-                <td style="text-align: center; color: {% if h.yupo %}green{% else %}red{% endif %};">
+                <td class="center {% if h.yupo %}status-present{% else %}status-absent{% endif %}">
                     <b>{% if h.yupo %}Yupo{% else %}Hayupo{% endif %}</b>
                 </td>
                 <td>{{ h.sababu_kama_hayupo|default:"-" }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="3" style="text-align: center;">Hakuna rekodi za mahudhurio kwa muda huu.</td>
+                <td colspan="3" class="center">Hakuna rekodi za mahudhurio kwa muda huu.</td>
             </tr>
             {% endfor %}
         </tbody>

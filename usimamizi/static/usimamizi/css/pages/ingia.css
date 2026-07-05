@@ -1,34 +1,6 @@
 /* ----- PREMIUM LOGIN UI (PAMOJA NA AUTO DARK-MODE) ----- */
-        :root {
-            --primary: #2E7D32;
-            --primary-hover: #1b5e20;
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-main: #2c3e50;
-            --text-muted: #7f8c8d;
-            --border-color: #e2e8f0;
-            --input-bg: #ffffff;
-            --danger-bg: #fde8e8;
-            --danger-text: #c62828;
-            --danger-border: #f8b4b4;
-        }
-
-        /* Inasoma moja kwa moja mpangilio wa Giza wa simu/kompyuta */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #121212;
-                --card-bg: #1e1e1e;
-                --text-main: #e0e0e0;
-                --text-muted: #a0aec0;
-                --border-color: #333333;
-                --input-bg: #2c2c2c;
-                --danger-bg: rgba(211, 47, 47, 0.1);
-                --danger-text: #f87171;
-                --danger-border: rgba(211, 47, 47, 0.3);
-            }
-        }
-
-        * {
+/* Inasoma moja kwa moja mpangilio wa Giza wa simu/kompyuta */
+* {
             box-sizing: border-box;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }

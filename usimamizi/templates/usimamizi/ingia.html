@@ -5,7 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ingia - Al-Madrasatul Rasulillah</title>
-    <link rel="stylesheet" href="{% static 'usimamizi/css/pages/ingia.css' %}">
+    <script>
+        (function () {
+            var theme = localStorage.getItem('theme');
+            if (theme) document.documentElement.dataset.theme = theme;
+        })();
+    </script>
+    <link rel="stylesheet" href="{% static 'usimamizi/css/base.css' %}?v=20260706a">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pages/ingia.css' %}?v=20260706a">
 </head>
 <body>
 

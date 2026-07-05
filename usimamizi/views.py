@@ -1,5 +1,9 @@
 import csv
+import os
+from urllib.parse import urlparse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
+from django.contrib.staticfiles import finders
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
@@ -16,6 +20,37 @@ from .models import Mwanafunzi, Hudhurio, Tangazo, Mwalimu, Darasa, Somo, Nyenzo
 from .forms import MwanafunziForm, NyenzoForm, MtihaniForm, MsetoMtihaniForm
 from .utils import hesabu_daraja, jenga_ripoti_jumla
 
+
+def link_callback(uri, rel):
+    parsed_uri = urlparse(uri)
+    path = parsed_uri.path or uri
+
+    if path.startswith(settings.MEDIA_URL):
+        media_path = os.path.join(settings.MEDIA_ROOT, path.replace(settings.MEDIA_URL, "", 1))
+        if os.path.isfile(media_path):
+            return media_path
+
+    static_url = settings.STATIC_URL
+    candidates = [static_url]
+    if static_url.startswith("/"):
+        candidates.append(static_url.lstrip("/"))
+    else:
+        candidates.append("/" + static_url)
+
+    for candidate in candidates:
+        if path.startswith(candidate):
+            relative_path = path.replace(candidate, "", 1)
+            static_path = finders.find(relative_path)
+            if static_path:
+                return static_path
+            if settings.STATIC_ROOT:
+                return os.path.join(settings.STATIC_ROOT, relative_path)
+
+    static_path = finders.find(path.lstrip("/"))
+    if static_path:
+        return static_path
+
+    return uri
 
 def paginate_items(request, items, per_page=20):
     paginator = Paginator(items, per_page)
@@ -448,7 +483,7 @@ def pakua_pdf_mahudhurio(request, mwanafunzi_id, aina, muda):
     jina_la_faili = f"Mahudhurio_{mwanafunzi.namba_ya_usajili}_{muda_wa_sasa.strftime('%H%M%S')}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response)
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Samahani, kumetokea hitilafu katika kutengeneza PDF', status=500)
     return response
@@ -479,7 +514,7 @@ def pakua_pdf_sabaq(request, mwanafunzi_id, aina, muda):
     jina_la_faili = f"Sabaq_{mwanafunzi.namba_ya_usajili}_{muda_wa_sasa.strftime('%H%M%S')}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response)
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Hitilafu ilitokea', status=500)
     return response
@@ -614,7 +649,7 @@ def pakua_risiti(request, malipo_id):
     jina_la_faili = f"Risiti_{mwanafunzi.namba_ya_usajili}_{malipo.id}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response)
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Kumetokea hitilafu katika kutengeneza Risiti', status=500)
     return response
@@ -691,7 +726,7 @@ def pakua_pdf_matokeo(request, mtihani_id):
     jina_la_faili = f"Matokeo_{somo.jina}_{mtihani.jina_la_mtihani}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response)
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Kumetokea hitilafu katika kutengeneza PDF ya matokeo', status=500)
     return response
@@ -771,7 +806,7 @@ def pakua_pdf_matokeo_jumla(request, darasa_id, mseto_id):
     jina_la_faili = f"Matokeo_Jumla_{darasa.jina}_{jina_salama}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response)
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Kumetokea hitilafu katika kutengeneza PDF ya matokeo ya jumla', status=500)
     return response

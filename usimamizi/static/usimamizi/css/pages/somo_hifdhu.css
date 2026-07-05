@@ -1,26 +1,5 @@
 /* ----- UI YA KIPROFESHINALI KWA SOMO LA HIFDHU (MINIMALIST) ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --hifdhu-accent: #673ab7; 
-        --warning: #f57c00;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-    }
-
-    /* Bango la Juu (Imesafishwa, Hakuna Icon) */
+/* Bango la Juu (Imesafishwa, Hakuna Icon) */
     .hifdhu-header {
         background-color: var(--card-bg); 
         padding: 35px 30px; 
@@ -83,10 +62,10 @@
     .btn-mahudhurio:hover { background-color: var(--secondary); color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(2, 136, 209, 0.2); }
     
     .btn-sabaq { background-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2); border: 2px solid var(--primary); }
-    .btn-sabaq:hover { background-color: #1b5e20; border-color: #1b5e20; transform: translateY(-2px); }
+    .btn-sabaq:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); transform: translateY(-2px); }
 
     /* Alerts */
-    .alert-error { background-color: rgba(211, 47, 47, 0.1); color: #d32f2f; padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #d32f2f; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+    .alert-error { background-color: rgba(211, 47, 47, 0.1); color: var(--danger); padding: 15px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid var(--danger); font-weight: 500; display: flex; align-items: center; gap: 10px; }
 
 .somo_hifdhu-inline-1 { max-width: 1000px; margin: auto; padding: 20px; }
 .somo_hifdhu-inline-2 { color: var(--text-muted); font-size: 13px; margin: 10px 0 0 0; }

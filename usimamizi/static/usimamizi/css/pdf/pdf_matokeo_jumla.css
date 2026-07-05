@@ -1,0 +1,56 @@
+@page { size: A4 landscape; margin: 0.8cm; }
+body { font-family: Helvetica, sans-serif; font-size: 12px; color: #13263a; }
+.header {
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 8px 0 9px;
+    border-top: 3px solid #2E7D32;
+    border-bottom: 1px solid #b8c6d6;
+}
+.school-name {
+    color: #1b5e20;
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.school-location { margin: 2px 0 7px; font-size: 12px; color: #5d6d7e; text-transform: uppercase; }
+.report-title {
+    display: inline-block;
+    margin: 0 0 5px;
+    padding: 4px 14px;
+    background-color: #f1f8e9;
+    color: #1b5e20;
+    border: 1px solid #c8e6c9;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.meta { margin: 2px 0 0; font-size: 12px; color: #34495e; }
+table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+th { background-color: #2E7D32; color: white; padding: 6px 4px; text-align: center; font-size: 12px; line-height: 1.2; text-transform: uppercase; border: 1px solid #1b5e20; }
+td { padding: 5px 4px; border: 1px solid #ccc; text-align: center; font-size: 12px; line-height: 1.25; }
+td.name { text-align: left; font-weight: bold; }
+td.avg { background-color: #f1f8e9; font-weight: bold; }
+th.avg { background-color: #1b5e20; color: white; }
+.summary-title { margin: 8px 0 4px; font-size: 12px; font-weight: bold; color: #13263a; }
+.summary-table { width: 45%; margin: 0 0 10px; }
+.summary-table th {
+    background-color: #f1f8e9;
+    color: #1b5e20;
+    border: 1px solid #9ccc9c;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+.summary-table td {
+    border: 1px solid #9ccc9c;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+.summary-table td:first-child { font-weight: bold; }
+.main-table { margin-top: 10px; }
+.main-table th { word-wrap: break-word; }
+.footer { margin-top: 15px; font-size: 10px; color: #777; text-align: center; border-top: 1px solid #ddd; padding-top: 6px; }
+.col-position { width: 5%; }
+.col-student { width: 20%; }

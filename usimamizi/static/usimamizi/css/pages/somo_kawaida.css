@@ -1,29 +1,5 @@
 /* CSS KWA AJILI YA UKURASA WA NDANI WA SOMO (MINIMALIST) */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --warning: #f57c00;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-        --hover-bg: #f8fafc;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-        --hover-bg: #222222;
-    }
-
-    /* Bango la Juu (Safi, Hakuna Icon ya Kitabu) */
+/* Bango la Juu (Safi, Hakuna Icon ya Kitabu) */
     .subject-header {
         background-color: var(--card-bg); 
         padding: 35px 30px; 
@@ -74,7 +50,7 @@
     .btn-add {
         background-color: var(--primary); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; border: none; cursor: pointer;
     }
-    .btn-add:hover { background-color: #1b5e20; }
+    .btn-add:hover { background-color: var(--primary-hover); }
 
     .btn-add.blue { background-color: var(--secondary); }
     .btn-add.blue:hover { background-color: #0277bd; }

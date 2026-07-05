@@ -1,0 +1,12 @@
+body { font-family: Helvetica, sans-serif; font-size: 12px; color: #333; }
+.header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
+.header h1 { color: #2E7D32; margin: 0 0 5px 0; font-size: 20px; text-transform: uppercase; }
+.header p { margin: 2px 0; font-size: 12px; color: #555; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th { background-color: #2E7D32; color: white; padding: 8px; text-align: left; font-size: 11px; text-transform: uppercase; }
+td { padding: 8px; border-bottom: 1px solid #ddd; font-size: 12px; }
+.center { text-align: center; }
+.footer { margin-top: 30px; font-size: 10px; color: #777; text-align: center; border-top: 1px solid #ddd; padding-top: 10px; }
+.col-position { width: 10%; }
+.col-student { width: 45%; }
+.col-score, .col-grade, .col-notes { width: 15%; }

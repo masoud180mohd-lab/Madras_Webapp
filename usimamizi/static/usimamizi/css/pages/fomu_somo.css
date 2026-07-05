@@ -1,27 +1,5 @@
 /* ----- PREMIUM MINIMALIST UI - PAKIA NYENZO/MTIHANI ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --danger: #d32f2f;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --input-bg: #ffffff;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --input-bg: #2c2c2c;
-    }
-
-    /* Rangi inabadilika kutegemea Aina (Nyenzo=Kijani, Mtihani=Bluu) */
+/* Rangi inabadilika kutegemea Aina (Nyenzo=Kijani, Mtihani=Bluu) */
     .form-card {
         background-color: var(--card-bg);
         padding: 35px 40px;

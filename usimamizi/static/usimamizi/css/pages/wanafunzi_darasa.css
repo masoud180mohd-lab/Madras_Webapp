@@ -1,27 +1,5 @@
 /* ----- PREMIUM MINIMALIST UI - ORODHA YA DARASA ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --female: #c2185b;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-    }
-
-    /* Kichwa cha Ukurasa */
+/* Kichwa cha Ukurasa */
     .page-header {
         background-color: var(--card-bg); padding: 25px 30px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 6px solid var(--primary); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
     }
@@ -44,7 +22,7 @@
     .btn-main {
         background-color: var(--primary); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: bold; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
     }
-    .btn-main:hover { background-color: #1b5e20; transform: translateY(-2px); }
+    .btn-main:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
     .btn-secondary {
         background-color: var(--secondary); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: bold; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(2, 136, 209, 0.2);

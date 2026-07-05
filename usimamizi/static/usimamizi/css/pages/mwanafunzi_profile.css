@@ -1,33 +1,7 @@
 /* ----- PREMIUM MINIMALIST UI - PROFAILI YA MWANAFUNZI ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --accent: #673ab7;
-        --warning: #f57c00;
-        --success: #388e3c;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-        --badge-bg: #e8f5e9;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-        --badge-bg: rgba(46, 125, 50, 0.15);
-    }
-
-    /* Kichwa cha Profaili */
+/* Kichwa cha Profaili */
     .profile-header {
-        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; border-top: 6px solid var(--primary);
+        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; border-top: 6px solid var(--primary);
     }
     
     .profile-identity { display: flex; align-items: center; gap: 18px; min-width: 260px; }
@@ -54,7 +28,7 @@
     }
     
     .info-card {
-        background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01);
+        background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color);
     }
     
     .info-card-title {
@@ -84,14 +58,14 @@
     .btn-edit:hover { background: var(--warning); color: white; }
     
     .btn-report-day { background-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2); }
-    .btn-report-day:hover { background-color: #1b5e20; transform: translateY(-2px); }
+    .btn-report-day:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
     
     .btn-report-night { background-color: var(--secondary); color: white; box-shadow: 0 4px 10px rgba(2, 136, 209, 0.2); }
     .btn-report-night:hover { background-color: #0277bd; transform: translateY(-2px); }
 
     /* Sehemu ya Fedha (Malipo) */
     .finance-section {
-        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01);
+        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color);
     }
     
     .finance-header {
@@ -127,3 +101,10 @@
 .mwanafunzi_profile-inline-9 { font-weight: 500; }
 .mwanafunzi_profile-inline-10 { color: var(--text-main); }
 .mwanafunzi_profile-inline-11 { text-align: center; padding: 40px; color: var(--text-muted); font-style: italic; }
+
+
+.profile-header.profile-header { border-top: 6px solid var(--primary); }
+.info-card.mwanafunzi_profile-inline-2 { border-top: 4px solid var(--primary); }
+.info-card.mwanafunzi_profile-inline-3 { border-top: 4px solid var(--warning); }
+.reg-number { background-color: var(--success-bg); color: var(--primary-hover); }
+.btn-report-day, .btn-report-night { color: white; }

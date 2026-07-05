@@ -1,27 +1,5 @@
 /* ----- PREMIUM MINIMALIST UI - ORODHA WANAFUNZI HIFDHU ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --accent: #673ab7;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-    }
-
-    /* Kichwa cha Ukurasa - Minimalist & Compact */
+/* Kichwa cha Ukurasa - Minimalist & Compact */
     .page-header {
         background-color: var(--card-bg); 
         padding: 20px 25px; 

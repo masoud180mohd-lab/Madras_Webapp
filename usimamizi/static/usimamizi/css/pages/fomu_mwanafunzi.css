@@ -1,26 +1,4 @@
-:root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --warning: #f57c00;
-        --danger: #d32f2f;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --input-bg: #ffffff;
-        --table-header: #f8fafc;
-    }
-
-    body.dark-mode {
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --input-bg: #2c2c2c;
-        --table-header: #222222;
-    }
-
-    .student-form-wrap { max-width: 840px; margin: auto; padding: 20px; }
+.student-form-wrap { max-width: 840px; margin: auto; padding: 20px; }
     .page-header {
         background-color: var(--card-bg);
         padding: 25px 30px;
@@ -133,4 +111,4 @@
     .btn-cancel { color: var(--text-main); border: 1px solid var(--border-color); background: transparent; flex: 1; }
     .btn-cancel:hover { background: var(--table-header); }
     .btn-submit { color: white; border: none; background: var(--primary); flex: 2; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2); }
-    .btn-submit:hover { background: #1b5e20; }
+    .btn-submit:hover { background: var(--primary-hover); }

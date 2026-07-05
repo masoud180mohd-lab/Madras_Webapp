@@ -1,29 +1,5 @@
 /* ----- PREMIUM MINIMALIST UI - ORODHA YA WANAFUNZI WOTE ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --female: #c2185b;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-        --input-bg: #ffffff;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-        --input-bg: #2c2c2c;
-    }
-
-    /* Kichwa cha Ukurasa */
+/* Kichwa cha Ukurasa */
     .page-header {
         background-color: var(--card-bg); padding: 25px 30px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 6px solid var(--primary); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
     }
@@ -33,7 +9,7 @@
     .page-header h1 { margin: 0; color: var(--text-main); font-size: 24px; font-weight: 700; }
 
     /* Beji za Takwimu */
-    .badge-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    .badge-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .stat-badge {
         padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent;
     }
@@ -43,7 +19,7 @@
 
     /* Kadi ya Utafutaji (Search/Filter) */
     .filter-card {
-        background-color: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01); margin-bottom: 25px;
+        background-color: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color); margin-bottom: 25px;
     }
     
     .filter-form { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
@@ -54,9 +30,9 @@
     .custom-input:focus, .custom-select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1); }
 
     .btn-search {
-        background-color: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
+        background-color: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; min-height: 44px; white-space: nowrap;
     }
-    .btn-search:hover { background-color: #1b5e20; }
+    .btn-search:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
     
     .btn-clear {
         background-color: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
@@ -64,13 +40,13 @@
     .btn-clear:hover { background-color: var(--table-header); color: var(--text-main); }
 
     .btn-add-student {
-        background-color: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;
+        background-color: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; min-height: 44px; white-space: nowrap; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
     }
-    .btn-add-student:hover { background-color: #1b5e20; color: white; }
+    .btn-add-student:hover { background-color: var(--primary-hover); color: white; transform: translateY(-2px); }
 
     /* Kadi ya Jedwali */
     .table-card {
-        background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01);
+        background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color);
     }
 
     .data-table { width: 100%; border-collapse: collapse; }

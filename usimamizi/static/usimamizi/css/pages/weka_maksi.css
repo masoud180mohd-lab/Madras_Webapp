@@ -1,24 +1,5 @@
 /* ----- PREMIUM FINTECH STYLE KWA AJILI YA MAKSI ----- */
-    :root {
-        --primary: #2E7D32;
-        --border-color: #e2e8f0;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --table-header: #f8fafc;
-        --input-bg: #ffffff;
-    }
-
-    body.dark-mode {
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-        --input-bg: #2c2c2c;
-    }
-
-    .marks-container {
+.marks-container {
         max-width: 800px; margin: auto; padding: 20px;
     }
 
@@ -45,7 +26,7 @@
     .btn-save-marks {
         background-color: var(--primary); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;
     }
-    .btn-save-marks:hover { background-color: #1b5e20; transform: translateY(-2px); }
+    .btn-save-marks:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 
 .weka_maksi-inline-1 { text-align: center; width: 120px; }
 .weka_maksi-inline-2 { font-weight: 600; }

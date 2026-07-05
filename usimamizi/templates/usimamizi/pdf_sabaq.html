@@ -1,18 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
     <title>{% if aina == 'Usiku' %}Ripoti ya Sabaq na Murajaa{% else %}Ripoti ya Sabaq{% endif %}</title>
-    <style>
-        body { font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #333; }
-        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
-        .title { color: #2E7D32; font-size: 22px; font-weight: bold; }
-        .info { font-size: 13px; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background-color: #e8f5e9; color: #1b5e20; padding: 8px; text-align: left; border: 1px solid #ddd; font-weight: bold; }
-        td { padding: 8px; border: 1px solid #ddd; vertical-align: top; }
-        .footer { text-align: center; margin-top: 30px; font-size: 11px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
-    </style>
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_sabaq.css' %}?v=20260706a">
 </head>
 <body>
 
@@ -29,11 +21,11 @@
     <table>
         <thead>
             <tr>
-                <th style="width: {% if aina == 'Usiku' %}20%{% else %}30%{% endif %};">Tarehe & Mwalimu</th>
-                <th style="width: {% if aina == 'Usiku' %}40%{% else %}70%{% endif %};">{% if aina == 'Usiku' %}Sabaq (Mpya){% else %}Sabaq{% endif %}</th>
+                <th class="{% if aina == 'Usiku' %}date-col-night{% else %}date-col-day{% endif %}">Tarehe & Mwalimu</th>
+                <th class="{% if aina == 'Usiku' %}sabaq-col-night{% else %}sabaq-col-day{% endif %}">{% if aina == 'Usiku' %}Sabaq (Mpya){% else %}Sabaq{% endif %}</th>
                 
                 {% if aina == 'Usiku' %}
-                <th style="width: 40%;">Murajaa / Pande</th>
+                <th class="murajaa-col">Murajaa / Pande</th>
                 {% endif %}
             </tr>
         </thead>
@@ -43,7 +35,7 @@
                 <td>
                     <b>{{ s.tarehe|date:"d M Y" }}</b><br>
                     {% if s.mwalimu %}
-                        <span style="font-size: 11px; color: #555;">(Mwl: {{ s.mwalimu.jina_kamili }})</span>
+                        <span class="teacher-name">(Mwl: {{ s.mwalimu.jina_kamili }})</span>
                     {% endif %}
                 </td>
                 <td>
@@ -71,7 +63,7 @@
             
             {% if s.maoni_ya_mwalimu %}
             <tr>
-                <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" style="background-color: #f9f9f9; font-style: italic; font-size: 12px; color: #555;">
+                <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" class="comment-row">
                     <b>Maoni ya Jumla:</b> {{ s.maoni_ya_mwalimu }}
                 </td>
             </tr>
@@ -79,7 +71,7 @@
             
             {% empty %}
             <tr>
-                <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" style="text-align: center;">Hakuna rekodi bado.</td>
+                <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" class="center">Hakuna rekodi bado.</td>
             </tr>
             {% endfor %}
         </tbody>

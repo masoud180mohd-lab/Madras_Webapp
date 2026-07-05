@@ -1,32 +1,5 @@
 /* ----- UI MPYA NA UTATUZI WA DARK MODE ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --danger: #d32f2f;
-        --warning: #f57c00;
-
-        /* Rangi za Mchana (Light Mode) */
-        --bg-body: #f4f4f9;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #6c757d;
-        --border-color: #edf2f7;
-        --input-bg: #ffffff;
-        --table-header: #f8f9fa;
-    }
-
-    body.dark-mode {
-        /* Rangi za Usiku (Dark Mode) - Zinabadilika Zenyewe! */
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #aaaaaa;
-        --border-color: #333333;
-        --input-bg: #2c2c2c;
-        --table-header: #222222;
-    }
-
-    /* Kadi za KPI na Wrapper Yake */
+/* Kadi za KPI na Wrapper Yake */
     .kpi-wrapper {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -87,7 +60,7 @@
     .btn-action-main {
         background-color: var(--primary); color: white; padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 15px; transition: 0.3s; text-decoration: none;
     }
-    .btn-action-main:hover { background-color: #1b5e20; transform: scale(1.02); color: white; }
+    .btn-action-main:hover { background-color: var(--primary-hover); transform: scale(1.02); color: white; }
 
     /* Fomu ya Malipo ya Haraka inayo Fichwa/Kuonyeshwa */
     .quick-pay-box {

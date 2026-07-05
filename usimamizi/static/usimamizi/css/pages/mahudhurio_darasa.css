@@ -1,30 +1,5 @@
 /* ----- UI KIPROFESHINALI KWA MAHUDHURIO (DARASA) ----- */
-    :root {
-        --primary: #2E7D32;
-        --secondary: #0288D1;
-        --danger: #d32f2f;
-        --warning: #f57c00;
-        
-        --bg-body: #f4f7f6;
-        --card-bg: #ffffff;
-        --text-main: #2c3e50;
-        --text-muted: #7f8c8d;
-        --border-color: #e2e8f0;
-        --table-header: #f8fafc;
-        --input-bg: #ffffff;
-    }
-
-    body.dark-mode {
-        --bg-body: #121212;
-        --card-bg: #1e1e1e;
-        --text-main: #e0e0e0;
-        --text-muted: #a0aec0;
-        --border-color: #333333;
-        --table-header: #222222;
-        --input-bg: #2c2c2c;
-    }
-
-    /* Kichwa cha Ukurasa */
+/* Kichwa cha Ukurasa */
     .page-header {
         background-color: var(--card-bg); padding: 25px 30px; border-radius: 12px; border: 1px solid var(--border-color); border-left: 6px solid var(--primary); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
     }
@@ -58,7 +33,7 @@
     .btn-submit {
         background-color: var(--primary); color: white; border: none; padding: 14px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center; margin-top: 25px;
     }
-    .btn-submit:hover { background-color: #1b5e20; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2); }
+    .btn-submit:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2); }
 
     /* Maelezo ya Chini */
     .bottom-note {

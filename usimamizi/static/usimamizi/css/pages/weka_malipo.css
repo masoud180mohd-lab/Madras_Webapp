@@ -1,14 +1,14 @@
 .weka_malipo-inline-1 { max-width: 600px; margin: auto; padding: 20px; }
-.weka_malipo-inline-2 { background-color: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid #0288D1; }
-.weka_malipo-inline-3 { color: #0288D1; margin-top: 0; }
+.weka_malipo-inline-2 { background-color: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--secondary); }
+.weka_malipo-inline-3 { color: var(--secondary); margin-top: 0; }
 .weka_malipo-inline-4 { font-size: 16px; margin-bottom: 20px; color: var(--text-muted); }
-.weka_malipo-inline-5 { color: #2E7D32; }
+.weka_malipo-inline-5 { color: var(--primary); }
 .weka_malipo-inline-6 { display: flex; gap: 15px; margin-bottom: 25px; }
-.weka_malipo-inline-7 { flex: 1; background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #4CAF50; text-align: center; }
+.weka_malipo-inline-7 { flex: 1; background: var(--success-bg); padding: 15px; border-radius: 8px; border: 1px solid #4CAF50; text-align: center; }
 .weka_malipo-inline-8 { font-size: 14px; color: var(--text-muted); }
-.weka_malipo-inline-9 { font-size: 20px; color: #2E7D32; }
-.weka_malipo-inline-10 { flex: 1; background: #ffebee; padding: 15px; border-radius: 8px; border: 1px solid #F44336; text-align: center; }
-.weka_malipo-inline-11 { font-size: 20px; color: #c62828; }
+.weka_malipo-inline-9 { font-size: 20px; color: var(--primary); }
+.weka_malipo-inline-10 { flex: 1; background: var(--danger-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--danger); text-align: center; }
+.weka_malipo-inline-11 { font-size: 20px; color: var(--danger-text); }
 .weka_malipo-inline-12 { margin-bottom: 20px; }
 .weka_malipo-inline-13 { font-weight: bold; font-size: 15px; }
 .weka_malipo-inline-14 { width: 100%; padding: 12px; margin-top: 8px; border: 2px solid #ccc; border-radius: 8px; font-size: 18px; font-weight: bold; }
@@ -17,5 +17,5 @@
 .weka_malipo-inline-17 { margin-bottom: 25px; }
 .weka_malipo-inline-18 { width: 100%; padding: 12px; margin-top: 8px; border: 2px solid #ccc; border-radius: 8px; font-size: 15px; }
 .weka_malipo-inline-19 { display: flex; justify-content: space-between; gap: 10px; }
-.weka_malipo-inline-20 { flex: 1; text-align: center; background-color: #eee; color: var(--text-main); padding: 15px; border-radius: 8px; text-decoration: none; font-weight: bold; }
-.weka_malipo-inline-21 { flex: 2; background-color: #0288D1; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+.weka_malipo-inline-20 { flex: 1; text-align: center; background-color: var(--button-muted-bg); color: var(--text-main); padding: 15px; border-radius: 8px; text-decoration: none; font-weight: bold; }
+.weka_malipo-inline-21 { flex: 2; background-color: var(--secondary); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
