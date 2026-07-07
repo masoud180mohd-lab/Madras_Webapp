@@ -11,7 +11,7 @@
         background-color: var(--card-bg);
         padding: 25px;
         border-radius: 16px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        box-shadow: 0 4px 15px var(--shadow-color);
         border: 1px solid var(--border-color);
         position: relative;
         overflow: hidden;
@@ -109,7 +109,7 @@
 .malipo-inline-1 { max-width: 1200px; margin: auto; padding: 20px; }
 .malipo-inline-2 { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; }
 .malipo-inline-3 { display: flex; align-items: center; gap: 15px; }
-.malipo-inline-4 { background: rgba(46, 125, 50, 0.1); padding: 15px; border-radius: 12px; color: var(--primary); }
+.malipo-inline-4 { background: var(--success-bg); padding: 15px; border-radius: 12px; color: var(--primary); }
 .malipo-inline-5 { color: var(--text-main); margin: 0; font-size: 26px; }
 .malipo-inline-6 { font-size: 14px; margin-top: 5px; color: var(--text-muted); margin-bottom: 0; }
 .malipo-inline-7 { color: var(--text-main); margin: 0 0 15px 0; }
@@ -122,7 +122,7 @@
 .malipo-inline-14 { border-top: 4px solid var(--primary); }
 .malipo-inline-15 { border-top: 4px solid var(--warning); }
 .malipo-inline-16 { font-size: 14px; color: var(--text-muted); font-weight: normal; }
-.malipo-inline-17 { background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); text-align: center; }
+.malipo-inline-17 { background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow-color); border: 1px solid var(--border-color); text-align: center; }
 .malipo-inline-18 { color: var(--text-main); margin-top: 0; }
 .malipo-inline-19 { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
 .malipo-inline-20 { margin-top: 30px; text-align: left; overflow-x: auto; }
@@ -136,6 +136,6 @@
 .malipo-inline-28 { margin-top: 40px; padding: 30px; color: var(--text-muted); border-top: 1px dashed var(--border-color); }
 .malipo-inline-29 { opacity: 0.3; margin-bottom: 10px; }
 .malipo-inline-30 { font-size: 16px; }
-.malipo-inline-31 { background-color: var(--card-bg); padding: 60px 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); text-align: center; border: 1px dashed var(--border-color); }
+.malipo-inline-31 { background-color: var(--card-bg); padding: 60px 20px; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow-color); text-align: center; border: 1px dashed var(--border-color); }
 .malipo-inline-32 { color: var(--text-main); margin-bottom: 10px; font-size: 20px; }
 .malipo-inline-33 { color: var(--text-muted); font-size: 15px; }

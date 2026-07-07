@@ -1,5 +1,15 @@
+from io import BytesIO
+from pathlib import Path
+
 from django import forms
-from .models import Mwanafunzi, Nyenzo, Mtihani, MsetoMtihani
+from django.core.files.uploadedfile import SimpleUploadedFile
+from .models import Mwanafunzi, Nyenzo, Mtihani, MsetoMtihani, validate_picha
+
+try:
+    from PIL import Image, ImageOps
+except ImportError:  # pragma: no cover - Pillow is expected, but we fail softly.
+    Image = None
+    ImageOps = None
 
 
 class MwanafunziForm(forms.ModelForm):
@@ -36,6 +46,49 @@ class MwanafunziForm(forms.ModelForm):
         self.fields['programu_ya_usiku'].empty_label = '-- Hana programu ya usiku --'
         self.fields['darasa'].required = False
         self.fields['darasa'].empty_label = '-- Hajapangiwa darasa --'
+        self.fields['picha'].validators = []
+
+    def clean_picha(self):
+        picha = self.cleaned_data.get('picha')
+        if not picha:
+            return picha
+        if Image is None:
+            validate_picha(picha)
+            return picha
+
+        try:
+            picha.seek(0)
+            original = Image.open(picha)
+            original = ImageOps.exif_transpose(original)
+            original.thumbnail((1600, 1600), Image.LANCZOS)
+
+            extension = Path(picha.name).suffix.lower().lstrip(".")
+            if extension in {"jpg", "jpeg"}:
+                extension = "jpg"
+                if original.mode not in ("RGB",):
+                    original = original.convert("RGB")
+                content_type = "image/jpeg"
+                save_kwargs = {"format": "JPEG", "quality": 82, "optimize": True, "progressive": True}
+            elif extension == "png":
+                content_type = "image/png"
+                save_kwargs = {"format": "PNG", "optimize": True, "compress_level": 9}
+            elif extension == "webp":
+                content_type = "image/webp"
+                save_kwargs = {"format": "WEBP", "quality": 82, "method": 6}
+            else:
+                return picha
+
+            output = BytesIO()
+            original.save(output, **save_kwargs)
+            output.seek(0)
+            new_name = f"{Path(picha.name).stem}.{extension}"
+            compressed = SimpleUploadedFile(new_name, output.read(), content_type=content_type)
+            validate_picha(compressed)
+            return compressed
+        except Exception:
+            picha.seek(0)
+            validate_picha(picha)
+            return picha
 
 
 class NyenzoForm(forms.ModelForm):

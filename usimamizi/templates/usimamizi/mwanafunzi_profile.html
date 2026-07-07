@@ -7,9 +7,9 @@
 {% endblock %}
 
 {% block maudhui %}
-<div class="mwanafunzi_profile-inline-1">
+<div class="page-shell mwanafunzi_profile-inline-1">
     
-    <div class="profile-header">
+    <div class="app-card app-page-header app-card-accent-top-primary profile-header">
         <div class="profile-identity">
             {% if mwanafunzi.picha %}
                 <img src="{{ mwanafunzi.picha.url }}" alt="{{ mwanafunzi.jina_kamili }}" class="student-photo">
@@ -25,13 +25,13 @@
                 </p>
             </div>
         </div>
-        <a href="{% url 'orodha_wanafunzi' %}" class="btn-icon-back" title="Rudi kwenye Orodha">
+        <a href="{% url 'orodha_wanafunzi' %}" class="app-btn app-btn-icon app-btn-outline btn-icon-back" title="Rudi kwenye Orodha">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         </a>
     </div>
 
     <div class="info-grid">
-        <div class="info-card mwanafunzi_profile-inline-2">
+        <div class="app-card app-card-accent-top-primary info-card mwanafunzi_profile-inline-2">
             <h3 class="info-card-title">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 Taarifa Binafsi
@@ -45,7 +45,7 @@
             </ul>
         </div>
 
-        <div class="info-card mwanafunzi_profile-inline-3">
+        <div class="app-card app-card-accent-top-warning info-card mwanafunzi_profile-inline-3">
             <h3 class="info-card-title">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                 Mawasiliano ya Mlezi
@@ -58,77 +58,145 @@
         </div>
     </div>
 
-    <div class="action-bar">
-        <a href="{% url 'hariri_mwanafunzi' mwanafunzi.id %}" class="btn-action-large btn-edit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            Hariri Taarifa
-        </a>
-        
-        {% if mwanafunzi.darasa %}
-            <a href="{% url 'ripoti_mwanafunzi' mwanafunzi.id 'Darasa' %}" class="btn-action-large btn-report-day">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                Ripoti ya Madrasa (Mchana)
-            </a>
-        {% endif %}
-
-        {% if mwanafunzi.programu_ya_usiku %}
-            <a href="{% url 'ripoti_mwanafunzi' mwanafunzi.id 'Usiku' %}" class="btn-action-large btn-report-night">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                Ripoti ya Hifdhu (Usiku)
-            </a>
-        {% endif %}
+    <div class="profile-tabs">
+        <a href="?tab=muhtasari" class="profile-tab {% if tab_teule == 'muhtasari' %}profile-tab-active{% endif %}">Muhtasari</a>
+        <a href="?tab=malipo" class="profile-tab {% if tab_teule == 'malipo' %}profile-tab-active{% endif %}">Malipo</a>
+        <a href="?tab=mahudhurio" class="profile-tab {% if tab_teule == 'mahudhurio' %}profile-tab-active{% endif %}">Mahudhurio</a>
+        <a href="?tab=rekodi" class="profile-tab {% if tab_teule == 'rekodi' %}profile-tab-active{% endif %}">Rekodi</a>
     </div>
 
-    <div class="finance-section">
-        <div class="finance-header">
-            <h2 class="info-card-title mwanafunzi_profile-inline-5">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                Historia ya Malipo
-            </h2>
-            <a href="{% url 'malipo' %}?q={{ mwanafunzi.jina_kamili }}" class="btn-pay">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Weka Malipo Mapya
-            </a>
+    {% if tab_teule == 'muhtasari' %}
+        <div class="summary-grid">
+            <div class="app-card summary-card">
+                <span class="summary-label">Malipo Yote</span>
+                <strong>Tsh {{ jumla_malipo|floatformat:"0" }}</strong>
+            </div>
+            <div class="app-card summary-card">
+                <span class="summary-label">Mahudhurio ya Mchana</span>
+                <strong>{{ mahudhurio_kawaida.count }}</strong>
+            </div>
+            <div class="app-card summary-card">
+                <span class="summary-label">Mahudhurio ya Hifdhu</span>
+                <strong>{{ mahudhurio_hifdhu.count }}</strong>
+            </div>
+            <div class="app-card summary-card">
+                <span class="summary-label">Rekodi za Sabaq</span>
+                <strong>{{ sabaq_darasa.count|add:sabaq_usiku.count }}</strong>
+            </div>
         </div>
+    {% elif tab_teule == 'malipo' %}
+        <div class="app-card finance-section">
+            <div class="finance-header">
+                <h2 class="info-card-title mwanafunzi_profile-inline-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    Historia ya Malipo
+                </h2>
+                <a href="{% url 'malipo' %}?q={{ mwanafunzi.jina_kamili }}" class="app-btn app-btn-secondary btn-pay">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Weka Malipo Mapya
+                </a>
+            </div>
 
-        <div class="mwanafunzi_profile-inline-6">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Tarehe</th>
-                        <th>Aina ya Malipo</th>
-                        <th class="mwanafunzi_profile-inline-7">Kiasi (Tsh)</th>
-                        <th class="mwanafunzi_profile-inline-8">Njia</th>
-                        <th class="mwanafunzi_profile-inline-7">Risiti</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for m in mwanafunzi.malipo_yote.all %}
-                    <tr>
-                        <td class="mwanafunzi_profile-inline-9">{{ m.tarehe_ya_malipo|date:"d M Y" }}</td>
-                        <td><b class="mwanafunzi_profile-inline-10">{{ m.aina_ya_malipo.jina }}</b></td>
-                        <td class="money-text mwanafunzi_profile-inline-7">{{ m.kiasi_kilicholipwa }}/=</td>
-                        <td class="mwanafunzi_profile-inline-8">
-                            <span class="method-badge">{{ m.njia_ya_malipo }}</span>
-                        </td>
-                        <td class="mwanafunzi_profile-inline-7">
-                            <a href="{% url 'pakua_risiti' m.id %}" class="btn-download-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                Pakua PDF
-                            </a>
-                        </td>
-                    </tr>
+            <div class="mwanafunzi_profile-inline-6">
+                <table class="app-table data-table">
+                    <thead>
+                        <tr>
+                            <th>Tarehe</th>
+                            <th>Aina ya Malipo</th>
+                            <th class="mwanafunzi_profile-inline-7">Kiasi (Tsh)</th>
+                            <th class="mwanafunzi_profile-inline-8">Njia</th>
+                            <th class="mwanafunzi_profile-inline-7">Risiti</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in malipo_yote %}
+                        <tr>
+                            <td class="mwanafunzi_profile-inline-9">{{ m.tarehe_ya_malipo|date:"d M Y" }}</td>
+                            <td><b class="mwanafunzi_profile-inline-10">{{ m.aina_ya_malipo.jina }}</b></td>
+                            <td class="money-text mwanafunzi_profile-inline-7">{{ m.kiasi_kilicholipwa }}/=</td>
+                            <td class="mwanafunzi_profile-inline-8"><span class="app-badge app-badge-neutral method-badge">{{ m.njia_ya_malipo }}</span></td>
+                            <td class="mwanafunzi_profile-inline-7">
+                                <a href="{% url 'pakua_risiti' m.id %}" class="app-btn app-btn-outline app-btn-sm btn-download-sm">Pakua PDF</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="mwanafunzi_profile-inline-11">Mwanafunzi huyu bado hajasajiliwa kuwa na malipo yoyote.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% elif tab_teule == 'mahudhurio' %}
+        <div class="tab-grid">
+            <div class="app-card finance-section">
+                <div class="tab-card-header">
+                    <h2 class="info-card-title">Mahudhurio ya Madrasa</h2>
+                    <a href="{% url 'pakua_pdf_mahudhurio' mwanafunzi.id 'Darasa' 'wote' %}" class="app-btn app-btn-outline app-btn-sm tab-download-btn" title="Pakua PDF ya Mahudhurio ya Madrasa">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        PDF
+                    </a>
+                </div>
+                <ul class="timeline-list">
+                    {% for h in mahudhurio_kawaida|slice:":12" %}
+                        <li><span>{{ h.tarehe|date:"d M Y" }}</span><strong>{% if h.yupo %}Yupo{% else %}Hayupo{% endif %}</strong></li>
                     {% empty %}
-                    <tr>
-                        <td colspan="5" class="mwanafunzi_profile-inline-11">
-                            Mwanafunzi huyu bado hajasajiliwa kuwa na malipo yoyote.
-                        </td>
-                    </tr>
+                        <li class="empty-line">Hakuna rekodi za mahudhurio ya Madrasa.</li>
                     {% endfor %}
-                </tbody>
-            </table>
+                </ul>
+            </div>
+            <div class="app-card finance-section">
+                <div class="tab-card-header">
+                    <h2 class="info-card-title">Mahudhurio ya Hifdhu</h2>
+                    <a href="{% url 'pakua_pdf_mahudhurio' mwanafunzi.id 'Usiku' 'wote' %}" class="app-btn app-btn-outline app-btn-sm tab-download-btn" title="Pakua PDF ya Mahudhurio ya Hifdhu">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        PDF
+                    </a>
+                </div>
+                <ul class="timeline-list">
+                    {% for h in mahudhurio_hifdhu|slice:":12" %}
+                        <li><span>{{ h.tarehe|date:"d M Y" }}</span><strong>{% if h.yupo %}Yupo{% else %}Hayupo{% endif %}</strong></li>
+                    {% empty %}
+                        <li class="empty-line">Hakuna rekodi za mahudhurio ya Hifdhu.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    </div>
+    {% elif tab_teule == 'rekodi' %}
+        <div class="tab-grid">
+            <div class="app-card finance-section">
+                <div class="tab-card-header">
+                    <h2 class="info-card-title">Sabaq ya Darasa</h2>
+                    <a href="{% url 'pakua_pdf_sabaq' mwanafunzi.id 'Darasa' 'wote' %}" class="app-btn app-btn-outline app-btn-sm tab-download-btn" title="Pakua PDF ya Sabaq ya Darasa">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        PDF
+                    </a>
+                </div>
+                <ul class="timeline-list">
+                    {% for r in sabaq_darasa|slice:":12" %}
+                        <li><span>{{ r.tarehe|date:"d M Y" }} - {{ r.sabaq_sura|default:"-" }}</span><strong>{{ r.sabaq_hali|default:"-" }}</strong></li>
+                    {% empty %}
+                        <li class="empty-line">Hakuna rekodi za sabaq ya darasa.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="app-card finance-section">
+                <div class="tab-card-header">
+                    <h2 class="info-card-title">Sabaq ya Usiku</h2>
+                    <a href="{% url 'pakua_pdf_sabaq' mwanafunzi.id 'Usiku' 'wote' %}" class="app-btn app-btn-outline app-btn-sm tab-download-btn" title="Pakua PDF ya Sabaq ya Usiku">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        PDF
+                    </a>
+                </div>
+                <ul class="timeline-list">
+                    {% for r in sabaq_usiku|slice:":12" %}
+                        <li><span>{{ r.tarehe|date:"d M Y" }} - {{ r.sabaq_sura|default:"-" }}</span><strong>{{ r.sabaq_hali|default:"-" }}</strong></li>
+                    {% empty %}
+                        <li class="empty-line">Hakuna rekodi za sabaq ya usiku.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
 
 </div>
 {% endblock %}

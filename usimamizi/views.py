@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
@@ -120,23 +120,29 @@ def mahudhurio_darasa(request, darasa_id):
 def orodha_wanafunzi(request):
     neno_la_kutafuta = request.GET.get('q', '')
     jinsia_filter = request.GET.get('jinsia', '')
+    darasa_filter = request.GET.get('darasa', '')
     wanafunzi = Mwanafunzi.objects.all().order_by('-id')
     if neno_la_kutafuta:
         wanafunzi = wanafunzi.filter(Q(jina_kamili__icontains=neno_la_kutafuta) | Q(namba_ya_usajili__icontains=neno_la_kutafuta))
     if jinsia_filter:
         wanafunzi = wanafunzi.filter(jinsia=jinsia_filter)
+    if darasa_filter:
+        wanafunzi = wanafunzi.filter(darasa_id=darasa_filter)
 
     page_obj, pagination_query = paginate_items(request, wanafunzi, per_page=20)
+    madarasa = Darasa.objects.all().order_by('jina')
 
     context = {
         'wanafunzi': page_obj,
         'page_obj': page_obj,
         'pagination_query': pagination_query,
+        'madarasa': madarasa,
         'jumla': wanafunzi.count(),
         'wavulana': wanafunzi.filter(jinsia='ME').count(),
         'wasichana': wanafunzi.filter(jinsia='KE').count(),
         'neno_la_kutafuta': neno_la_kutafuta,
-        'jinsia_filter': jinsia_filter
+        'jinsia_filter': jinsia_filter,
+        'darasa_filter': darasa_filter,
     }
     return render(request, 'usimamizi/orodha_wanafunzi.html', context)
 
@@ -375,7 +381,24 @@ def weka_maksi(request, mtihani_id):
 @login_required(login_url='ingia')
 def mwanafunzi_profile(request, mwanafunzi_id):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
-    return render(request, 'usimamizi/mwanafunzi_profile.html', {'mwanafunzi': mwanafunzi})
+    tab_teule = request.GET.get('tab', 'muhtasari')
+    mahudhurio_kawaida = Hudhurio.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Kawaida').order_by('-tarehe')
+    mahudhurio_hifdhu = Hudhurio.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Hifdhu').order_by('-tarehe')
+    malipo_yote = mwanafunzi.malipo_yote.select_related('aina_ya_malipo').order_by('-tarehe_ya_malipo')
+    sabaq_darasa = RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Darasa').select_related('somo', 'mwalimu').order_by('-tarehe')
+    sabaq_usiku = RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Usiku').select_related('somo', 'mwalimu').order_by('-tarehe')
+    jumla_malipo = malipo_yote.aggregate(jumla=Sum('kiasi_kilicholipwa'))['jumla'] or 0
+
+    return render(request, 'usimamizi/mwanafunzi_profile.html', {
+        'mwanafunzi': mwanafunzi,
+        'tab_teule': tab_teule,
+        'mahudhurio_kawaida': mahudhurio_kawaida,
+        'mahudhurio_hifdhu': mahudhurio_hifdhu,
+        'malipo_yote': malipo_yote,
+        'sabaq_darasa': sabaq_darasa,
+        'sabaq_usiku': sabaq_usiku,
+        'jumla_malipo': jumla_malipo,
+    })
 
 @login_required(login_url='ingia')
 def rekodi_sabaq(request, mwanafunzi_id, aina):
@@ -528,6 +551,7 @@ def ukurasa_malipo(request):
     neno_la_kutafuta = request.GET.get('q', '')
     aina_id = request.GET.get('aina', '')
     hali_teule = request.GET.get('hali', 'wote') # KICHUJIO KIPYA CHA DENI
+    darasa_filter = request.GET.get('darasa', '')
 
     if aina_id:
         aina_teule = get_object_or_404(AinaMalipo, id=aina_id)
@@ -539,6 +563,8 @@ def ukurasa_malipo(request):
             Q(jina_kamili__icontains=neno_la_kutafuta) |
             Q(namba_ya_usajili__icontains=neno_la_kutafuta)
         )
+    if darasa_filter:
+        wanafunzi = wanafunzi.filter(darasa_id=darasa_filter)
 
     jumla_iliyokusanywa = 0
     idadi_waliolipa = 0
@@ -575,6 +601,7 @@ def ukurasa_malipo(request):
             })
 
     page_obj, pagination_query = paginate_items(request, taarifa_wanafunzi, per_page=20)
+    madarasa = Darasa.objects.all().order_by('jina')
 
     context = {
         'aina_za_malipo': aina_za_malipo,
@@ -584,8 +611,10 @@ def ukurasa_malipo(request):
         'taarifa_wanafunzi': page_obj,
         'page_obj': page_obj,
         'pagination_query': pagination_query,
+        'madarasa': madarasa,
         'neno_la_kutafuta': neno_la_kutafuta,
         'hali_teule': hali_teule, # Tunapeleka Hali kwenye HTML
+        'darasa_filter': darasa_filter,
     }
     return render(request, 'usimamizi/malipo.html', context)
 

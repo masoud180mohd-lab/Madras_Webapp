@@ -1,47 +1,47 @@
 /* ----- UI YA KIPROFESHINALI KWA SOMO LA HIFDHU (MINIMALIST) ----- */
 /* Bango la Juu (Imesafishwa, Hakuna Icon) */
     .hifdhu-header {
-        background-color: var(--card-bg); 
-        padding: 35px 30px; 
-        border-radius: 12px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
-        border: 1px solid var(--border-color); 
-        border-left: 6px solid var(--hifdhu-accent); 
+        background-color: var(--card-bg);
+        padding: 35px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px var(--shadow-color);
+        border: 1px solid var(--border-color);
+        border-left: 6px solid var(--hifdhu-accent);
         margin-bottom: 30px;
     }
 
-    .hifdhu-header h1 { 
-        margin: 0 0 8px 0; 
-        color: var(--text-main); 
-        font-size: 28px; 
+    .hifdhu-header h1 {
+        margin: 0 0 8px 0;
+        color: var(--text-main);
+        font-size: 28px;
         font-weight: 700;
     }
-    
-    .hifdhu-header p { 
-        margin: 0; 
-        color: var(--text-muted); 
-        font-size: 15px; 
-        display: flex; 
-        align-items: center; 
-        gap: 8px; 
+
+    .hifdhu-header p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .grid-container {
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 25px;
     }
 
     .stats-card, .actions-card {
-        background-color: var(--card-bg); 
-        padding: 30px; 
-        border-radius: 12px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
-        border: 1px solid var(--border-color); 
-        text-align: center; 
-        display: flex; 
-        flex-direction: column; 
-        justify-content: center; 
+        background-color: var(--card-bg);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px var(--shadow-color);
+        border: 1px solid var(--border-color);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
     }
 
@@ -52,15 +52,15 @@
 
     /* Kadi ya Vitendo */
     .actions-card h3 { color: var(--text-main); font-size: 18px; margin: 0 0 20px 0; }
-    
+
     .btn-action-large {
         display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px 20px; border-radius: 8px; font-size: 15px; font-weight: bold; text-decoration: none; transition: 0.3s; margin-bottom: 15px; border: none; cursor: pointer;
     }
     .btn-action-large:last-child { margin-bottom: 0; }
-    
+
     .btn-mahudhurio { background-color: var(--card-bg); color: var(--secondary); border: 2px solid var(--secondary); }
     .btn-mahudhurio:hover { background-color: var(--secondary); color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(2, 136, 209, 0.2); }
-    
+
     .btn-sabaq { background-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2); border: 2px solid var(--primary); }
     .btn-sabaq:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); transform: translateY(-2px); }
 

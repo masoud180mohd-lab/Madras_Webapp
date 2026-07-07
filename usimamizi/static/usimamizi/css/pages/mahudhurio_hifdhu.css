@@ -13,7 +13,7 @@
 
     /* Fomu na Jedwali */
     .form-card {
-        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color);
     }
 
     .data-table { width: 100%; border-collapse: collapse; }
@@ -33,7 +33,7 @@
     .btn-submit {
         background-color: var(--primary); color: white; border: none; padding: 14px 30px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center; margin-top: 25px;
     }
-    .btn-submit:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2); }
+    .btn-submit:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 4px 12px var(--form-button-shadow); }
 
     /* Maelezo ya Chini (Dark mode fix) */
     .bottom-note {
@@ -43,7 +43,7 @@
 
     /* Alert ya Kuzuia Kurudia */
     .alert-warning {
-        background-color: rgba(245, 124, 0, 0.1); color: var(--warning); padding: 25px; border-radius: 12px; border: 1px solid rgba(245, 124, 0, 0.3); text-align: center; margin-bottom: 25px;
+        background-color: var(--warning-bg); color: var(--warning-text); padding: 25px; border-radius: 12px; border: 1px solid var(--warning-border); text-align: center; margin-bottom: 25px;
     }
     .alert-warning h3 { margin: 0 0 10px 0; }
     .alert-warning p { margin: 0; font-size: 15px; }

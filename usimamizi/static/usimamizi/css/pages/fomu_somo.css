@@ -4,7 +4,7 @@
         background-color: var(--card-bg);
         padding: 35px 40px;
         border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        box-shadow: 0 4px 20px var(--shadow-color);
         border: 1px solid var(--border-color);
         border-top: 6px solid var(--form-accent);
     }

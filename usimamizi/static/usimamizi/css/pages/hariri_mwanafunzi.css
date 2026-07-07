@@ -13,7 +13,7 @@
 
     /* Kadi za Fomu */
     .form-section {
-        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01); margin-bottom: 25px;
+        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color); margin-bottom: 25px;
     }
     .section-title {
         color: var(--text-main); font-size: 16px; margin: 0 0 20px 0; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
@@ -45,7 +45,7 @@
     .btn-cancel:hover { background-color: var(--table-header); border-color: var(--text-muted); }
 
     .btn-submit {
-        flex: 2; background-color: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 200px; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+        flex: 2; background-color: var(--primary); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 200px; box-shadow: 0 4px 12px var(--form-button-shadow);
     }
     .btn-submit:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
 

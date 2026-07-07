@@ -33,7 +33,7 @@
 
     /* Kadi ya Jedwali */
     .table-card {
-        background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.01);
+        background-color: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color);
     }
 
     .data-table { width: 100%; border-collapse: collapse; }

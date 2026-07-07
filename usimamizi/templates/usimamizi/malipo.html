@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block maudhui %}
-<div class="malipo-inline-1">
+<div class="page-shell malipo-inline-1">
 
     <div class="malipo-inline-2">
         <div class="malipo-inline-3">
@@ -23,18 +23,18 @@
             </div>
         </div>
 
-        <button class="btn-action-main" onclick="toggleQuickPay()">
+        <button class="app-btn app-btn-primary btn-action-main" onclick="toggleQuickPay()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             Weka Malipo Mpya
         </button>
     </div>
 
-    <div id="quickPayBox" class="quick-pay-box">
+    <div id="quickPayBox" class="app-card app-card-accent-left-primary quick-pay-box">
         <h3 class="malipo-inline-7">Tafuta Mwanafunzi Kufanya Malipo</h3>
         <form method="GET" action="" class="malipo-inline-8">
-            <input type="text" name="q" placeholder="Andika Jina la Mwanafunzi hapa..." class="custom-input malipo-inline-9" required>
+            <input type="text" name="q" placeholder="Andika Jina la Mwanafunzi hapa..." class="app-input custom-input malipo-inline-9" required>
 
-            <select name="aina" class="custom-select malipo-inline-10">
+            <select name="aina" class="app-select custom-select malipo-inline-10">
                 {% for a in aina_za_malipo %}
                     <option value="{{ a.id }}" {% if aina_teule.id == a.id %}selected{% endif %}>{{ a.jina }}</option>
                 {% endfor %}
@@ -42,26 +42,36 @@
 
             <input type="hidden" name="hali" value="wote">
 
-            <button type="submit" class="btn-action-main">
+            <button type="submit" class="app-btn app-btn-primary btn-action-main">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 Tafuta Mwanafunzi
             </button>
         </form>
     </div>
 
-    <form method="GET" class="filter-section">
+    <form method="GET" class="app-card app-toolbar filter-section">
         <span class="malipo-inline-11">Aina ya Malipo:</span>
-        <select name="aina" class="custom-select malipo-inline-12" onchange="this.form.submit()">
+        <select name="aina" class="app-select custom-select malipo-inline-12" onchange="this.form.submit()">
             {% for a in aina_za_malipo %}
                 <option value="{{ a.id }}" {% if aina_teule.id == a.id %}selected{% endif %}>{{ a.jina }}</option>
             {% endfor %}
         </select>
+        <select name="darasa" class="app-select custom-select malipo-inline-12" onchange="this.form.submit()">
+            <option value="">Madarasa Yote</option>
+            {% for darasa in madarasa %}
+                <option value="{{ darasa.id }}" {% if darasa_filter|stringformat:"s" == darasa.id|stringformat:"s" %}selected{% endif %}>{{ darasa.jina }}</option>
+            {% endfor %}
+        </select>
+        {% if neno_la_kutafuta %}
+            <input type="hidden" name="q" value="{{ neno_la_kutafuta }}">
+        {% endif %}
+        <input type="hidden" name="hali" value="{{ hali_teule }}">
     </form>
 
     {% if aina_teule %}
     <div class="kpi-wrapper">
 
-        <div class="finance-card malipo-inline-13">
+        <div class="app-card app-card-accent-top-primary finance-card malipo-inline-13">
             <div class="kpi-details">
                 <h3>Kiasi Kinachotakiwa</h3>
                 <h2>Tsh {{ aina_teule.kiasi_kinachotakiwa|floatformat:"0" }}</h2>
@@ -69,7 +79,7 @@
             <svg class="finance-icon-bg" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
         </div>
 
-        <div class="finance-card malipo-inline-14">
+        <div class="app-card app-card-accent-top-secondary finance-card malipo-inline-14">
             <div class="kpi-details">
                 <h3>Iliyokusanywa Mpaka Sasa</h3>
                 <h2>Tsh {{ jumla_iliyokusanywa|floatformat:"0" }}</h2>
@@ -77,7 +87,7 @@
             <svg class="finance-icon-bg" xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
         </div>
 
-        <div class="finance-card malipo-inline-15">
+        <div class="app-card app-card-accent-top-warning finance-card malipo-inline-15">
             <div class="kpi-details">
                 <h3>Idadi ya Waliolipa</h3>
                 <h2>{{ idadi_waliolipa }} <span class="malipo-inline-16">Wanafunzi</span></h2>
@@ -86,28 +96,28 @@
         </div>
     </div>
 
-    <div class="malipo-inline-17">
+    <div class="app-card malipo-inline-17">
 
         <h3 class="malipo-inline-18">Chagua kundi ili kuona orodha ya wanafunzi:</h3>
 
         <div class="malipo-inline-19">
-            <a href="?aina={{ aina_teule.id }}&hali=wote" class="filter-tab {% if request.GET.hali == 'wote' %}filter-tab-active-primary{% endif %}">
+            <a href="?aina={{ aina_teule.id }}&hali=wote{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="app-btn app-btn-outline app-btn-sm filter-tab {% if hali_teule == 'wote' %}filter-tab-active-primary{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 Orodha Yote
             </a>
-            <a href="?aina={{ aina_teule.id }}&hali=wanaodaiwa" class="filter-tab {% if request.GET.hali == 'wanaodaiwa' %}filter-tab-active-danger{% endif %}">
+            <a href="?aina={{ aina_teule.id }}&hali=wanaodaiwa{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="app-btn app-btn-outline app-btn-sm filter-tab {% if hali_teule == 'wanaodaiwa' %}filter-tab-active-danger{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 Wanaodaiwa
             </a>
-            <a href="?aina={{ aina_teule.id }}&hali=waliokamilisha" class="filter-tab {% if request.GET.hali == 'waliokamilisha' %}filter-tab-active-primary{% endif %}">
+            <a href="?aina={{ aina_teule.id }}&hali=waliokamilisha{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="app-btn app-btn-outline app-btn-sm filter-tab {% if hali_teule == 'waliokamilisha' %}filter-tab-active-primary{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 Waliokamilisha
             </a>
         </div>
 
-        {% if request.GET.hali or request.GET.q %}
-        <div class="malipo-inline-20">
-            <table class="data-table">
+        {% if request.GET.hali or request.GET.q or request.GET.darasa %}
+        <div class="app-table-wrap malipo-inline-20">
+            <table class="app-table data-table">
                 <thead>
                     <tr>
                         <th>Mwanafunzi</th>
@@ -129,8 +139,8 @@
                             {% if t.deni > 0 %}{{ t.deni|floatformat:"0" }}{% else %}0{% endif %} <small class="malipo-inline-25">Tsh</small>
                         </td>
                         <td data-label="Hatua" class="malipo-inline-21">
-                            <a href="{% url 'weka_malipo' t.mwanafunzi.id aina_teule.id %}" class="btn-action-main malipo-inline-26">
-                                ➕ Weka Malipo
+                            <a href="{% url 'weka_malipo' t.mwanafunzi.id aina_teule.id %}" class="app-btn app-btn-primary app-btn-sm btn-action-main malipo-inline-26">
+                                + Weka Malipo
                             </a>
                         </td>
                     </tr>

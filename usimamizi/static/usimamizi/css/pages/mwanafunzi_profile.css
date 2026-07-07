@@ -45,24 +45,6 @@
 
     .highlight-value { background-color: var(--table-header); padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border-color); }
 
-    /* Sehemu ya Vitufe (Action Bar) */
-    .action-bar {
-        display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 35px;
-    }
-    
-    .btn-action-large {
-        padding: 12px 20px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; border: 1px solid transparent;
-    }
-    
-    .btn-edit { background: transparent; border-color: var(--warning); color: var(--warning); }
-    .btn-edit:hover { background: var(--warning); color: white; }
-    
-    .btn-report-day { background-color: var(--primary); color: white; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2); }
-    .btn-report-day:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
-    
-    .btn-report-night { background-color: var(--secondary); color: white; box-shadow: 0 4px 10px rgba(2, 136, 209, 0.2); }
-    .btn-report-night:hover { background-color: #0277bd; transform: translateY(-2px); }
-
     /* Sehemu ya Fedha (Malipo) */
     .finance-section {
         background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color);
@@ -90,6 +72,181 @@
     }
     .btn-download-sm:hover { color: #0277bd; text-decoration: underline; }
 
+    .profile-tabs {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 0 0 20px;
+    }
+    .profile-tab {
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+        color: var(--text-muted);
+        padding: 10px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .profile-tab:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    .profile-tab-active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+    }
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .summary-card {
+        padding: 20px;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--card-bg);
+        box-shadow: 0 4px 15px var(--shadow-color);
+    }
+    .summary-card strong {
+        display: block;
+        color: var(--text-main);
+        font-size: 24px;
+        margin-top: 6px;
+    }
+    .summary-label {
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .tab-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    .tab-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .tab-card-header .info-card-title {
+        border-bottom: none;
+        margin: 0;
+        padding: 0;
+        min-width: 0;
+    }
+    .tab-download-btn {
+        flex: 0 0 auto;
+        min-height: 36px;
+        color: var(--secondary);
+        border-color: var(--secondary);
+    }
+    .tab-download-btn:hover {
+        background: var(--secondary);
+        color: white;
+    }
+    .timeline-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .timeline-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 0;
+        border-bottom: 1px dashed var(--border-color);
+        color: var(--text-main);
+        font-size: 14px;
+    }
+    .timeline-list li:last-child {
+        border-bottom: none;
+    }
+    .timeline-list span {
+        color: var(--text-muted);
+    }
+    .timeline-list strong {
+        text-align: right;
+        color: var(--text-main);
+    }
+    .empty-line {
+        justify-content: center !important;
+        color: var(--text-muted) !important;
+        font-style: italic;
+    }
+
+    @media (max-width: 640px) {
+        .mwanafunzi_profile-inline-1 {
+            padding: 12px;
+        }
+        .profile-header {
+            padding: 18px;
+            align-items: flex-start;
+        }
+        .profile-title h1 {
+            font-size: 20px;
+            line-height: 1.25;
+        }
+        .profile-title p {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .student-photo,
+        .student-photo-placeholder {
+            width: 72px;
+            height: 72px;
+        }
+        .info-grid,
+        .tab-grid {
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+        .info-card,
+        .finance-section {
+            padding: 18px;
+        }
+        .info-list li,
+        .timeline-list li {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .info-value,
+        .timeline-list strong {
+            text-align: left;
+        }
+        .profile-tabs {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .profile-tab {
+            width: 100%;
+        }
+        .profile-identity {
+            min-width: 0;
+        }
+        .tab-card-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+        .tab-download-btn {
+            width: 100%;
+        }
+    }
+
 .mwanafunzi_profile-inline-1 { max-width: 1000px; margin: auto; padding: 20px; }
 .mwanafunzi_profile-inline-2 { border-top: 4px solid var(--primary); }
 .mwanafunzi_profile-inline-3 { border-top: 4px solid var(--warning); }
@@ -107,4 +264,3 @@
 .info-card.mwanafunzi_profile-inline-2 { border-top: 4px solid var(--primary); }
 .info-card.mwanafunzi_profile-inline-3 { border-top: 4px solid var(--warning); }
 .reg-number { background-color: var(--success-bg); color: var(--primary-hover); }
-.btn-report-day, .btn-report-night { color: white; }

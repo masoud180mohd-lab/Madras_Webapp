@@ -10,7 +10,7 @@
     .marks-header p { margin: 5px 0 0 0; color: var(--text-muted); font-size: 14px; }
 
     .marks-card {
-        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        background-color: var(--card-bg); padding: 30px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color);
     }
 
     .marks-table { width: 100%; border-collapse: collapse; }

@@ -32,7 +32,7 @@
         padding: 30px;
         border-radius: 12px;
         border: 1px solid var(--border-color);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.01);
+        box-shadow: 0 4px 15px var(--shadow-color);
     }
     .styled-form p { margin: 0 0 18px 0; }
     .styled-form label {
@@ -110,5 +110,5 @@
     }
     .btn-cancel { color: var(--text-main); border: 1px solid var(--border-color); background: transparent; flex: 1; }
     .btn-cancel:hover { background: var(--table-header); }
-    .btn-submit { color: white; border: none; background: var(--primary); flex: 2; box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2); }
+    .btn-submit { color: white; border: none; background: var(--primary); flex: 2; box-shadow: 0 4px 12px var(--form-button-shadow); }
     .btn-submit:hover { background: var(--primary-hover); }

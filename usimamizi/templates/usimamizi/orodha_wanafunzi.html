@@ -7,9 +7,9 @@
 {% endblock %}
 
 {% block maudhui %}
-<div class="orodha_wanafunzi-inline-1">
+<div class="page-shell orodha_wanafunzi-inline-1">
 
-    <div class="page-header">
+    <div class="app-card app-page-header app-card-accent-left-primary page-header">
         <div class="header-title">
             <div class="header-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -23,10 +23,10 @@
         </div>
 
         <div class="badge-group">
-            <span class="stat-badge badge-male">Wanaume: {{ wavulana }}</span>
-            <span class="stat-badge badge-female">Wanawake: {{ wasichana }}</span>
-            <span class="stat-badge badge-total">Jumla: {{ jumla }}</span>
-            <a href="{% url 'sajili_mwanafunzi' %}" class="btn-add-student">
+            <span class="app-badge app-badge-info stat-badge badge-male">Wanaume: {{ wavulana }}</span>
+            <span class="app-badge app-badge-female stat-badge badge-female">Wanawake: {{ wasichana }}</span>
+            <span class="app-badge app-badge-success stat-badge badge-total">Jumla: {{ jumla }}</span>
+            <a href="{% url 'sajili_mwanafunzi' %}" class="app-btn app-btn-primary btn-add-student">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -36,17 +36,24 @@
         </div>
     </div>
 
-    <div class="filter-card">
+    <div class="app-card app-toolbar filter-card">
         <form method="GET" class="filter-form">
-            <input type="text" name="q" value="{{ neno_la_kutafuta }}" placeholder="Tafuta kwa jina..." class="custom-input">
+            <input type="text" name="q" value="{{ neno_la_kutafuta }}" placeholder="Tafuta kwa jina..." class="app-input custom-input">
 
-            <select name="jinsia" class="custom-select orodha_wanafunzi-inline-2">
+            <select name="jinsia" class="app-select custom-select orodha_wanafunzi-inline-2">
                 <option value="">Jinsia Zote</option>
                 <option value="ME" {% if jinsia_filter == 'ME' %}selected{% endif %}>Wanaume (ME)</option>
                 <option value="KE" {% if jinsia_filter == 'KE' %}selected{% endif %}>Wanawake (KE)</option>
             </select>
 
-            <button type="submit" class="btn-search">
+            <select name="darasa" class="app-select custom-select orodha_wanafunzi-inline-2">
+                <option value="">Madarasa Yote</option>
+                {% for darasa in madarasa %}
+                    <option value="{{ darasa.id }}" {% if darasa_filter|stringformat:"s" == darasa.id|stringformat:"s" %}selected{% endif %}>{{ darasa.jina }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="app-btn app-btn-primary btn-search">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -54,7 +61,7 @@
                 Tafuta
             </button>
 
-            <a href="{% url 'orodha_wanafunzi' %}" class="btn-clear" title="Safisha Utafutaji">
+            <a href="{% url 'orodha_wanafunzi' %}" class="app-btn app-btn-outline btn-clear" title="Safisha Utafutaji">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -64,9 +71,9 @@
         </form>
     </div>
 
-    <div class="table-card">
-        <div class="orodha_wanafunzi-inline-3">
-            <table class="data-table">
+    <div class="app-card table-card">
+        <div class="app-table-wrap orodha_wanafunzi-inline-3">
+            <table class="app-table data-table">
                 <thead>
                     <tr>
                         <th>Jina Kamili</th>
@@ -82,7 +89,7 @@
                             </a>
                         </td>
                         <td class="orodha_wanafunzi-inline-4">
-                            <a href="{% url 'ripoti_mwanafunzi' mwanafunzi.id 'Darasa' %}" class="btn-action-outline">
+                            <a href="{% url 'ripoti_mwanafunzi' mwanafunzi.id 'Darasa' %}" class="app-btn app-btn-outline app-btn-sm btn-action-outline">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V8l-6-6z"></path>
                                     <polyline points="14 2 14 8 20 8"></polyline>

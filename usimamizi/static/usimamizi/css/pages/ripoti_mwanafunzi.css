@@ -23,7 +23,7 @@
 
     /* Content Cards */
     .tab-content {
-        background-color: var(--card-bg); padding: 30px; border-radius: 0 12px 12px 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: none;
+        background-color: var(--card-bg); padding: 30px; border-radius: 0 12px 12px 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color); display: none;
     }
 
     /* Toolbar (Filters na Download PDF) */
@@ -60,7 +60,7 @@
     .pande-list { margin: 0; padding-left: 20px; font-size: 13px; line-height: 1.6; color: var(--text-muted); }
     
     /* Maoni Box */
-    .maoni-box { background-color: rgba(2, 136, 209, 0.05); padding: 10px 15px; border-left: 3px solid var(--secondary); border-radius: 4px; font-size: 13px; color: var(--text-muted); margin-top: 5px; }
+    .maoni-box { background-color: var(--info-bg); padding: 10px 15px; border-left: 3px solid var(--secondary); border-radius: 4px; font-size: 13px; color: var(--text-muted); margin-top: 5px; }
 
 .ripoti_mwanafunzi-inline-1 { max-width: 1100px; margin: auto; padding: 20px; }
 .ripoti_mwanafunzi-inline-2 { color: var(--secondary); }

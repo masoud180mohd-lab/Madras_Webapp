@@ -4,7 +4,7 @@
 .orodha_walimu-inline-4 { background-color: var(--card-bg); border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; text-align: center; border-top: 5px solid var(--primary); }
 .orodha_walimu-inline-5 { padding: 20px; background-color: var(--tangazo-bg); }
 .orodha_walimu-inline-6 { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #FFD700; }
-.orodha_walimu-inline-7 { width: 120px; height: 120px; border-radius: 50%; background-color: #ccc; display: inline-flex; justify-content: center; align-items: center; border: 3px solid #FFD700; }
+.orodha_walimu-inline-7 { width: 120px; height: 120px; border-radius: 50%; background-color: var(--table-header); display: inline-flex; justify-content: center; align-items: center; border: 3px solid #FFD700; }
 .orodha_walimu-inline-8 { padding: 15px; }
 .orodha_walimu-inline-9 { margin: 0 0 10px 0; color: var(--primary-hover); }
 .orodha_walimu-inline-10 { margin: 0; color: var(--text-muted); font-weight: bold; }

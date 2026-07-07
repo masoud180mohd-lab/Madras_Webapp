@@ -7,12 +7,12 @@
         flex: 1; padding: 16px; font-size: 16px; font-weight: 600; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; background-color: var(--card-bg); color: var(--text-muted); transition: all 0.2s ease;
     }
     .tab-btn.active {
-        background-color: var(--primary); color: #ffffff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background-color: var(--primary); color: var(--text-on-primary); border-color: var(--primary); box-shadow: 0 4px 12px var(--shadow-color);
     }
 
     /* Makasha ya Jedwali */
     .tab-content {
-        display: none; background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 2px 15px rgba(0,0,0,0.02); border: 1px solid var(--border-color); animation: fadeIn 0.3s ease;
+        display: none; background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px var(--shadow-color); border: 1px solid var(--border-color); animation: fadeIn 0.3s ease;
     }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -50,7 +50,7 @@
     .btn-download {
         background-color: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; transition: 0.2s; display: inline-block;
     }
-    .btn-download:hover { background-color: var(--accent); color: #ffffff; }
+    .btn-download:hover { background-color: var(--accent); color: var(--text-on-primary); }
 
     /* Kuweka namba za utoro zionekane vizuri */
     .utoro-count { font-weight: bold; color: var(--danger); font-size: 15px; }

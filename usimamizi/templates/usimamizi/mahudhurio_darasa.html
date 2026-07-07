@@ -7,34 +7,34 @@
 {% endblock %}
 
 {% block maudhui %}
-<div class="mahudhurio_darasa-inline-1">
+<div class="page-shell mahudhurio_darasa-inline-1">
 
-    <div class="page-header">
+    <div class="app-card app-page-header app-card-accent-left-primary page-header">
         <div>
             <h1>Mahudhurio: {{ darasa.jina }}</h1>
             <p>Tarehe ya Leo: {{ leo|date:"d M Y" }}</p>
         </div>
-        <a href="{% url 'wanafunzi_darasa' darasa.id %}" class="btn-back">
+        <a href="{% url 'wanafunzi_darasa' darasa.id %}" class="app-btn app-btn-outline app-btn-sm btn-back">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             Rudi Kwenye Darasa
         </a>
     </div>
 
     {% if tayari_yapo %}
-        <div class="alert-warning">
+        <div class="app-card app-card-accent-left-warning alert-warning">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mahudhurio_darasa-inline-2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             <h3>Mahudhurio Tayari Yamechukuliwa!</h3>
             <p>Mahudhurio ya darasa hili kwa siku ya leo yameshasajiliwa kwenye mfumo. Huruhusiwi kuchukua mara mbili kwa siku moja.</p>
-            <a href="{% url 'wanafunzi_darasa' darasa.id %}" class="btn-back mahudhurio_darasa-inline-3">Rudi Nyuma</a>
+            <a href="{% url 'wanafunzi_darasa' darasa.id %}" class="app-btn app-btn-outline app-btn-sm btn-back mahudhurio_darasa-inline-3">Rudi Nyuma</a>
         </div>
     {% else %}
     
-        <div class="form-card">
+        <div class="app-card form-card">
             <form method="POST">
                 {% csrf_token %}
                 
-                <div class="mahudhurio_darasa-inline-4">
-                    <table class="data-table">
+                <div class="app-table-wrap mahudhurio_darasa-inline-4">
+                    <table class="app-table data-table">
                         <thead>
                             <tr>
                                 <th>Jina la Mwanafunzi</th>
@@ -52,7 +52,7 @@
                                     <input type="checkbox" name="yupo_{{ mwanafunzi.id }}" checked class="custom-checkbox">
                                 </td>
                                 <td>
-                                    <input type="text" name="sababu_{{ mwanafunzi.id }}" placeholder="Andika sababu hapa..." class="custom-input">
+                                    <input type="text" name="sababu_{{ mwanafunzi.id }}" placeholder="Andika sababu hapa..." class="app-input custom-input">
                                 </td>
                             </tr>
                             {% empty %}
@@ -67,7 +67,7 @@
                 </div>
 
 
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="app-btn app-btn-primary btn-submit">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
                     Hifadhi Mahudhurio
                 </button>

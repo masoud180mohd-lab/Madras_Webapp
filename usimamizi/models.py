@@ -5,7 +5,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
 
-PICHA_MAX_SIZE = 2 * 1024 * 1024
+PICHA_MAX_SIZE = 512 * 1024
 PICHA_FORMATS = ("jpg", "jpeg", "png", "webp")
 NYENZO_MAX_SIZE = 10 * 1024 * 1024
 NYENZO_FORMATS = (
@@ -16,7 +16,8 @@ NYENZO_FORMATS = (
 
 def _validate_file_size(uploaded_file, max_size, label):
     if uploaded_file and uploaded_file.size > max_size:
-        max_mb = max_size // (1024 * 1024)
+        max_mb = max_size / (1024 * 1024)
+        max_display = f"{max_mb:g}"
         raise ValidationError(f"{label} lisizidi {max_mb}MB.")
 
 
