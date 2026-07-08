@@ -1,10 +1,12 @@
 import csv
 import os
+from functools import wraps
 from urllib.parse import urlparse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Q, Count, Sum
 from django.contrib.auth import authenticate, login, logout
@@ -59,6 +61,27 @@ def paginate_items(request, items, per_page=20):
     query_params.pop('page', None)
     return page_obj, query_params.urlencode()
 
+
+def user_has_app_permission(user, *permissions):
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser:
+        return True
+    if Mwalimu.objects.filter(user=user, cheo='Mwalimu Mkuu').exists():
+        return True
+    return any(user.has_perm(permission) for permission in permissions)
+
+
+def ruhusa_inahitajika(*permissions):
+    def decorator(view_func):
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            if user_has_app_permission(request.user, *permissions):
+                return view_func(request, *args, **kwargs)
+            raise PermissionDenied
+        return wrapper
+    return decorator
+
 def ingia(request):
     if request.method == 'POST':
         jina = request.POST.get('username')
@@ -81,6 +104,7 @@ def ukurasa_wa_mwanzo(request):
     return render(request, 'usimamizi/mwanzo.html', {'matangazo': matangazo})
 
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.add_hudhurio')
 def mahudhurio_darasa(request, darasa_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
     wanafunzi = Mwanafunzi.objects.filter(darasa=darasa).order_by('jina_kamili')
@@ -143,10 +167,12 @@ def orodha_wanafunzi(request):
         'neno_la_kutafuta': neno_la_kutafuta,
         'jinsia_filter': jinsia_filter,
         'darasa_filter': darasa_filter,
+        'anaweza_sajili_mwanafunzi': user_has_app_permission(request.user, 'usimamizi.add_mwanafunzi'),
     }
     return render(request, 'usimamizi/orodha_wanafunzi.html', context)
 
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.add_mwanafunzi')
 def sajili_mwanafunzi(request):
     if request.method == 'POST':
         form = MwanafunziForm(request.POST, request.FILES)
@@ -164,6 +190,7 @@ def sajili_mwanafunzi(request):
     })
 
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.change_mwanafunzi')
 def hariri_mwanafunzi(request, id):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=id)
     if request.method == 'POST':
@@ -286,6 +313,7 @@ def wanafunzi_hifdhu(request, somo_id):
     return render(request, 'usimamizi/wanafunzi_hifdhu.html', {'somo': somo, 'wanafunzi': wanafunzi})
 
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.add_hudhurio')
 def chukua_mahudhurio_hifdhu(request, somo_id):
     somo = get_object_or_404(Somo, id=somo_id)
     wanafunzi = Mwanafunzi.objects.filter(programu_ya_usiku=somo).order_by('jina_kamili')
@@ -314,6 +342,7 @@ def chukua_mahudhurio_hifdhu(request, somo_id):
     return render(request, 'usimamizi/mahudhurio_hifdhu.html', {'wanafunzi': wanafunzi, 'leo': leo, 'somo': somo, 'tayari_yapo': tayari_yapo})
 
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.add_nyenzo')
 def pakia_nyenzo(request, somo_id):
     somo = get_object_or_404(Somo, id=somo_id)
     if request.method == 'POST':
@@ -329,6 +358,7 @@ def pakia_nyenzo(request, somo_id):
     return render(request, 'usimamizi/fomu_somo.html', {'form': form, 'somo': somo, 'aina': 'Nyenzo'})
 
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.add_mtihani')
 def ongeza_mtihani(request, somo_id):
     somo = get_object_or_404(Somo, id=somo_id)
     if request.method == 'POST':
@@ -347,6 +377,7 @@ def ongeza_mtihani(request, somo_id):
 # HII NDIO FUNCTION MPYA YA MAKSI
 # ==========================================
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.add_matokeo', 'usimamizi.change_matokeo')
 def weka_maksi(request, mtihani_id):
     mtihani = get_object_or_404(Mtihani, id=mtihani_id)
     somo = mtihani.somo
@@ -401,6 +432,7 @@ def mwanafunzi_profile(request, mwanafunzi_id):
     })
 
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.add_rekodihifdhu')
 def rekodi_sabaq(request, mwanafunzi_id, aina):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
     mwalimu = get_object_or_404(Mwalimu, user=request.user)
@@ -615,10 +647,12 @@ def ukurasa_malipo(request):
         'neno_la_kutafuta': neno_la_kutafuta,
         'hali_teule': hali_teule, # Tunapeleka Hali kwenye HTML
         'darasa_filter': darasa_filter,
+        'anaweza_weka_malipo': user_has_app_permission(request.user, 'usimamizi.add_malipo'),
     }
     return render(request, 'usimamizi/malipo.html', context)
 
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.add_malipo')
 def weka_malipo(request, mwanafunzi_id, aina_id):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
     aina_ya_malipo = get_object_or_404(AinaMalipo, id=aina_id)
@@ -766,6 +800,7 @@ def pakua_pdf_matokeo(request, mtihani_id):
 # ==========================================
 
 @login_required(login_url='ingia')
+@ruhusa_inahitajika('usimamizi.add_msetomtihani')
 def mseto_mitihani_darasa(request, darasa_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
     mseto_zote = MsetoMtihani.objects.filter(darasa=darasa).prefetch_related('mitihani__somo')

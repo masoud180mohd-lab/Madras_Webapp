@@ -3,7 +3,7 @@
 
 {% load static %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'usimamizi/css/pages/fomu_mwanafunzi.css' %}?v=20260706a">
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/fomu_mwanafunzi.css' %}?v=20260708a">
 {% endblock %}
 
 {% block maudhui %}
@@ -19,13 +19,77 @@
     </div>
 
     <div class="form-card">
-        {% if mwanafunzi and mwanafunzi.picha %}
-            <img src="{{ mwanafunzi.picha.url }}" alt="{{ mwanafunzi.jina_kamili }}" class="current-photo">
-        {% endif %}
-
         <form method="POST" enctype="multipart/form-data" class="styled-form">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form.non_field_errors }}
+
+            <div class="photo-upload-panel">
+                <div class="photo-preview-frame">
+                    {% if mwanafunzi and mwanafunzi.picha %}
+                        <img src="{{ mwanafunzi.picha.url }}" alt="{{ mwanafunzi.jina_kamili }}" class="current-photo" id="photoPreview">
+                    {% else %}
+                        <div class="photo-placeholder" id="photoPlaceholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        </div>
+                        <img src="" alt="" class="current-photo photo-preview-hidden" id="photoPreview">
+                    {% endif %}
+                </div>
+                <div class="photo-input-area">
+                    <label for="{{ form.picha.id_for_label }}">{{ form.picha.label }}</label>
+                    {{ form.picha }}
+                    {% if form.picha.help_text %}<span class="helptext">{{ form.picha.help_text }}</span>{% endif %}
+                    <div class="upload-feedback" id="photoFeedback"></div>
+                    {{ form.picha.errors }}
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="field-group field-wide">
+                    <label for="{{ form.jina_kamili.id_for_label }}">{{ form.jina_kamili.label }}</label>
+                    {{ form.jina_kamili }}
+                    {{ form.jina_kamili.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.jinsia.id_for_label }}">{{ form.jinsia.label }}</label>
+                    {{ form.jinsia }}
+                    {{ form.jinsia.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.tarehe_ya_kuzaliwa.id_for_label }}">{{ form.tarehe_ya_kuzaliwa.label }}</label>
+                    {{ form.tarehe_ya_kuzaliwa }}
+                    {{ form.tarehe_ya_kuzaliwa.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.darasa.id_for_label }}">{{ form.darasa.label }}</label>
+                    {{ form.darasa }}
+                    {{ form.darasa.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.programu_ya_usiku.id_for_label }}">{{ form.programu_ya_usiku.label }}</label>
+                    {{ form.programu_ya_usiku }}
+                    {{ form.programu_ya_usiku.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.juzuu_aliyohifadhi.id_for_label }}">{{ form.juzuu_aliyohifadhi.label }}</label>
+                    {{ form.juzuu_aliyohifadhi }}
+                    {{ form.juzuu_aliyohifadhi.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.mahala_anapoishi.id_for_label }}">{{ form.mahala_anapoishi.label }}</label>
+                    {{ form.mahala_anapoishi }}
+                    {{ form.mahala_anapoishi.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.jina_la_mzazi.id_for_label }}">{{ form.jina_la_mzazi.label }}</label>
+                    {{ form.jina_la_mzazi }}
+                    {{ form.jina_la_mzazi.errors }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.namba_ya_simu_mzazi.id_for_label }}">{{ form.namba_ya_simu_mzazi.label }}</label>
+                    {{ form.namba_ya_simu_mzazi }}
+                    {{ form.namba_ya_simu_mzazi.errors }}
+                </div>
+            </div>
 
             <div class="action-buttons">
                 <a href="{% if mwanafunzi %}{% url 'mwanafunzi_profile' mwanafunzi.id %}{% else %}{% url 'orodha_wanafunzi' %}{% endif %}" class="btn-cancel">
@@ -40,4 +104,49 @@
         </form>
     </div>
 </div>
+
+<script>
+    (function () {
+        var input = document.getElementById('{{ form.picha.id_for_label }}');
+        var preview = document.getElementById('photoPreview');
+        var placeholder = document.getElementById('photoPlaceholder');
+        var feedback = document.getElementById('photoFeedback');
+        var allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        var maxSize = 512 * 1024;
+
+        if (!input || !preview || !feedback) return;
+
+        input.addEventListener('change', function () {
+            var file = input.files && input.files[0];
+            feedback.textContent = '';
+            feedback.className = 'upload-feedback';
+
+            if (!file) return;
+
+            if (allowedTypes.indexOf(file.type) === -1) {
+                feedback.textContent = 'Format haikubaliki. Tumia JPG, PNG au WebP.';
+                feedback.classList.add('upload-feedback-error');
+                input.value = '';
+                return;
+            }
+
+            if (file.size > maxSize) {
+                feedback.textContent = 'Picha ni kubwa kuliko 0.5MB. Chagua picha ndogo zaidi.';
+                feedback.classList.add('upload-feedback-error');
+                input.value = '';
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                preview.src = event.target.result;
+                preview.classList.remove('photo-preview-hidden');
+                if (placeholder) placeholder.style.display = 'none';
+                feedback.textContent = 'Picha imechaguliwa vizuri.';
+                feedback.classList.add('upload-feedback-success');
+            };
+            reader.readAsDataURL(file);
+        });
+    })();
+</script>
 {% endblock %}

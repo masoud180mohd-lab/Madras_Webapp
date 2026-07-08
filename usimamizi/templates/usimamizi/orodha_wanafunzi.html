@@ -26,13 +26,15 @@
             <span class="app-badge app-badge-info stat-badge badge-male">Wanaume: {{ wavulana }}</span>
             <span class="app-badge app-badge-female stat-badge badge-female">Wanawake: {{ wasichana }}</span>
             <span class="app-badge app-badge-success stat-badge badge-total">Jumla: {{ jumla }}</span>
-            <a href="{% url 'sajili_mwanafunzi' %}" class="app-btn app-btn-primary btn-add-student">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                Sajili Mwanafunzi
-            </a>
+            {% if anaweza_sajili_mwanafunzi %}
+                <a href="{% url 'sajili_mwanafunzi' %}" class="app-btn app-btn-primary btn-add-student">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Sajili Mwanafunzi
+                </a>
+            {% endif %}
         </div>
     </div>
 

@@ -23,10 +23,12 @@
             </div>
         </div>
 
-        <button class="app-btn app-btn-primary btn-action-main" onclick="toggleQuickPay()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Weka Malipo Mpya
-        </button>
+        {% if anaweza_weka_malipo %}
+            <button class="app-btn app-btn-primary btn-action-main" onclick="toggleQuickPay()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Weka Malipo Mpya
+            </button>
+        {% endif %}
     </div>
 
     <div id="quickPayBox" class="app-card app-card-accent-left-primary quick-pay-box">
@@ -139,9 +141,13 @@
                             {% if t.deni > 0 %}{{ t.deni|floatformat:"0" }}{% else %}0{% endif %} <small class="malipo-inline-25">Tsh</small>
                         </td>
                         <td data-label="Hatua" class="malipo-inline-21">
-                            <a href="{% url 'weka_malipo' t.mwanafunzi.id aina_teule.id %}" class="app-btn app-btn-primary app-btn-sm btn-action-main malipo-inline-26">
-                                + Weka Malipo
-                            </a>
+                            {% if anaweza_weka_malipo %}
+                                <a href="{% url 'weka_malipo' t.mwanafunzi.id aina_teule.id %}" class="app-btn app-btn-primary app-btn-sm btn-action-main malipo-inline-26">
+                                    + Weka Malipo
+                                </a>
+                            {% else %}
+                                <span class="app-badge app-badge-neutral">Tazama tu</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}

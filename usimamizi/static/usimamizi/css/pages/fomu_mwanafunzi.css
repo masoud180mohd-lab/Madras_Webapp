@@ -84,14 +84,71 @@
         font-size: 12px;
         font-weight: 600;
     }
-    .current-photo {
-        width: 96px;
-        height: 96px;
-        border-radius: 10px;
-        object-fit: cover;
-        border: 1px solid var(--border-color);
+    .photo-upload-panel {
+        display: grid;
+        grid-template-columns: 120px minmax(0, 1fr);
+        gap: 18px;
+        align-items: center;
+        padding: 16px;
+        border: 1px dashed var(--border-color);
+        border-radius: 12px;
         background: var(--table-header);
-        margin-bottom: 18px;
+        margin-bottom: 22px;
+    }
+    .photo-preview-frame {
+        width: 112px;
+        height: 112px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+    }
+    .current-photo {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        object-fit: cover;
+        border: none;
+        background: var(--table-header);
+        margin: 0;
+        display: block;
+    }
+    .photo-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+    }
+    .photo-preview-hidden {
+        display: none;
+    }
+    .photo-input-area input[type="file"] {
+        margin-top: 6px;
+    }
+    .upload-feedback {
+        min-height: 18px;
+        margin-top: 8px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .upload-feedback-error {
+        color: var(--danger);
+    }
+    .upload-feedback-success {
+        color: var(--primary);
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+    .field-group {
+        min-width: 0;
+    }
+    .field-wide {
+        grid-column: 1 / -1;
     }
     .action-buttons { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
     .btn-cancel,
@@ -112,3 +169,27 @@
     .btn-cancel:hover { background: var(--table-header); }
     .btn-submit { color: white; border: none; background: var(--primary); flex: 2; box-shadow: 0 4px 12px var(--form-button-shadow); }
     .btn-submit:hover { background: var(--primary-hover); }
+
+    @media (max-width: 640px) {
+        .student-form-wrap {
+            padding: 12px;
+        }
+        .form-card,
+        .page-header {
+            padding: 18px;
+        }
+        .photo-upload-panel,
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .photo-preview-frame {
+            width: 100%;
+            max-width: 180px;
+            height: 180px;
+        }
+        .btn-cancel,
+        .btn-submit {
+            width: 100%;
+            min-width: 0;
+        }
+    }
