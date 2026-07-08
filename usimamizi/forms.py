@@ -33,7 +33,7 @@ class MwanafunziForm(forms.ModelForm):
             'picha': 'Picha ya Mwanafunzi',
         }
         help_texts = {
-            'picha': 'Formats: JPG, JPEG, PNG, WebP. Ukubwa usizidi 2MB.',
+            'picha': 'Formats: JPG, JPEG, PNG, WebP. Ukubwa usizidi 0.5MB.',
         }
         widgets = {
             'tarehe_ya_kuzaliwa': forms.DateInput(attrs={'type': 'date'}),

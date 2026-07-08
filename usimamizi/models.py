@@ -18,7 +18,7 @@ def _validate_file_size(uploaded_file, max_size, label):
     if uploaded_file and uploaded_file.size > max_size:
         max_mb = max_size / (1024 * 1024)
         max_display = f"{max_mb:g}"
-        raise ValidationError(f"{label} lisizidi {max_mb}MB.")
+        raise ValidationError(f"{label} lisizidi {max_display}MB.")
 
 
 def _validate_file_extension(uploaded_file, allowed_extensions, label):
