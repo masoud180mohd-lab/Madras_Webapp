@@ -96,6 +96,32 @@
 
 .mawasiliano-tel {
     margin: 16px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.mawasiliano-wa-compose {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.mawasiliano-wa-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main);
+}
+
+.mawasiliano-wa-text {
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+}
+
+.mawasiliano-wa-count {
+    margin: 0 0 16px;
+    color: var(--text-muted);
 }
 
 @media (max-width: 900px) {

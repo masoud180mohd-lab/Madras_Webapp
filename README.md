@@ -60,6 +60,11 @@ SQLite inaendelea kuwa default ya lab. Production DB (Postgres n.k.) bado haijau
 
 Angalia [docs/ROLES.md](docs/ROLES.md) — matrix ya Mwalimu Mkuu / Kawaida / Jaji / ofisi.
 
+## Mawasiliano / WhatsApp (M-011)
+
+Ofisi: `/madrasa/mawasiliano/` na **Tuma WhatsApp** (`/madrasa/mawasiliano/whatsapp/`).
+Hutumia `https://wa.me/…` tu (WhatsApp ya kawaida) — **hakuna** Business API wala kutuma kiotomatiki; opereta anathibitisha Send.
+
 ## Data integrity (M-003)
 
 - Mahudhurio: unique kwa `(mwanafunzi, tarehe, aina_ya_rekodi)` — rekodi moja kwa siku/aina.

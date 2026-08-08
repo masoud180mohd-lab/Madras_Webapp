@@ -1,0 +1,102 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_mawasiliano.css' %}?v=20260809wa">
+{% endblock %}
+
+{% block page_eyebrow %}Mawasiliano · WhatsApp{% endblock %}
+{% block title %}Tuma WhatsApp · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="mawasiliano-page">
+    <header class="mawasiliano-hero">
+        <div>
+            <h1 class="mawasiliano-title">Tuma WhatsApp</h1>
+            <p class="mawasiliano-lead">
+                Ujumbe <strong>hautumwi kiotomatiki</strong> — bonyeza <em>Fungua WhatsApp</em>, kisha <strong>Send</strong> kwenye WhatsApp.
+            </p>
+        </div>
+        <a href="{% url 'orodha_mawasiliano' %}" class="app-btn app-btn-outline app-btn-sm">Rudi Mawasiliano</a>
+    </header>
+
+    <form method="get" class="mawasiliano-filter mawasiliano-wa-compose">
+        <label class="mawasiliano-wa-label" for="kigezo">Kigezo</label>
+        <select id="kigezo" name="kigezo" class="app-input" onchange="if(this.value){ document.getElementById('ujumbe').value=''; this.form.submit(); }">
+            {% for value, label in template_choices %}
+            <option value="{{ value }}" {% if kigezo == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <label class="mawasiliano-wa-label" for="ujumbe">Ujumbe</label>
+        <textarea id="ujumbe" name="ujumbe" class="app-input mawasiliano-wa-text" rows="4" placeholder="Unaweza kutumia {jina} na {mr}…">{{ ujumbe }}</textarea>
+        <input type="search" name="q" value="{{ q }}" class="app-input" placeholder="Tafuta jina, MR, mzazi…">
+        <select name="darasa" class="app-input">
+            <option value="">Madarasa yote</option>
+            {% for d in madarasa %}
+            <option value="{{ d.id }}" {% if darasa_filter == d.id|stringformat:"s" %}selected{% endif %}>{{ d.jina }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="app-btn app-btn-primary">Onyesha wazazi</button>
+    </form>
+
+    <p class="mawasiliano-wa-count">
+        Namba sahihi: <strong>{{ valid_count }}</strong>
+        {% if invalid_count %} · Zisizotumika: <strong>{{ invalid_count }}</strong>{% endif %}
+    </p>
+
+    <div class="app-card">
+        <div class="app-table-wrap">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th>Mwanafunzi</th>
+                        <th>Mzazi</th>
+                        <th>Simu</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        <td>
+                            <strong>{{ row.mwanafunzi.jina_kamili }}</strong>
+                            <div class="mawasiliano-meta">{{ row.mwanafunzi.namba_ya_usajili }} · {{ row.mwanafunzi.darasa.jina|default:"Bila darasa" }}</div>
+                        </td>
+                        <td>{{ row.mwanafunzi.jina_la_mzazi|default:"—" }}</td>
+                        <td>
+                            {% if row.ina_namba_sahihi %}
+                                {{ row.namba_onyesho }}
+                                <div class="mawasiliano-meta">wa.me/{{ row.e164 }}</div>
+                            {% else %}
+                                <span class="mawasiliano-missing">{{ row.namba_onyesho|default:"Namba si sahihi" }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.ina_namba_sahihi %}
+                            <a
+                                class="app-btn app-btn-primary app-btn-sm"
+                                href="{% url 'fungua_whatsapp' row.mwanafunzi.id %}?ujumbe={{ ujumbe|urlencode }}&amp;next={% url 'tuma_whatsapp' %}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >Fungua WhatsApp</a>
+                            {% else %}
+                            <span class="mawasiliano-meta">Hakuna kiungo</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">
+                            <div class="app-empty-state">
+                                <p class="app-empty-state-title">Hakuna wazazi wenye namba</p>
+                                <p class="app-empty-state-copy">Sajili namba kwenye Mawasiliano au badilisha kichujio.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

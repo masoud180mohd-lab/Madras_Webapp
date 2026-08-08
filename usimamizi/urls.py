@@ -73,6 +73,7 @@ urlpatterns = [
     path('mwaka/', views.ukurasa_mwaka_masomo, name='mwaka_masomo'),
     path('ukaguzi/', views.orodha_ukaguzi, name='orodha_ukaguzi'),
     path('mawasiliano/', views.orodha_mawasiliano, name='orodha_mawasiliano'),
+    path('mawasiliano/whatsapp/', views.tuma_whatsapp, name='tuma_whatsapp'),
     path(
         'mawasiliano/<int:mwanafunzi_id>/',
         views.mwanafunzi_mawasiliano,
@@ -82,6 +83,11 @@ urlpatterns = [
         'mawasiliano/<int:mwanafunzi_id>/simu/',
         views.rekodi_simu_kutoka_profile,
         name='rekodi_simu_kutoka_profile',
+    ),
+    path(
+        'mawasiliano/<int:mwanafunzi_id>/whatsapp/',
+        views.fungua_whatsapp,
+        name='fungua_whatsapp',
     ),
     
     path('hifdhu/kundi/<int:somo_id>/', views.wanafunzi_hifdhu, name='wanafunzi_hifdhu'),

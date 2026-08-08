@@ -52,6 +52,8 @@ from .contacts import (
     orodha_mawasiliano,
     mwanafunzi_mawasiliano,
     rekodi_simu_kutoka_profile,
+    tuma_whatsapp,
+    fungua_whatsapp,
 )
 from .payments import ukurasa_malipo, weka_malipo, pakua_risiti
 from .pdfs import pakua_pdf_mahudhurio, pakua_pdf_sabaq
@@ -105,6 +107,8 @@ __all__ = [
     "orodha_mawasiliano",
     "mwanafunzi_mawasiliano",
     "rekodi_simu_kutoka_profile",
+    "tuma_whatsapp",
+    "fungua_whatsapp",
     "ukurasa_malipo",
     "weka_malipo",
     "pakua_risiti",

@@ -42,6 +42,11 @@
             {% if mwanafunzi.namba_ya_simu_mzazi %}
             <p class="mawasiliano-tel">
                 <a class="app-btn app-btn-primary" href="tel:{{ mwanafunzi.namba_ya_simu_mzazi }}">Piga {{ mwanafunzi.namba_ya_simu_mzazi }}</a>
+                {% if ina_whatsapp and whatsapp_fungua_url %}
+                <a class="app-btn app-btn-secondary" href="{{ whatsapp_fungua_url }}" target="_blank" rel="noopener noreferrer" title="Haitumwi kiotomatiki — bonyeza Send kwenye WhatsApp">WhatsApp</a>
+                {% else %}
+                <span class="mawasiliano-missing">WhatsApp: namba si sahihi</span>
+                {% endif %}
             </p>
             {% endif %}
         </section>

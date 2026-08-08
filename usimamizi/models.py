@@ -591,11 +591,13 @@ class RekodiSimuMzazi(models.Model):
     SABABU_ADA = "ada"
     SABABU_MAHUDHURIO = "mahudhurio"
     SABABU_JUMLA = "jumla"
+    SABABU_WHATSAPP = "whatsapp"
     SABABU_NYINGINE = "nyingine"
     SABABU_CHOICES = (
         (SABABU_ADA, "Ada / malipo"),
         (SABABU_MAHUDHURIO, "Mahudhurio / utoro"),
         (SABABU_JUMLA, "Habari za jumla"),
+        (SABABU_WHATSAPP, "WhatsApp"),
         (SABABU_NYINGINE, "Nyingine"),
     )
 
@@ -604,6 +606,7 @@ class RekodiSimuMzazi(models.Model):
     MATOKEO_IMEZIMWA = "imezimwa"
     MATOKEO_SIYO_SAHIHI = "siyo_sahihi"
     MATOKEO_AKAAHIDI = "akaahidi"
+    MATOKEO_IMEANZISHWA = "imeanzishwa"
     MATOKEO_NYINGINE = "nyingine"
     MATOKEO_CHOICES = (
         (MATOKEO_ALIJIBU, "Alijibu"),
@@ -611,6 +614,7 @@ class RekodiSimuMzazi(models.Model):
         (MATOKEO_IMEZIMWA, "Simu imezimwa"),
         (MATOKEO_SIYO_SAHIHI, "Namba si sahihi"),
         (MATOKEO_AKAAHIDI, "Akaahidi (malipo/kuja)"),
+        (MATOKEO_IMEANZISHWA, "Imeanzishwa (WhatsApp)"),
         (MATOKEO_NYINGINE, "Nyingine"),
     )
 

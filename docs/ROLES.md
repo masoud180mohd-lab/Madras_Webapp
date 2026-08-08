@@ -21,6 +21,7 @@ Utekelezaji: [`usimamizi/permissions.py`](../usimamizi/permissions.py).
 - Mwaka / muhula (`/madrasa/mwaka/`) → `mseto` (Mkuu + Jaji)
 - Ukaguzi (`/madrasa/ukaguzi/`) → `manage_students` au `fees` (nani alirekodi mahudhurio/malipo)
 - Mawasiliano / call log (`/madrasa/mawasiliano/`) → `parent_contact` (Mkuu; ofisi yenye `fees` au ruhusa za `RekodiSimuMzazi`)
+- WhatsApp ya kawaida (`/madrasa/mawasiliano/whatsapp/`, `wa.me`) → ruhusa sawa na Mawasiliano; **si** Business API — opereta anabonyeza Send kwenye WhatsApp; kubofya “Fungua WhatsApp” inaandika rekodi `sababu=whatsapp` / `matokeo=imeanzishwa`
 
 ## Wasifu wa Mwalimu
 
