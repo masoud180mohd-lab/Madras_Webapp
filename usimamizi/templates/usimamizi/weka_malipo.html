@@ -31,22 +31,22 @@
             {% csrf_token %}
             
             <div class="weka_malipo-inline-12">
-                <label class="weka_malipo-inline-13">Kiasi Anacholipa Sasa Hivi (Tsh):</label>
-                <input type="number" name="kiasi" max="{{ deni }}" required placeholder="Mf. 5000" class="weka_malipo-inline-14">
+                <label class="weka_malipo-inline-13" for="id_kiasi">Kiasi Anacholipa Sasa Hivi (Tsh):</label>
+                <input id="id_kiasi" type="number" name="kiasi" max="{{ deni }}" required placeholder="Mf. 5000" class="weka_malipo-inline-14" value="{{ form.kiasi.value|default_if_none:'' }}" step="0.01" min="0.01">
                 <small class="weka_malipo-inline-15">Hawezi kulipa kiasi kinachozidi deni lake.</small>
             </div>
 
             <div class="weka_malipo-inline-12">
-                <label class="weka_malipo-inline-13">Njia ya Malipo:</label>
-                <select name="njia" required class="weka_malipo-inline-16">
-                    <option value="Cash">Pesa Taslimu (Cash)</option>
-                    <option value="Simu">Mtandao wa Simu / Benki</option>
+                <label class="weka_malipo-inline-13" for="id_njia">Njia ya Malipo:</label>
+                <select id="id_njia" name="njia" required class="weka_malipo-inline-16">
+                    <option value="Cash" {% if form.njia.value == 'Cash' or not form.njia.value %}selected{% endif %}>Pesa Taslimu (Cash)</option>
+                    <option value="Simu" {% if form.njia.value == 'Simu' %}selected{% endif %}>Mtandao wa Simu / Benki</option>
                 </select>
             </div>
 
             <div class="weka_malipo-inline-17">
-                <label class="weka_malipo-inline-13">Maelezo ya Ziada (Si Lazima):</label>
-                <textarea name="maelezo" rows="2" placeholder="Mf. Amelipa kwa Mpesa namba..." class="weka_malipo-inline-18"></textarea>
+                <label class="weka_malipo-inline-13" for="id_maelezo">Maelezo ya Ziada (Si Lazima):</label>
+                <textarea id="id_maelezo" name="maelezo" rows="2" placeholder="Mf. Amelipa kwa Mpesa namba..." class="weka_malipo-inline-18">{{ form.maelezo.value|default_if_none:'' }}</textarea>
             </div>
 
             <div class="weka_malipo-inline-19">

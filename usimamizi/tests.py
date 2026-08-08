@@ -133,6 +133,42 @@ class RegistrationConcurrencyTests(TransactionTestCase):
         self.assertEqual(int(third.namba_ya_usajili.split("-")[1]), n + 2)
 
 
+class FormsHardeningTests(TestCase):
+    def test_parse_maksi_rejects_out_of_range(self):
+        from usimamizi.forms import parse_maksi_post
+
+        student = Mwanafunzi.objects.create(jina_kamili="Maksi Bound")
+        scores, errors = parse_maksi_post([student], {f"maksi_{student.id}": "150"})
+        self.assertEqual(scores, {})
+        self.assertTrue(errors)
+
+    def test_malipo_form_blocks_overpay(self):
+        from decimal import Decimal
+        from usimamizi.forms import MalipoForm
+
+        form = MalipoForm(
+            {"kiasi": "5000", "njia": "Cash", "maelezo": ""},
+            max_kiasi=Decimal("1000"),
+        )
+        self.assertFalse(form.is_valid())
+        self.assertIn("kiasi", form.errors)
+
+    def test_build_hudhurio_rows_bulk_shape(self):
+        from datetime import date
+        from usimamizi.forms import build_hudhurio_rows
+
+        student = Mwanafunzi.objects.create(jina_kamili="Hudhurio Bulk")
+        rows = build_hudhurio_rows(
+            [student],
+            {f"yupo_{student.id}": "on"},
+            aina_ya_rekodi="Kawaida",
+            tarehe=date(2026, 8, 1),
+        )
+        self.assertEqual(len(rows), 1)
+        self.assertTrue(rows[0].yupo)
+        self.assertEqual(rows[0].aina_ya_rekodi, "Kawaida")
+
+
 class AuthZRoleMatrixTests(TestCase):
     def setUp(self):
         from django.contrib.auth import get_user_model

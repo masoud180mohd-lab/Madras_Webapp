@@ -1,9 +1,20 @@
 from io import BytesIO
 from pathlib import Path
+from decimal import Decimal
 
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
-from .models import Mwanafunzi, Nyenzo, Mtihani, MsetoMtihani, validate_picha
+from .models import (
+    Hudhurio,
+    Malipo,
+    Mwanafunzi,
+    Nyenzo,
+    Mtihani,
+    MsetoMtihani,
+    PandeMurajaa,
+    RekodiHifdhu,
+    validate_picha,
+)
 
 try:
     from PIL import Image, ImageOps
@@ -131,3 +142,137 @@ class MtihaniForm(forms.ModelForm):
             self.fields['mseto'].queryset = MsetoMtihani.objects.filter(darasa=darasa)
         else:
             self.fields['mseto'].queryset = MsetoMtihani.objects.none()
+
+
+class MalipoForm(forms.Form):
+    """Pokea malipo — field names match existing template inputs."""
+
+    kiasi = forms.DecimalField(
+        min_value=Decimal("0.01"),
+        max_digits=10,
+        decimal_places=2,
+        error_messages={
+            "required": "Weka kiasi cha malipo.",
+            "min_value": "Kiasi lazima kiwe zaidi ya sifuri.",
+            "invalid": "Kiasi si sahihi.",
+        },
+    )
+    njia = forms.ChoiceField(
+        choices=Malipo._meta.get_field("njia_ya_malipo").choices,
+        error_messages={"required": "Chagua njia ya malipo.", "invalid_choice": "Njia si sahihi."},
+    )
+    maelezo = forms.CharField(required=False, max_length=2000)
+
+    def __init__(self, *args, max_kiasi=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.max_kiasi = max_kiasi
+
+    def clean_kiasi(self):
+        kiasi = self.cleaned_data["kiasi"]
+        if self.max_kiasi is not None and kiasi > self.max_kiasi:
+            raise forms.ValidationError(
+                f"Hawezi kulipa zaidi ya deni (Tsh {self.max_kiasi}/=)."
+            )
+        return kiasi
+
+
+class SabaqRekodiForm(forms.Form):
+    sabaq_sura = forms.CharField(required=False, max_length=50)
+    sabaq_aya_kuanzia = forms.IntegerField(required=False, min_value=1)
+    sabaq_aya_kuishia = forms.IntegerField(required=False, min_value=1)
+    sabaq_hali = forms.ChoiceField(
+        required=False,
+        choices=[("", "---------")] + list(RekodiHifdhu._meta.get_field("sabaq_hali").choices),
+    )
+    maoni = forms.CharField(required=False, max_length=2000)
+
+    def clean(self):
+        cleaned = super().clean()
+        start = cleaned.get("sabaq_aya_kuanzia")
+        end = cleaned.get("sabaq_aya_kuishia")
+        if start is not None and end is not None and end < start:
+            self.add_error("sabaq_aya_kuishia", "Aya ya kuishia haiwezi kuwa chini ya kuanzia.")
+        return cleaned
+
+
+def parse_mapande_from_post(post_data):
+    """Validate murajaa rows from the dynamic sabaq template lists."""
+    sura_list = post_data.getlist("pande_sura[]")
+    kuanzia_list = post_data.getlist("pande_aya_kuanzia[]")
+    kuishia_list = post_data.getlist("pande_aya_kuishia[]")
+    hali_list = post_data.getlist("pande_hali[]")
+    valid_hali = {c[0] for c in PandeMurajaa._meta.get_field("hali").choices}
+
+    rows = []
+    errors = []
+    for i, sura in enumerate(sura_list):
+        sura = (sura or "").strip()
+        if not sura:
+            continue
+        hali = hali_list[i] if i < len(hali_list) else ""
+        if hali not in valid_hali:
+            errors.append(f"Hali ya pande '{sura}' si sahihi.")
+            continue
+        kuanzia = kuanzia_list[i] if i < len(kuanzia_list) else ""
+        kuishia = kuishia_list[i] if i < len(kuishia_list) else ""
+        try:
+            aya_kuanzia = int(kuanzia) if str(kuanzia).strip() else None
+            aya_kuishia = int(kuishia) if str(kuishia).strip() else None
+        except (TypeError, ValueError):
+            errors.append(f"Aya za pande '{sura}' si namba sahihi.")
+            continue
+        if aya_kuanzia is not None and aya_kuanzia < 1:
+            errors.append(f"Aya kuanzia ya '{sura}' lazima iwe ≥ 1.")
+            continue
+        if aya_kuishia is not None and aya_kuanzia is not None and aya_kuishia < aya_kuanzia:
+            errors.append(f"Aya kuishia ya '{sura}' haiwezi kuwa chini ya kuanzia.")
+            continue
+        rows.append(
+            {
+                "sura": sura,
+                "aya_kuanzia": aya_kuanzia,
+                "aya_kuishia": aya_kuishia,
+                "hali": hali,
+            }
+        )
+    return rows, errors
+
+
+def parse_maksi_post(wanafunzi, post_data):
+    """Parse maksi_<id> fields; return {mwanafunzi_id: float} and error messages."""
+    scores = {}
+    errors = []
+    for mwanafunzi in wanafunzi:
+        raw = (post_data.get(f"maksi_{mwanafunzi.id}") or "").strip()
+        if not raw:
+            continue
+        try:
+            value = float(raw)
+        except ValueError:
+            errors.append(f"Maksi ya {mwanafunzi.jina_kamili} si namba sahihi.")
+            continue
+        if value < 0 or value > 100:
+            errors.append(f"Maksi ya {mwanafunzi.jina_kamili} lazima iwe kati ya 0 na 100.")
+            continue
+        scores[mwanafunzi.id] = value
+    return scores, errors
+
+
+def build_hudhurio_rows(wanafunzi, post_data, *, aina_ya_rekodi, tarehe):
+    """Build Hudhurio instances for bulk_create from attendance grid POST."""
+    rows = []
+    for mwanafunzi in wanafunzi:
+        yupo = post_data.get(f"yupo_{mwanafunzi.id}") == "on"
+        sababu = (post_data.get(f"sababu_{mwanafunzi.id}") or "").strip()
+        if yupo:
+            sababu = ""
+        rows.append(
+            Hudhurio(
+                mwanafunzi=mwanafunzi,
+                yupo=yupo,
+                sababu_kama_hayupo=sababu or None,
+                aina_ya_rekodi=aina_ya_rekodi,
+                tarehe=tarehe,
+            )
+        )
+    return rows

@@ -6,7 +6,8 @@ from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q, Count, Sum
+from django.db.models import Q, Count, Sum, Value, DecimalField
+from django.db.models.functions import Coalesce
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta
@@ -18,7 +19,17 @@ from django.utils.timezone import localtime
 from django.urls import reverse
 
 from .models import Mwanafunzi, Hudhurio, Tangazo, Mwalimu, Darasa, Somo, Nyenzo, Mtihani, Matokeo, RekodiHifdhu, PandeMurajaa, AinaMalipo, Malipo, MsetoMtihani
-from .forms import MwanafunziForm, NyenzoForm, MtihaniForm, MsetoMtihaniForm
+from .forms import (
+    MwanafunziForm,
+    NyenzoForm,
+    MtihaniForm,
+    MsetoMtihaniForm,
+    MalipoForm,
+    SabaqRekodiForm,
+    parse_mapande_from_post,
+    parse_maksi_post,
+    build_hudhurio_rows,
+)
 from .utils import hesabu_daraja, jenga_ripoti_jumla
 from .permissions import (
     CAP_ATTENDANCE,
@@ -119,16 +130,10 @@ def mahudhurio_darasa(request, darasa_id):
             messages.error(request, '❌ Mahudhurio ya siku ya leo tayari yasharikodiwa!')
             return redirect('mahudhurio_darasa', darasa_id=darasa.id)
 
-        for mwanafunzi in wanafunzi:
-            yupo = request.POST.get(f'yupo_{mwanafunzi.id}') == 'on'
-            sababu = request.POST.get(f'sababu_{mwanafunzi.id}', '')
-            Hudhurio.objects.create(
-                mwanafunzi=mwanafunzi,
-                yupo=yupo,
-                sababu_kama_hayupo=sababu,
-                aina_ya_rekodi='Kawaida',
-                tarehe=leo
-            )
+        rows = build_hudhurio_rows(
+            wanafunzi, request.POST, aina_ya_rekodi='Kawaida', tarehe=leo
+        )
+        Hudhurio.objects.bulk_create(rows)
         messages.success(request, f'✅ Mahudhurio ya {darasa.jina} yamehifadhiwa kikamilifu!')
         return redirect('wanafunzi_darasa', darasa_id=darasa.id)
 
@@ -209,7 +214,7 @@ def hariri_mwanafunzi(request, id):
 @login_required(login_url='ingia')
 @ruhusa_capability(CAP_VIEW_DIRECTORY)
 def orodha_walimu(request):
-    walimu = Mwalimu.objects.all()
+    walimu = Mwalimu.objects.select_related('user').all()
     return render(request, 'usimamizi/orodha_walimu.html', {'walimu': walimu})
 
 @login_required(login_url='ingia')
@@ -268,7 +273,7 @@ def ripoti_watoro(request):
             hudhurio__yupo=False,
             hudhurio__aina_ya_rekodi='Kawaida'
         ))
-    ).order_by('-idadi_ya_utoro')
+    ).select_related('darasa', 'programu_ya_usiku').order_by('-idadi_ya_utoro')
 
     # 3. WATORO WA DARSA (Hifdhu - Usiku)
     # Tunachuja kwa tarehe kuanzia Jumamosi iliyopita, yupo=False, na aina=Hifdhu
@@ -282,7 +287,7 @@ def ripoti_watoro(request):
             hudhurio__yupo=False,
             hudhurio__aina_ya_rekodi='Hifdhu'
         ))
-    ).order_by('-idadi_ya_utoro')
+    ).select_related('darasa', 'programu_ya_usiku').order_by('-idadi_ya_utoro')
 
     # 4. Rudisha data kwenye ukurasa wa HTML
     return render(request, 'usimamizi/ripoti_watoro.html', {
@@ -294,7 +299,7 @@ def ripoti_watoro(request):
 @login_required(login_url='ingia')
 @ruhusa_capability(CAP_VIEW_DIRECTORY, CAP_EXAMS, CAP_MATERIALS)
 def orodha_masomo(request):
-    masomo = Somo.objects.all()
+    masomo = Somo.objects.select_related('mwalimu__user', 'darasa').all()
     return render(request, 'usimamizi/orodha_masomo.html', {'masomo': masomo})
 
 @login_required(login_url='ingia')
@@ -336,10 +341,10 @@ def chukua_mahudhurio_hifdhu(request, somo_id):
             messages.error(request, '❌ Mahudhurio ya siku ya leo tayari yasharikodiwa!')
             return redirect('chukua_mahudhurio_hifdhu', somo_id=somo.id)
 
-        for mwanafunzi in wanafunzi:
-            yupo = request.POST.get(f'yupo_{mwanafunzi.id}') == 'on'
-            sababu = request.POST.get(f'sababu_{mwanafunzi.id}', '')
-            Hudhurio.objects.create(mwanafunzi=mwanafunzi, yupo=yupo, sababu_kama_hayupo=sababu, aina_ya_rekodi='Hifdhu', tarehe=leo)
+        rows = build_hudhurio_rows(
+            wanafunzi, request.POST, aina_ya_rekodi='Hifdhu', tarehe=leo
+        )
+        Hudhurio.objects.bulk_create(rows)
         messages.success(request, f'✅ Mahudhurio ya Usiku ({somo.jina}) yamehifadhiwa!')
         return redirect('orodha_masomo')
 
@@ -387,25 +392,31 @@ def weka_maksi(request, mtihani_id):
     somo = mtihani.somo
 
     if somo.darasa:
-        wanafunzi = Mwanafunzi.objects.filter(darasa=somo.darasa).order_by('jina_kamili')
+        wanafunzi = Mwanafunzi.objects.filter(darasa=somo.darasa).select_related('darasa').order_by('jina_kamili')
     else:
-        wanafunzi = Mwanafunzi.objects.all().order_by('jina_kamili')
+        wanafunzi = Mwanafunzi.objects.select_related('darasa').all().order_by('jina_kamili')
+
     if request.method == 'POST':
-        for mwanafunzi in wanafunzi:
-            maksi_value = request.POST.get(f'maksi_{mwanafunzi.id}')
-            if maksi_value:
-                Matokeo.objects.update_or_create(
-                    mwanafunzi=mwanafunzi,
-                    mtihani=mtihani,
-                    defaults={'maksi': float(maksi_value)}
-                )
+        scores, errors = parse_maksi_post(wanafunzi, request.POST)
+        if errors:
+            for err in errors:
+                messages.error(request, err)
+            return redirect('weka_maksi', mtihani_id=mtihani.id)
+        for mwanafunzi_id, maksi_value in scores.items():
+            Matokeo.objects.update_or_create(
+                mwanafunzi_id=mwanafunzi_id,
+                mtihani=mtihani,
+                defaults={'maksi': maksi_value},
+            )
         messages.success(request, f'✅ Maksi za mtihani "{mtihani.jina_la_mtihani}" zimehifadhiwa!')
         return redirect('somo_detail', somo_id=somo.id)
 
-    # Tafuta maksi zilizopo ili zi-populate kwenye fomu moja kwa moja
+    existing = {
+        row.mwanafunzi_id: row.maksi
+        for row in Matokeo.objects.filter(mtihani=mtihani, mwanafunzi__in=wanafunzi)
+    }
     for mwanafunzi in wanafunzi:
-        matokeo = Matokeo.objects.filter(mwanafunzi=mwanafunzi, mtihani=mtihani).first()
-        mwanafunzi.maksi_yake = matokeo.maksi if matokeo else ""
+        mwanafunzi.maksi_yake = existing.get(mwanafunzi.id, "")
 
     return render(request, 'usimamizi/weka_maksi.html', {
         'mtihani': mtihani,
@@ -421,8 +432,18 @@ def mwanafunzi_profile(request, mwanafunzi_id):
     mahudhurio_kawaida = Hudhurio.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Kawaida').order_by('-tarehe')
     mahudhurio_hifdhu = Hudhurio.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Hifdhu').order_by('-tarehe')
     malipo_yote = mwanafunzi.malipo_yote.select_related('aina_ya_malipo').order_by('-tarehe_ya_malipo')
-    sabaq_darasa = RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Darasa').select_related('somo', 'mwalimu').order_by('-tarehe')
-    sabaq_usiku = RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Usiku').select_related('somo', 'mwalimu').order_by('-tarehe')
+    sabaq_darasa = (
+        RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Darasa')
+        .select_related('somo', 'mwalimu')
+        .prefetch_related('mapande')
+        .order_by('-tarehe')
+    )
+    sabaq_usiku = (
+        RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Usiku')
+        .select_related('somo', 'mwalimu')
+        .prefetch_related('mapande')
+        .order_by('-tarehe')
+    )
     jumla_malipo = malipo_yote.aggregate(jumla=Sum('kiasi_kilicholipwa'))['jumla'] or 0
 
     return render(request, 'usimamizi/mwanafunzi_profile.html', {
@@ -448,31 +469,46 @@ def rekodi_sabaq(request, mwanafunzi_id, aina):
     somo = mwanafunzi.programu_ya_usiku if aina == 'Usiku' else None
 
     if request.method == 'POST':
+        form = SabaqRekodiForm(request.POST)
+        mapande_rows, mapande_errors = parse_mapande_from_post(request.POST)
+        if not form.is_valid() or mapande_errors:
+            for field_errors in form.errors.values():
+                for err in field_errors:
+                    messages.error(request, err)
+            for err in mapande_errors:
+                messages.error(request, err)
+            return render(
+                request,
+                'usimamizi/rekodi_hifdhu.html',
+                {'mwanafunzi': mwanafunzi, 'aina': aina, 'somo': somo, 'darasa': darasa, 'form': form},
+            )
+
+        cleaned = form.cleaned_data
         rekodi = RekodiHifdhu.objects.create(
             mwanafunzi=mwanafunzi,
             somo=somo,
             darasa=darasa,
             aina_ya_rekodi=aina,
             mwalimu=mwalimu,
-            sabaq_sura=request.POST.get('sabaq_sura'),
-            sabaq_aya_kuanzia=request.POST.get('sabaq_aya_kuanzia') or None,
-            sabaq_aya_kuishia=request.POST.get('sabaq_aya_kuishia') or None,
-            sabaq_hali=request.POST.get('sabaq_hali'),
-            maoni_ya_mwalimu=request.POST.get('maoni')
+            sabaq_sura=cleaned.get('sabaq_sura') or None,
+            sabaq_aya_kuanzia=cleaned.get('sabaq_aya_kuanzia'),
+            sabaq_aya_kuishia=cleaned.get('sabaq_aya_kuishia'),
+            sabaq_hali=cleaned.get('sabaq_hali') or None,
+            maoni_ya_mwalimu=cleaned.get('maoni') or None,
         )
 
-        mapande_sura = request.POST.getlist('pande_sura[]')
-        mapande_kuanzia = request.POST.getlist('pande_aya_kuanzia[]')
-        mapande_kuishia = request.POST.getlist('pande_aya_kuishia[]')
-        mapande_hali = request.POST.getlist('pande_hali[]')
-
-        for i in range(len(mapande_sura)):
-            if mapande_sura[i]:
-                PandeMurajaa.objects.create(
-                    rekodi=rekodi, sura=mapande_sura[i],
-                    aya_kuanzia=mapande_kuanzia[i] or None, aya_kuishia=mapande_kuishia[i] or None,
-                    hali=mapande_hali[i]
+        PandeMurajaa.objects.bulk_create(
+            [
+                PandeMurajaa(
+                    rekodi=rekodi,
+                    sura=row['sura'],
+                    aya_kuanzia=row['aya_kuanzia'],
+                    aya_kuishia=row['aya_kuishia'],
+                    hali=row['hali'],
                 )
+                for row in mapande_rows
+            ]
+        )
 
         messages.success(request, f'✅ Tathmini ya {aina} imehifadhiwa kikamilifu!')
         if aina == 'Darasa':
@@ -480,7 +516,17 @@ def rekodi_sabaq(request, mwanafunzi_id, aina):
         else:
             return redirect('wanafunzi_hifdhu', somo_id=somo.id)
 
-    return render(request, 'usimamizi/rekodi_hifdhu.html', {'mwanafunzi': mwanafunzi, 'aina': aina, 'somo': somo, 'darasa': darasa})
+    return render(
+        request,
+        'usimamizi/rekodi_hifdhu.html',
+        {
+            'mwanafunzi': mwanafunzi,
+            'aina': aina,
+            'somo': somo,
+            'darasa': darasa,
+            'form': SabaqRekodiForm(),
+        },
+    )
 
 # ==========================================
 # RIPOTI RASMI YA MWANAFUNZI
@@ -491,7 +537,11 @@ def rekodi_sabaq(request, mwanafunzi_id, aina):
 def ripoti_mwanafunzi(request, mwanafunzi_id, aina):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
 
-    sabaq = RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi=aina).order_by('-tarehe')
+    sabaq = (
+        RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi=aina)
+        .prefetch_related('mapande')
+        .order_by('-tarehe')
+    )
     aina_hudhurio = 'Kawaida' if aina == 'Darasa' else 'Hifdhu'
     mahudhurio = Hudhurio.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi=aina_hudhurio).order_by('-tarehe')
 
@@ -556,7 +606,11 @@ def pakua_pdf_mahudhurio(request, mwanafunzi_id, aina, muda):
 @ruhusa_capability(CAP_VIEW_STUDENTS, CAP_SABAQ)
 def pakua_pdf_sabaq(request, mwanafunzi_id, aina, muda):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
-    sabaq = RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi=aina).order_by('-tarehe')
+    sabaq = (
+        RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi=aina)
+        .prefetch_related('mapande')
+        .order_by('-tarehe')
+    )
 
     leo = timezone.now().date()
     if muda == 'wiki':
@@ -587,7 +641,7 @@ def pakua_pdf_sabaq(request, mwanafunzi_id, aina, muda):
 @login_required(login_url='ingia')
 @ruhusa_capability(CAP_FEES)
 def ukurasa_malipo(request):
-    wanafunzi = Mwanafunzi.objects.all().order_by('jina_kamili')
+    wanafunzi = Mwanafunzi.objects.select_related('darasa').order_by('jina_kamili')
     aina_za_malipo = AinaMalipo.objects.all().order_by('-tarehe_ya_kuanzishwa')
 
     # 1. Pata Vichujio kutoka kwenye URL
@@ -614,14 +668,28 @@ def ukurasa_malipo(request):
     taarifa_wanafunzi = []
 
     if aina_teule:
-        malipo_yote = Malipo.objects.filter(aina_ya_malipo=aina_teule)
-        jumla_iliyokusanywa = sum([p.kiasi_kilicholipwa for p in malipo_yote])
-        idadi_waliolipa = malipo_yote.values('mwanafunzi').distinct().count()
+        paid_agg = Malipo.objects.filter(aina_ya_malipo=aina_teule).aggregate(
+            jumla=Coalesce(Sum('kiasi_kilicholipwa'), Value(0), output_field=DecimalField(max_digits=14, decimal_places=2)),
+            walio=Count('mwanafunzi', distinct=True),
+        )
+        jumla_iliyokusanywa = paid_agg['jumla'] or 0
+        idadi_waliolipa = paid_agg['walio'] or 0
 
+        wanafunzi = wanafunzi.annotate(
+            jumla_yake=Coalesce(
+                Sum(
+                    'malipo_yote__kiasi_kilicholipwa',
+                    filter=Q(malipo_yote__aina_ya_malipo=aina_teule),
+                ),
+                Value(0),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
+            )
+        )
+
+        kinachotakiwa = aina_teule.kiasi_kinachotakiwa
         for m in wanafunzi:
-            malipo_yake = malipo_yote.filter(mwanafunzi=m)
-            jumla_yake = sum([p.kiasi_kilicholipwa for p in malipo_yake])
-            deni = aina_teule.kiasi_kinachotakiwa - jumla_yake
+            jumla_yake = m.jumla_yake or 0
+            deni = kinachotakiwa - jumla_yake
 
             if deni <= 0:
                 hali = 'Amemaliza'
@@ -630,11 +698,10 @@ def ukurasa_malipo(request):
             else:
                 hali = 'Hajalipa'
 
-            # AKILI MPYA YA KUCHUJA WANAODAIWA NA WALIOKAMILISHA
             if hali_teule == 'wanaodaiwa' and hali == 'Amemaliza':
-                continue # Ruka huyu, tunataka wanaodaiwa tu
+                continue
             if hali_teule == 'waliokamilisha' and hali != 'Amemaliza':
-                continue # Ruka huyu, tunataka waliomaliza tu
+                continue
 
             taarifa_wanafunzi.append({
                 'mwanafunzi': m,
@@ -656,7 +723,7 @@ def ukurasa_malipo(request):
         'pagination_query': pagination_query,
         'madarasa': madarasa,
         'neno_la_kutafuta': neno_la_kutafuta,
-        'hali_teule': hali_teule, # Tunapeleka Hali kwenye HTML
+        'hali_teule': hali_teule,
         'darasa_filter': darasa_filter,
         'anaweza_weka_malipo': user_has_capability(request.user, CAP_FEES) and user_has_app_permission(request.user, 'usimamizi.add_malipo'),
     }
@@ -669,45 +736,72 @@ def weka_malipo(request, mwanafunzi_id, aina_id):
     aina_ya_malipo = get_object_or_404(AinaMalipo, id=aina_id)
     mwalimu = linked_mwalimu_or_none(request.user)
 
-    malipo_yake = Malipo.objects.filter(mwanafunzi=mwanafunzi, aina_ya_malipo=aina_ya_malipo)
-    jumla_yake = sum([p.kiasi_kilicholipwa for p in malipo_yake])
+    jumla_yake = (
+        Malipo.objects.filter(mwanafunzi=mwanafunzi, aina_ya_malipo=aina_ya_malipo)
+        .aggregate(
+            jumla=Coalesce(
+                Sum('kiasi_kilicholipwa'),
+                Value(0),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
+            )
+        )['jumla']
+        or 0
+    )
     deni = aina_ya_malipo.kiasi_kinachotakiwa - jumla_yake
 
     if request.method == 'POST':
-        kiasi = request.POST.get('kiasi')
-        njia = request.POST.get('njia')
-        maelezo = request.POST.get('maelezo')
-
-        if kiasi and float(kiasi) > 0:
+        form = MalipoForm(request.POST, max_kiasi=deni if deni > 0 else None)
+        if form.is_valid():
             Malipo.objects.create(
                 mwanafunzi=mwanafunzi,
                 aina_ya_malipo=aina_ya_malipo,
-                kiasi_kilicholipwa=kiasi,
-                njia_ya_malipo=njia,
+                kiasi_kilicholipwa=form.cleaned_data['kiasi'],
+                njia_ya_malipo=form.cleaned_data['njia'],
                 mpokeaji=mwalimu,
-                maelezo_ya_ziada=maelezo
+                maelezo_ya_ziada=form.cleaned_data.get('maelezo') or None,
             )
-            messages.success(request, f'✅ Malipo ya Tsh {kiasi}/= kutoka kwa {mwanafunzi.jina_kamili} yamepokelewa!')
+            messages.success(
+                request,
+                f"✅ Malipo ya Tsh {form.cleaned_data['kiasi']}/= kutoka kwa {mwanafunzi.jina_kamili} yamepokelewa!",
+            )
             return redirect(f"{reverse('malipo')}?aina={aina_id}")
+        for field_errors in form.errors.values():
+            for err in field_errors:
+                messages.error(request, err)
+    else:
+        form = MalipoForm(max_kiasi=deni if deni > 0 else None)
 
     context = {
         'mwanafunzi': mwanafunzi,
         'aina_ya_malipo': aina_ya_malipo,
         'deni': deni,
-        'jumla_yake': jumla_yake
+        'jumla_yake': jumla_yake,
+        'form': form,
     }
     return render(request, 'usimamizi/weka_malipo.html', context)
 
 @login_required(login_url='ingia')
 @ruhusa_capability(CAP_FEES)
 def pakua_risiti(request, malipo_id):
-    malipo = get_object_or_404(Malipo, id=malipo_id)
+    malipo = get_object_or_404(
+        Malipo.objects.select_related('mwanafunzi', 'aina_ya_malipo', 'mpokeaji'),
+        id=malipo_id,
+    )
     mwanafunzi = malipo.mwanafunzi
     aina = malipo.aina_ya_malipo
 
     # Piga hesabu ya deni lililobaki baada ya malipo haya
-    malipo_yote = Malipo.objects.filter(mwanafunzi=mwanafunzi, aina_ya_malipo=aina)
-    jumla_yake = sum([p.kiasi_kilicholipwa for p in malipo_yote])
+    jumla_yake = (
+        Malipo.objects.filter(mwanafunzi=mwanafunzi, aina_ya_malipo=aina)
+        .aggregate(
+            jumla=Coalesce(
+                Sum('kiasi_kilicholipwa'),
+                Value(0),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
+            )
+        )['jumla']
+        or 0
+    )
     deni_lililobaki = aina.kiasi_kinachotakiwa - jumla_yake
 
     context = {
@@ -738,7 +832,11 @@ def tazama_matokeo(request, mtihani_id):
     somo = mtihani.somo
 
     # Tunavuta matokeo na kupanga kuanzia Maksi kubwa kwenda ndogo (Ranking)
-    matokeo_yote = Matokeo.objects.filter(mtihani=mtihani).order_by('-maksi')
+    matokeo_yote = (
+        Matokeo.objects.filter(mtihani=mtihani)
+        .select_related('mwanafunzi')
+        .order_by('-maksi')
+    )
 
     # Tunatengeneza list mpya itakayobeba matokeo + daraja + nafasi
     orodha_iliyopangwa = []
@@ -771,7 +869,11 @@ def tazama_matokeo(request, mtihani_id):
 def pakua_pdf_matokeo(request, mtihani_id):
     mtihani = get_object_or_404(Mtihani, id=mtihani_id)
     somo = mtihani.somo
-    matokeo_yote = Matokeo.objects.filter(mtihani=mtihani).order_by('-maksi')
+    matokeo_yote = (
+        Matokeo.objects.filter(mtihani=mtihani)
+        .select_related('mwanafunzi')
+        .order_by('-maksi')
+    )
 
     orodha_iliyopangwa = []
     nafasi = 1
