@@ -29,17 +29,18 @@ class MwanafunziAdmin(NoDeleteAdmin):
         "jina_kamili",
         "namba_ya_usajili",
         "umri",
+        "amehifadhiwa",
         "mahala_anapoishi",
         "jina_la_mzazi",
         "namba_ya_simu_mzazi",
         "tarehe_ya_kujiunga",
     )
     search_fields = ("jina_kamili", "namba_ya_usajili")
-    list_filter = ("mahala_anapoishi",)
+    list_filter = ("amehifadhiwa", "mahala_anapoishi", "darasa")
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
-            return ("namba_ya_usajili",)
+            return ("namba_ya_usajili", "tarehe_ya_kuhifadhiwa")
         return ()
 
     def get_fields(self, request, obj=None):

@@ -7,7 +7,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 from decimal import Decimal
 
-from django.db.models import Count, DecimalField, Sum, Value
+from django.db.models import Count, DecimalField, Q, Sum, Value
 from django.db.models.functions import Coalesce
 from django.urls import reverse
 
@@ -47,8 +47,8 @@ def build_dashboard_context(user, leo=None):
         context["vipimo"].append(
             {
                 "label": "Wanafunzi",
-                "value": Mwanafunzi.objects.count(),
-                "hint": "Walioandikishwa mfumo",
+                "value": Mwanafunzi.objects.active().count(),
+                "hint": "Walio hai (bila waliohifadhiwa)",
                 "url": reverse("orodha_wanafunzi")
                 if user_has_capability(user, CAP_VIEW_STUDENTS)
                 else reverse("orodha_madarasa"),
@@ -65,7 +65,9 @@ def build_dashboard_context(user, leo=None):
 
     if user_has_capability(user, CAP_ATTENDANCE):
         madarasa_yenye_wanafunzi = (
-            Darasa.objects.annotate(n=Count("mwanafunzi"))
+            Darasa.objects.annotate(
+                n=Count("mwanafunzi", filter=Q(mwanafunzi__amehifadhiwa=False))
+            )
             .filter(n__gt=0)
             .count()
         )

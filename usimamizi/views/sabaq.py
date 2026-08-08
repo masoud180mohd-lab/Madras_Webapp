@@ -53,6 +53,12 @@ from ..permissions import (
 @ruhusa_inahitajika('usimamizi.add_rekodihifdhu')
 def rekodi_sabaq(request, mwanafunzi_id, aina):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
+    if mwanafunzi.amehifadhiwa:
+        messages.error(
+            request,
+            'Mwanafunzi huyu amehifadhiwa — huwezi kurekodi sabaq mpya.',
+        )
+        return redirect('mwanafunzi_profile', mwanafunzi_id=mwanafunzi.id)
     mwalimu = require_linked_mwalimu(request)
     if mwalimu is None:
         return redirect('mwanzo')

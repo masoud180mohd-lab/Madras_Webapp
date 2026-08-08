@@ -10,7 +10,9 @@ urlpatterns = [
     # Madarasa na Wanafunzi
     path('wanafunzi/', views.orodha_wanafunzi, name='orodha_wanafunzi'),
     path('wanafunzi/sajili/', views.sajili_mwanafunzi, name='sajili_mwanafunzi'),
-    path('wanafunzi/hariri/<int:id>/', views.hariri_mwanafunzi, name='hariri_mwanafunzi'), 
+    path('wanafunzi/hariri/<int:id>/', views.hariri_mwanafunzi, name='hariri_mwanafunzi'),
+    path('wanafunzi/hifadhi/<int:mwanafunzi_id>/', views.hifadhi_mwanafunzi, name='hifadhi_mwanafunzi'),
+    path('wanafunzi/rudisha/<int:mwanafunzi_id>/', views.rudisha_mwanafunzi, name='rudisha_mwanafunzi'),
     path('walimu/', views.orodha_walimu, name='orodha_walimu'),
     path('madarasa/', views.orodha_madarasa, name='orodha_madarasa'),
     path('madarasa/<int:darasa_id>/', views.wanafunzi_darasa, name='wanafunzi_darasa'),

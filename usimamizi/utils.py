@@ -48,7 +48,7 @@ def jenga_ripoti_jumla(mseto):
             matokeo_lookup[(matokeo.mwanafunzi_id, matokeo.mtihani_id)] = matokeo
 
     idadi_ya_mitihani = len(mtihani_ids)
-    wanafunzi = Mwanafunzi.objects.filter(darasa=darasa).order_by('jina_kamili')
+    wanafunzi = Mwanafunzi.objects.active().filter(darasa=darasa).order_by('jina_kamili')
     matokeo_wanafunzi = []
 
     for mwanafunzi in wanafunzi:

@@ -10,6 +10,7 @@ from django.db.models import Q, Count, Sum, Value, DecimalField
 from django.db.models.functions import Coalesce
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from datetime import date, timedelta
 from django.utils import timezone
 from django.http import HttpResponse
@@ -57,7 +58,16 @@ def orodha_wanafunzi(request):
     neno_la_kutafuta = request.GET.get('q', '')
     jinsia_filter = request.GET.get('jinsia', '')
     darasa_filter = request.GET.get('darasa', '')
+    hali_filter = request.GET.get('hali', 'hai')
+    if hali_filter not in ('hai', 'hifadhiwa'):
+        hali_filter = 'hai'
+
     wanafunzi = Mwanafunzi.objects.all().order_by('-id')
+    if hali_filter == 'hifadhiwa':
+        wanafunzi = wanafunzi.archived()
+    else:
+        wanafunzi = wanafunzi.active()
+
     if neno_la_kutafuta:
         wanafunzi = wanafunzi.filter(Q(jina_kamili__icontains=neno_la_kutafuta) | Q(namba_ya_usajili__icontains=neno_la_kutafuta))
     if jinsia_filter:
@@ -79,6 +89,7 @@ def orodha_wanafunzi(request):
         'neno_la_kutafuta': neno_la_kutafuta,
         'jinsia_filter': jinsia_filter,
         'darasa_filter': darasa_filter,
+        'hali_filter': hali_filter,
         'anaweza_sajili_mwanafunzi': user_has_capability(request.user, CAP_MANAGE_STUDENTS),
     }
     return render(request, 'usimamizi/orodha_wanafunzi.html', context)
@@ -105,6 +116,12 @@ def sajili_mwanafunzi(request):
 @ruhusa_inahitajika('usimamizi.change_mwanafunzi')
 def hariri_mwanafunzi(request, id):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=id)
+    if mwanafunzi.amehifadhiwa:
+        messages.error(
+            request,
+            'Mwanafunzi huyu amehifadhiwa. Rudisha kwenye orodha hai kabla ya kuhariri.',
+        )
+        return redirect('mwanafunzi_profile', mwanafunzi_id=mwanafunzi.id)
     if request.method == 'POST':
         form = MwanafunziForm(request.POST, request.FILES, instance=mwanafunzi)
         if form.is_valid():
@@ -137,7 +154,7 @@ def orodha_madarasa(request):
 @ruhusa_capability(CAP_VIEW_STUDENTS)
 def wanafunzi_darasa(request, darasa_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
-    wanafunzi = Mwanafunzi.objects.filter(darasa=darasa)
+    wanafunzi = Mwanafunzi.objects.active().filter(darasa=darasa)
 
     jumla = wanafunzi.count()
     wavulana = wanafunzi.filter(jinsia='ME').count()
@@ -182,7 +199,42 @@ def mwanafunzi_profile(request, mwanafunzi_id):
         'sabaq_darasa': sabaq_darasa,
         'sabaq_usiku': sabaq_usiku,
         'jumla_malipo': jumla_malipo,
+        'anaweza_simamia_wanafunzi': user_has_capability(
+            request.user, CAP_MANAGE_STUDENTS
+        ),
     })
+
+
+@login_required(login_url='ingia')
+@ruhusa_capability(CAP_MANAGE_STUDENTS)
+@require_POST
+def hifadhi_mwanafunzi(request, mwanafunzi_id):
+    mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
+    if mwanafunzi.amehifadhiwa:
+        messages.info(request, f'{mwanafunzi.jina_kamili} tayari amehifadhiwa.')
+    else:
+        mwanafunzi.archive(sababu=request.POST.get('sababu', ''))
+        messages.success(
+            request,
+            f'{mwanafunzi.jina_kamili} amehifadhiwa. Historia inabaki; haonekani kwenye orodha hai.',
+        )
+    return redirect('mwanafunzi_profile', mwanafunzi_id=mwanafunzi.id)
+
+
+@login_required(login_url='ingia')
+@ruhusa_capability(CAP_MANAGE_STUDENTS)
+@require_POST
+def rudisha_mwanafunzi(request, mwanafunzi_id):
+    mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
+    if not mwanafunzi.amehifadhiwa:
+        messages.info(request, f'{mwanafunzi.jina_kamili} tayari yupo kwenye orodha hai.')
+    else:
+        mwanafunzi.restore()
+        messages.success(
+            request,
+            f'{mwanafunzi.jina_kamili} amerudishwa kwenye orodha hai.',
+        )
+    return redirect('mwanafunzi_profile', mwanafunzi_id=mwanafunzi.id)
 
 @login_required(login_url='ingia')
 @ruhusa_capability(CAP_VIEW_STUDENTS, CAP_ATTENDANCE)
@@ -206,7 +258,7 @@ def ripoti_watoro(request):
 
     # 2. WATORO WA CHUONI (Kawaida - Mchana)
     # Tunachuja kwa tarehe kuanzia Jumamosi iliyopita, yupo=False, na aina=Kawaida
-    watoro_chuoni = Mwanafunzi.objects.filter(
+    watoro_chuoni = Mwanafunzi.objects.active().filter(
         hudhurio__tarehe__gte=jumamosi_iliyopita,
         hudhurio__yupo=False,
         hudhurio__aina_ya_rekodi='Kawaida'
@@ -220,7 +272,7 @@ def ripoti_watoro(request):
 
     # 3. WATORO WA DARSA (Hifdhu - Usiku)
     # Tunachuja kwa tarehe kuanzia Jumamosi iliyopita, yupo=False, na aina=Hifdhu
-    watoro_darsa = Mwanafunzi.objects.filter(
+    watoro_darsa = Mwanafunzi.objects.active().filter(
         hudhurio__tarehe__gte=jumamosi_iliyopita,
         hudhurio__yupo=False,
         hudhurio__aina_ya_rekodi='Hifdhu'

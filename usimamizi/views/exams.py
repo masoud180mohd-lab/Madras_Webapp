@@ -58,9 +58,18 @@ def weka_maksi(request, mtihani_id):
     somo = mtihani.somo
 
     if somo.darasa:
-        wanafunzi = Mwanafunzi.objects.filter(darasa=somo.darasa).select_related('darasa').order_by('jina_kamili')
+        wanafunzi = (
+            Mwanafunzi.objects.active()
+            .filter(darasa=somo.darasa)
+            .select_related('darasa')
+            .order_by('jina_kamili')
+        )
     else:
-        wanafunzi = Mwanafunzi.objects.select_related('darasa').all().order_by('jina_kamili')
+        wanafunzi = (
+            Mwanafunzi.objects.active()
+            .select_related('darasa')
+            .order_by('jina_kamili')
+        )
 
     if request.method == 'POST':
         scores, errors = parse_maksi_post(wanafunzi, request.POST)

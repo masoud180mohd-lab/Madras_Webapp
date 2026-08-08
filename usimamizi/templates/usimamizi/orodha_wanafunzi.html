@@ -23,14 +23,19 @@
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                 </svg>
             </div>
-            <h1>Orodha ya Wanafunzi</h1>
+            <h1>{% if hali_filter == 'hifadhiwa' %}Wanafunzi Waliohifadhiwa{% else %}Orodha ya Wanafunzi{% endif %}</h1>
         </div>
 
         <div class="badge-group">
             <span class="app-badge app-badge-info stat-badge badge-male">Wanaume: {{ wavulana }}</span>
             <span class="app-badge app-badge-female stat-badge badge-female">Wanawake: {{ wasichana }}</span>
             <span class="app-badge app-badge-success stat-badge badge-total">Jumla: {{ jumla }}</span>
-            {% if anaweza_sajili_mwanafunzi %}
+            {% if hali_filter == 'hifadhiwa' %}
+                <a href="{% url 'orodha_wanafunzi' %}?hali=hai" class="app-btn app-btn-outline">Orodha hai</a>
+            {% else %}
+                <a href="{% url 'orodha_wanafunzi' %}?hali=hifadhiwa" class="app-btn app-btn-outline">Waliohifadhiwa</a>
+            {% endif %}
+            {% if anaweza_sajili_mwanafunzi and hali_filter != 'hifadhiwa' %}
                 <a href="{% url 'sajili_mwanafunzi' %}" class="app-btn app-btn-primary btn-add-student">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -44,6 +49,7 @@
 
     <div class="app-card app-toolbar filter-card">
         <form method="GET" class="filter-form">
+            <input type="hidden" name="hali" value="{{ hali_filter }}">
             <input type="text" name="q" value="{{ neno_la_kutafuta }}" placeholder="Tafuta kwa jina..." class="app-input custom-input">
 
             <select name="jinsia" class="app-select custom-select orodha_wanafunzi-inline-2">
@@ -67,7 +73,7 @@
                 Tafuta
             </button>
 
-            <a href="{% url 'orodha_wanafunzi' %}" class="app-btn app-btn-outline btn-clear" title="Safisha Utafutaji">
+            <a href="{% url 'orodha_wanafunzi' %}?hali={{ hali_filter }}" class="app-btn app-btn-outline btn-clear" title="Safisha Utafutaji">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -93,6 +99,9 @@
                             <a href="{% url 'mwanafunzi_profile' mwanafunzi.id %}" class="orodha_wanafunzi-inline-6">
                                 {{ mwanafunzi.jina_kamili }}
                             </a>
+                            {% if mwanafunzi.amehifadhiwa %}
+                                <span class="app-badge app-badge-warning">Amehifadhiwa</span>
+                            {% endif %}
                         </td>
                         <td class="orodha_wanafunzi-inline-4">
                             <a href="{% url 'ripoti_mwanafunzi' mwanafunzi.id 'Darasa' %}" class="app-btn app-btn-outline app-btn-sm btn-action-outline">
@@ -112,8 +121,14 @@
                         <td colspan="2">
                             <div class="app-empty-state">
                                 <p class="app-empty-state-title">Hakuna mwanafunzi</p>
-                                <p class="app-empty-state-copy">Hakuna mwanafunzi aliyepatikana kwa kigezo ulichotafuta.</p>
-                                {% if anaweza_sajili_mwanafunzi %}
+                                <p class="app-empty-state-copy">
+                                    {% if hali_filter == 'hifadhiwa' %}
+                                        Hakuna mwanafunzi aliyehifadhiwa kwa sasa.
+                                    {% else %}
+                                        Hakuna mwanafunzi aliyepatikana kwa kigezo ulichotafuta.
+                                    {% endif %}
+                                </p>
+                                {% if anaweza_sajili_mwanafunzi and hali_filter != 'hifadhiwa' %}
                                     <a href="{% url 'sajili_mwanafunzi' %}" class="app-btn app-btn-primary">Sajili Mwanafunzi</a>
                                 {% endif %}
                             </div>

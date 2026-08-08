@@ -54,7 +54,7 @@ from .helpers import link_callback, paginate_items
 @login_required(login_url='ingia')
 @ruhusa_capability(CAP_FEES)
 def ukurasa_malipo(request):
-    wanafunzi = Mwanafunzi.objects.select_related('darasa').order_by('jina_kamili')
+    wanafunzi = Mwanafunzi.objects.active().select_related('darasa').order_by('jina_kamili')
     aina_za_malipo = AinaMalipo.objects.all().order_by('-tarehe_ya_kuanzishwa')
 
     # 1. Pata Vichujio kutoka kwenye URL

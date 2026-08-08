@@ -53,7 +53,7 @@ from ..permissions import (
 @ruhusa_inahitajika('usimamizi.add_hudhurio')
 def mahudhurio_darasa(request, darasa_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
-    wanafunzi = Mwanafunzi.objects.filter(darasa=darasa).order_by('jina_kamili')
+    wanafunzi = Mwanafunzi.objects.active().filter(darasa=darasa).order_by('jina_kamili')
     leo = date.today()
 
     # KODI MPYA: Cheki kama mahudhurio ya leo yapo tayari kwa darasa hili
@@ -84,7 +84,7 @@ def mahudhurio_darasa(request, darasa_id):
 @ruhusa_inahitajika('usimamizi.add_hudhurio')
 def chukua_mahudhurio_hifdhu(request, somo_id):
     somo = get_object_or_404(Somo, id=somo_id)
-    wanafunzi = Mwanafunzi.objects.filter(programu_ya_usiku=somo).order_by('jina_kamili')
+    wanafunzi = Mwanafunzi.objects.active().filter(programu_ya_usiku=somo).order_by('jina_kamili')
     leo = date.today()
 
     # KODI MPYA: Cheki kama mahudhurio ya leo yapo tayari kwa somo hili

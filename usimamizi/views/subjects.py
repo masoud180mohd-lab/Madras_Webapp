@@ -60,7 +60,7 @@ def orodha_masomo(request):
 def somo_detail(request, somo_id):
     somo = get_object_or_404(Somo, id=somo_id)
     if somo.ni_la_hifdhu:
-        idadi = Mwanafunzi.objects.filter(programu_ya_usiku=somo).count()
+        idadi = Mwanafunzi.objects.active().filter(programu_ya_usiku=somo).count()
         return render(request, 'usimamizi/somo_hifdhu.html', {'somo': somo, 'idadi': idadi})
     else:
         nyenzo = Nyenzo.objects.filter(somo=somo).order_by('-tarehe_iliyowekwa')
@@ -71,7 +71,7 @@ def somo_detail(request, somo_id):
 @ruhusa_capability(CAP_VIEW_STUDENTS, CAP_SABAQ, CAP_ATTENDANCE)
 def wanafunzi_hifdhu(request, somo_id):
     somo = get_object_or_404(Somo, id=somo_id)
-    wanafunzi = Mwanafunzi.objects.filter(programu_ya_usiku=somo).order_by('jina_kamili')
+    wanafunzi = Mwanafunzi.objects.active().filter(programu_ya_usiku=somo).order_by('jina_kamili')
     return render(request, 'usimamizi/wanafunzi_hifdhu.html', {'somo': somo, 'wanafunzi': wanafunzi})
 
 @login_required(login_url='ingia')

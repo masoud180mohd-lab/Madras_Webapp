@@ -22,13 +22,47 @@
                 <h1>{{ mwanafunzi.jina_kamili }}</h1>
                 <p>
                     Namba ya Usajili: <span class="reg-number">{{ mwanafunzi.namba_ya_usajili }}</span>
+                    {% if mwanafunzi.amehifadhiwa %}
+                        <span class="app-badge app-badge-warning">Amehifadhiwa</span>
+                    {% endif %}
                 </p>
             </div>
         </div>
-        <a href="{% url 'orodha_wanafunzi' %}" class="app-btn app-btn-icon app-btn-outline btn-icon-back" title="Rudi kwenye Orodha">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-        </a>
+        <div class="profile-header-actions">
+            {% if anaweza_simamia_wanafunzi %}
+                {% if mwanafunzi.amehifadhiwa %}
+                <form method="post" action="{% url 'rudisha_mwanafunzi' mwanafunzi.id %}" class="archive-form">
+                    {% csrf_token %}
+                    <button type="submit" class="app-btn app-btn-primary">Rudisha kwenye orodha hai</button>
+                </form>
+                {% else %}
+                <form method="post" action="{% url 'hifadhi_mwanafunzi' mwanafunzi.id %}" class="archive-form" onsubmit="return confirm('Hifadhi mwanafunzi huyu? Atatoka kwenye orodha hai; historia itabaki.');">
+                    {% csrf_token %}
+                    <input type="hidden" name="sababu" value="">
+                    <button type="submit" class="app-btn app-btn-outline">Hifadhi (ondoa kwenye orodha hai)</button>
+                </form>
+                {% endif %}
+            {% endif %}
+            <a href="{% url 'orodha_wanafunzi' %}{% if mwanafunzi.amehifadhiwa %}?hali=hifadhiwa{% endif %}" class="app-btn app-btn-icon app-btn-outline btn-icon-back" title="Rudi kwenye Orodha">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </a>
+        </div>
     </div>
+
+    {% if mwanafunzi.amehifadhiwa %}
+    <div class="app-card archive-banner" role="status">
+        <p class="archive-banner-title">Mwanafunzi amehifadhiwa</p>
+        <p class="archive-banner-copy">
+            Haonekani kwenye orodha hai, mahudhurio mapya, wala mseto wa maksi.
+            {% if mwanafunzi.tarehe_ya_kuhifadhiwa %}
+                Tarehe: {{ mwanafunzi.tarehe_ya_kuhifadhiwa|date:"d M Y H:i" }}.
+            {% endif %}
+            {% if mwanafunzi.sababu_ya_kuhifadhiwa %}
+                Sababu: {{ mwanafunzi.sababu_ya_kuhifadhiwa }}
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
 
     <div class="info-grid">
         <div class="app-card app-card-accent-top-primary info-card mwanafunzi_profile-inline-2">

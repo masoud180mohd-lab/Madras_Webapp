@@ -4,6 +4,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, models, transaction
 from django.contrib.auth.models import User
+from django.utils import timezone
 from datetime import date
 
 PICHA_MAX_SIZE = 512 * 1024
@@ -71,6 +72,15 @@ class Somo(models.Model):
     def __str__(self):
         return self.jina
 
+class MwanafunziQuerySet(models.QuerySet):
+    def active(self):
+        """Wanafunzi walio hai (hawajahifadhiwa)."""
+        return self.filter(amehifadhiwa=False)
+
+    def archived(self):
+        return self.filter(amehifadhiwa=True)
+
+
 class Mwanafunzi(models.Model):
     jina_kamili = models.CharField(
         max_length=100,
@@ -95,6 +105,15 @@ class Mwanafunzi(models.Model):
     juzuu_aliyohifadhi = models.IntegerField(default=1)
     picha = models.ImageField(upload_to='picha_za_wanafunzi/', null=True, blank=True, validators=[validate_picha])
     tarehe_ya_kujiunga = models.DateField(auto_now_add=True)
+    amehifadhiwa = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="True = ameondolewa kwenye orodha hai; historia inabaki",
+    )
+    tarehe_ya_kuhifadhiwa = models.DateTimeField(null=True, blank=True)
+    sababu_ya_kuhifadhiwa = models.CharField(max_length=255, blank=True, default="")
+
+    objects = MwanafunziQuerySet.as_manager()
 
     # 3. KODI YA KUPIGA HESABU YA UMRI AUTOMATIKI
     @property
@@ -133,6 +152,32 @@ class Mwanafunzi(models.Model):
                 last_error = exc
                 self.namba_ya_usajili = ""
         raise last_error
+
+    def archive(self, sababu=""):
+        """Soft-remove from active lists; keep history and MR number."""
+        self.amehifadhiwa = True
+        self.tarehe_ya_kuhifadhiwa = timezone.now()
+        self.sababu_ya_kuhifadhiwa = (sababu or "").strip()[:255]
+        self.save(
+            update_fields=[
+                "amehifadhiwa",
+                "tarehe_ya_kuhifadhiwa",
+                "sababu_ya_kuhifadhiwa",
+            ]
+        )
+
+    def restore(self):
+        """Rudisha mwanafunzi kwenye orodha hai."""
+        self.amehifadhiwa = False
+        self.tarehe_ya_kuhifadhiwa = None
+        self.sababu_ya_kuhifadhiwa = ""
+        self.save(
+            update_fields=[
+                "amehifadhiwa",
+                "tarehe_ya_kuhifadhiwa",
+                "sababu_ya_kuhifadhiwa",
+            ]
+        )
 
     def __str__(self):
         return f"{self.namba_ya_usajili} - {self.jina_kamili}"

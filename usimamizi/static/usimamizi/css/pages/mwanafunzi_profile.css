@@ -22,6 +22,17 @@
     }
     .btn-icon-back:hover { background-color: var(--table-header); border-color: var(--text-muted); }
 
+    .profile-header-actions {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+    .archive-form { margin: 0; }
+    .archive-banner {
+        margin-bottom: 20px; padding: 16px 18px; border-left: 4px solid var(--warning);
+        background: var(--warning-bg); border-radius: 10px;
+    }
+    .archive-banner-title { margin: 0 0 6px; font-weight: 700; color: var(--warning-text); }
+    .archive-banner-copy { margin: 0; color: var(--text-normal); line-height: 1.45; }
+
     /* Kadi za Taarifa (Grid) */
     .info-grid {
         display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 30px;
