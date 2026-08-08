@@ -42,7 +42,7 @@ Nakili `.env.example` → `.env` na urekebishe. **Usicommmit `.env`.**
 
 - Lab: SQLite (`db.sqlite3`).
 - Production **inakataa SQLite**.
-- **PythonAnywhere (ilipendekezwa kwako):** MySQL + WSGI — fuata **[docs/DEPLOY_PYTHONANYWHERE.md](docs/DEPLOY_PYTHONANYWHERE.md)**.
+- **PythonAnywhere:** free = SQLite (`DJANGO_ALLOW_SQLITE=True`); paid = MySQL — **[docs/DEPLOY_PYTHONANYWHERE.md](docs/DEPLOY_PYTHONANYWHERE.md)**.
 - **VPS** (server yako): Postgres + Nginx — [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ```bash
@@ -58,6 +58,10 @@ Angalia [docs/ROLES.md](docs/ROLES.md) — matrix ya Mwalimu Mkuu / Kawaida / Ja
 
 Ofisi: `/madrasa/mawasiliano/` na **Tuma WhatsApp** (`/madrasa/mawasiliano/whatsapp/`).
 Hutumia `https://wa.me/…` tu (WhatsApp ya kawaida) — **hakuna** Business API wala kutuma kiotomatiki; opereta anathibitisha Send.
+
+## Hamisha darasa (M-012)
+
+Mkuu: `/madrasa/hamisha-darasa/` — uhamisho wa wanafunzi darasa → darasa (mwisho wa mwaka) kwa kuthibitisha; inaandika ukaguzi. Maelezo: [docs/ACADEMIC_YEAR.md](docs/ACADEMIC_YEAR.md).
 
 ## Data integrity (M-003)
 

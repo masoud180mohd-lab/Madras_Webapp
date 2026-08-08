@@ -31,20 +31,22 @@ if not CSRF_TRUSTED_ORIGINS:
     )
 
 _db_engine = DATABASES["default"].get("ENGINE", "")  # noqa: F405
-if _db_engine.endswith("sqlite3"):
-    raise ImproperlyConfigured(
-        "Production must not use SQLite. On PythonAnywhere use MySQL "
-        "(DB_ENGINE=django.db.backends.mysql); on a VPS use Postgres. "
-        "See docs/DEPLOY_PYTHONANYWHERE.md or docs/DEPLOY.md."
-    )
+_allow_sqlite = env_bool("DJANGO_ALLOW_SQLITE", False)
 _allowed_engines = {
     "django.db.backends.postgresql",
     "django.db.backends.mysql",
 }
-if _db_engine not in _allowed_engines:
+if _db_engine.endswith("sqlite3"):
+    if not _allow_sqlite:
+        raise ImproperlyConfigured(
+            "Production SQLite is off by default. For PythonAnywhere free set "
+            "DJANGO_ALLOW_SQLITE=True (see docs/DEPLOY_PYTHONANYWHERE.md). "
+            "Prefer MySQL (paid PA) or Postgres (VPS) when you can."
+        )
+elif _db_engine not in _allowed_engines:
     raise ImproperlyConfigured(
         f"Unsupported production DB engine {_db_engine!r}. "
-        "Use postgresql or mysql."
+        "Use postgresql, mysql, or sqlite with DJANGO_ALLOW_SQLITE=True."
     )
 
 # WhiteNoise: serve collected static files from Gunicorn when Nginx is not aliasing them.

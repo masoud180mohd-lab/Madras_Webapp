@@ -1,7 +1,9 @@
 """
 Configure rasulillahmadras.pythonanywhere.com via API after secrets.env exists.
 
-Usage (from repo root, after filling deploy/pythonanywhere/secrets.env):
+Free plan default: SQLite (DJANGO_ALLOW_SQLITE=True).
+
+Usage (from repo root):
   py -m pip install requests
   py scripts/pa_configure.py
 """
@@ -34,28 +36,23 @@ def load_env(path: Path) -> dict:
     return data
 
 
+def _is_placeholder(value: str) -> bool:
+    return (not value) or ("bandika" in value.lower())
+
+
 def main() -> int:
     if not SECRETS.exists():
         print(
             f"Missing {SECRETS}\n"
             "1) Copy .env.pythonanywhere.example → deploy/pythonanywhere/secrets.env\n"
-            "2) Fill PA_API_TOKEN and DB_PASSWORD\n"
+            "2) Fill PA_API_TOKEN only (SQLite free plan)\n"
             "3) Run this script again."
         )
         return 1
 
     cfg = load_env(SECRETS)
-    required = [
-        "PA_USERNAME",
-        "PA_API_TOKEN",
-        "DB_PASSWORD",
-        "DB_NAME",
-        "DB_USER",
-        "DB_HOST",
-        "PA_PROJECT_HOME",
-        "PA_DOMAIN",
-    ]
-    missing = [k for k in required if not cfg.get(k) or "bandika" in cfg.get(k, "")]
+    required = ["PA_USERNAME", "PA_API_TOKEN", "PA_PROJECT_HOME", "PA_DOMAIN"]
+    missing = [k for k in required if _is_placeholder(cfg.get(k, ""))]
     if missing:
         print("Fill these in secrets.env:", ", ".join(missing))
         return 1
@@ -64,25 +61,44 @@ def main() -> int:
     host = cfg.get("PA_HOST", "www.pythonanywhere.com")
     token = cfg["PA_API_TOKEN"]
     domain = cfg["PA_DOMAIN"]
-    project = cfg["PA_PROJECT_HOME"]
+    project = cfg["PA_PROJECT_HOME"].rstrip("/")
+    db_mode = (cfg.get("DB_MODE") or "sqlite").strip().lower()
     base = f"https://{host}/api/v0/user/{username}/"
     headers = {"Authorization": f"Token {token}"}
 
-    # Probe auth
     r = requests.get(base + "cpu/", headers=headers, timeout=60)
     if r.status_code != 200:
         print("API token rejected:", r.status_code, r.text[:300])
         return 1
     print("API OK — CPU quota reachable.")
 
-    # Inspect webapps
     r = requests.get(base + "webapps/", headers=headers, timeout=60)
     r.raise_for_status()
-    apps = r.json()
-    print("Webapps:", [a.get("domain_name") for a in apps])
+    print("Webapps:", [a.get("domain_name") for a in r.json()])
 
-    # Build and upload .env
     django_secret = cfg.get("DJANGO_SECRET_KEY") or secrets.token_urlsafe(50)
+    if db_mode == "mysql":
+        for key in ("DB_PASSWORD", "DB_NAME", "DB_USER", "DB_HOST"):
+            if _is_placeholder(cfg.get(key, "")):
+                print(f"DB_MODE=mysql requires {key} in secrets.env")
+                return 1
+        db_lines = [
+            "DB_ENGINE=django.db.backends.mysql",
+            f"DB_NAME={cfg['DB_NAME']}",
+            f"DB_USER={cfg['DB_USER']}",
+            f"DB_PASSWORD={cfg['DB_PASSWORD']}",
+            f"DB_HOST={cfg['DB_HOST']}",
+            "DB_PORT=3306",
+        ]
+    else:
+        sqlite_path = cfg.get("DB_NAME") or f"{project}/db.sqlite3"
+        db_lines = [
+            "DJANGO_ALLOW_SQLITE=True",
+            "DB_ENGINE=django.db.backends.sqlite3",
+            f"DB_NAME={sqlite_path}",
+        ]
+        print(f"Using SQLite (free plan): {sqlite_path}")
+
     env_body = "\n".join(
         [
             "DJANGO_ENV=production",
@@ -90,12 +106,7 @@ def main() -> int:
             f"DJANGO_ALLOWED_HOSTS={domain}",
             f"DJANGO_CSRF_TRUSTED_ORIGINS=https://{domain}",
             "DJANGO_SECURE_SSL_REDIRECT=True",
-            "DB_ENGINE=django.db.backends.mysql",
-            f"DB_NAME={cfg['DB_NAME']}",
-            f"DB_USER={cfg['DB_USER']}",
-            f"DB_PASSWORD={cfg['DB_PASSWORD']}",
-            f"DB_HOST={cfg['DB_HOST']}",
-            "DB_PORT=3306",
+            *db_lines,
             "",
         ]
     )
@@ -111,7 +122,6 @@ def main() -> int:
         return 1
     print(f"Uploaded {env_path}")
 
-    # Upload WSGI
     wsgi_remote = f"/var/www/{username}_pythonanywhere_com_wsgi.py"
     wsgi_text = WSGI_SRC.read_text(encoding="utf-8").replace(
         "/home/rasulillahmadras/Madras_Webapp", project
@@ -127,7 +137,6 @@ def main() -> int:
         return 1
     print(f"Uploaded {wsgi_remote}")
 
-    # Patch webapp paths
     r = requests.patch(
         base + f"webapps/{domain}/",
         headers=headers,
@@ -143,7 +152,6 @@ def main() -> int:
     else:
         print("Webapp source/virtualenv updated.")
 
-    # Static mappings
     r = requests.get(base + f"webapps/{domain}/static_files/", headers=headers, timeout=60)
     existing = r.json() if r.status_code == 200 else []
     wanted = {
@@ -172,7 +180,6 @@ def main() -> int:
         else:
             print(f"Static mapping OK: {url} → {path}")
 
-    # Reload
     r = requests.post(base + f"webapps/{domain}/reload/", headers=headers, timeout=120)
     if r.status_code not in (200, 201):
         print("Reload failed:", r.status_code, r.text[:300])
@@ -180,14 +187,14 @@ def main() -> int:
     print("Webapp reloaded.")
     print(f"Open: https://{domain}/madrasa/ingia/")
     print(
-        "\nBADO UNAHITAJIKA (mara moja kwenye Bash console ya PA):\n"
+        "\nBADO (mara moja — Bash console kwenye PA):\n"
         f"  cd {project}\n"
-        "  source .venv/bin/activate   # au unda venv kama haipo\n"
+        "  source .venv/bin/activate\n"
         "  pip install -r requirements.txt\n"
         "  python manage.py migrate\n"
         "  python manage.py collectstatic --noinput\n"
         "  python manage.py createsuperuser\n"
-        "Kisha Reload tena kwenye Web tab."
+        "Kisha Web → Reload."
     )
     return 0
 

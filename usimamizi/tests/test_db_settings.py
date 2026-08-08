@@ -2,6 +2,7 @@ from pathlib import Path
 
 from django.test import SimpleTestCase
 
+from madrasa_sys.settings.base import env_bool
 from madrasa_sys.settings.db import build_databases, parse_database_url
 
 
@@ -77,3 +78,14 @@ class DatabaseSettingsBuilderTests(SimpleTestCase):
     def test_parse_rejects_unknown(self):
         with self.assertRaises(ValueError):
             parse_database_url("oracle://u:p@localhost/db")
+
+    def test_allow_sqlite_env_flag(self):
+        import os
+
+        os.environ.pop("DJANGO_ALLOW_SQLITE", None)
+        self.assertFalse(env_bool("DJANGO_ALLOW_SQLITE", False))
+        os.environ["DJANGO_ALLOW_SQLITE"] = "True"
+        try:
+            self.assertTrue(env_bool("DJANGO_ALLOW_SQLITE", False))
+        finally:
+            os.environ.pop("DJANGO_ALLOW_SQLITE", None)

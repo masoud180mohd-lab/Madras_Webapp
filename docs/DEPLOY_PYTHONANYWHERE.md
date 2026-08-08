@@ -6,18 +6,20 @@
 **VPS** = server ya Linux unayoikodisha wewe mwenyewe (Nginx + Gunicorn).  
 **PythonAnywhere** = hosting tayari — wewe huhitaji VPS. App yako inaendesha hapa.
 
-## Kwa mwenye hafahamu (hatua chache wewe, zengine agent)
+## Kwa mwenye hafahamu — mpango A (bure: SQLite)
 
-Mimi (agent) **siwezi** kuingia akaunti yako bila ruhusa. Fanya hivi **mara moja**, kisha andika *tayari*:
+Akaunti ya **free** haina MySQL. Tunatumia **SQLite** + `DJANGO_ALLOW_SQLITE=True`.
 
-1. Ingia [pythonanywhere.com](https://www.pythonanywhere.com/) → **Account** → **API token** → Create / copy token.
-2. **Databases** → weka MySQL password → **Create** database `rasulillahmadras$madrasa` (au tumia iliyopo).
-3. Kwenye PC yako (Cursor), nakili:
-   - `.env.pythonanywhere.example` → `deploy/pythonanywhere/secrets.env`
-   - Bandika `PA_API_TOKEN=...` na `DB_PASSWORD=...`
-4. Usitume token kwenye chat — andika tu **tayari**.
+Mimi (agent) **siwezi** kuingia bila ruhusa. Fanya hivi **mara moja**, kisha andika *tayari*:
 
-Halafu nitaendesha `py scripts/pa_configure.py` kukutengenezea `.env`, WSGI, static/media, reload.
+1. Ingia [pythonanywhere.com](https://www.pythonanywhere.com/) → **Account** → **API token** → Create / copy.
+2. Fungua faili `deploy/pythonanywhere/secrets.env` kwenye Cursor.
+3. Bandika: `PA_API_TOKEN=token-yako` (acha `DB_MODE=sqlite`).
+4. **Usitume token kwenye chat** — andika tu **tayari**.
+
+Halafu nitaendesha `py scripts/pa_configure.py` (`.env`, WSGI, static/media, reload).
+
+**Backup:** nakili `db.sqlite3` na folder `media/` mara kwa mara (Files tab).
 
 Lab (PC yako) inaweza kubaki SQLite. **Kwenye PythonAnywhere usitumie SQLite** kwa data ya kweli — tumia **MySQL** (mpango wa kawaida wa PA) au Postgres ukiwa na mpango unaounga mkono.
 
