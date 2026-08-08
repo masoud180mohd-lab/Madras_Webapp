@@ -100,6 +100,25 @@ LOGIN_URL = "ingia"
 LOGIN_REDIRECT_URL = "mwanzo"
 LOGOUT_REDIRECT_URL = "ingia"
 
+# DRF obtain_auth_token — off by default. See docs/API.md.
+ENABLE_TOKEN_AUTH = env_bool("DJANGO_ENABLE_TOKEN_AUTH", False)
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "30/hour",
+    },
+}
+
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"

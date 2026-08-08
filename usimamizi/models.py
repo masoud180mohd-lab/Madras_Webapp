@@ -198,24 +198,6 @@ class RekodiHifdhu(models.Model):
     class Meta:
         ordering = ['-tarehe']
 
-class RekodiMaendeleoMchana(models.Model):
-    mwanafunzi = models.ForeignKey(Mwanafunzi, on_delete=models.CASCADE)
-    somo = models.ForeignKey(Somo, on_delete=models.CASCADE) # Mfano: Fiqhi
-    mwalimu = models.ForeignKey(Mwalimu, on_delete=models.SET_NULL, null=True)
-    tarehe = models.DateField(auto_now_add=True)
-
-    mada_iliyosomwa = models.CharField(max_length=200, help_text="Mfano: Mlango wa Udhu")
-    ukurasa_au_aya = models.CharField(max_length=50, blank=True, null=True)
-    hali = models.CharField(max_length=20, choices=[
-        ('Ameelewa', '✅ Ameelewa'),
-        ('Hajaelewa', '❌ Hajaelewa'),
-        ('Hajasikilizwa', '⏸️ Hajasikilizwa')
-    ])
-    maoni = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.somo.jina} - {self.mwanafunzi.jina_kamili}"
-
 
 class PandeMurajaa(models.Model):
     rekodi = models.ForeignKey(RekodiHifdhu, on_delete=models.CASCADE, related_name='mapande')

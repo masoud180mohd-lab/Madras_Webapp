@@ -67,9 +67,9 @@ Angalia [docs/ROLES.md](docs/ROLES.md) — matrix ya Mwalimu Mkuu / Kawaida / Ja
 - Namba ya usajili `MR-###` inatolewa atomically (na retry ikigongana).
 - Migration `0011_integrity_constraints` inasafisha duplicates zilizokuwepo kabla ya kuweka constraint.
 
-## Token API
+## Token API / DRF
 
-`/api-token-auth/` (DRF) ipo kwa urithi / majaribio; hakuna API kamili ya domain bado. Usifungue public bila hardening.
+Hakuna domain REST API. `/api-token-auth/` **imezimwa kwa default** — weka `DJANGO_ENABLE_TOKEN_AUTH=True` lab pekee. Sera: [docs/API.md](docs/API.md). Dead-code: [docs/DEAD_CODE.md](docs/DEAD_CODE.md).
 
 ## Majukumu ya kawaida
 
@@ -79,10 +79,10 @@ py manage.py check
 py manage.py test usimamizi
 ```
 
-Critical-path tests (`usimamizi/tests/`): auth (login/logout), attendance uniqueness, marks, fees, AuthZ permissions, no-cache middleware, model integrity, forms, staff dashboard (role widgets), academic year/term.
+Critical-path tests (`usimamizi/tests/`): auth, attendance, marks, fees, AuthZ, middleware, integrity, forms, dashboard, academic year/term, API token gate.
 
 ## Muundo
 
 - `madrasa_sys/` — project (settings package, urls, wsgi)
 - `usimamizi/` — app ya biashara (models, views/, templates, static, tests/)
-- `docs/` — ROLES.md, ACADEMIC_YEAR.md
+- `docs/` — ROLES.md, ACADEMIC_YEAR.md, API.md, DEAD_CODE.md
