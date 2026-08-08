@@ -1,5 +1,39 @@
+# Python / Django
 *.sqlite3
 db.sqlite3
+db.sqlite3-journal
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment / secrets
 .env
+.env.*
+!.env.example
+
+# Local static collect + uploads
+staticfiles/
+media/
+
+# Logs / OS / editors
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~

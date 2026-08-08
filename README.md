@@ -1,0 +1,74 @@
+# Madras_Webapp
+
+Mfumo wa usimamizi wa **Al-Madrasatul Rasulillah** (Mwera, Zanzibar).
+Django server-rendered templates (HTML + CSS + vanilla JS), UI kwa Kiswahili.
+
+## Mahitaji
+
+- Python 3.9+ (Windows: tumia `py`, si `python` ikiwa PATH haiko)
+- Pip packages kutoka `requirements.txt`
+
+## Usanidi wa haraka (lab)
+
+```bash
+cd Madras_Webapp
+py -m pip install -r requirements.txt
+copy .env.example .env
+py manage.py migrate
+py manage.py runserver
+```
+
+Fungua: [http://127.0.0.1:8000/madrasa/ingia/](http://127.0.0.1:8000/madrasa/ingia/)
+
+| Anwani | Maana |
+|--------|--------|
+| `/madrasa/ingia/` | Login |
+| `/madrasa/` | Mwanzo |
+| `/admin/` | Django admin |
+| `/` | Health ping |
+
+## Settings / mazingira
+
+`DJANGO_SETTINGS_MODULE` inabaki `madrasa_sys.settings`.
+
+| `DJANGO_ENV` | Module | Matumizi |
+|--------------|--------|----------|
+| `development` (default) | `madrasa_sys.settings.development` | Lab / `runserver` |
+| `production` | `madrasa_sys.settings.production` | Server halisi |
+
+Nakili `.env.example` → `.env` na urekebishe. **Usicommmit `.env`.**
+
+### Production checklist
+
+1. Weka `DJANGO_ENV=production`
+2. Weka `DJANGO_SECRET_KEY` yenye nguvu (si `django-insecure-…`)
+3. Production **forces** `DEBUG=False` (hata kama `.env` ina `DJANGO_DEBUG=True`)
+4. Weka `DJANGO_ALLOWED_HOSTS` (si `*`) na `DJANGO_CSRF_TRUSTED_ORIGINS` (`https://…`)
+5. Tengeneza `DJANGO_SECRET_KEY` ndefu (≥50 chars, random). `check --deploy` itaonya ikiwa fupi.
+6. Endesha:
+
+```bash
+py manage.py check --deploy
+py manage.py collectstatic
+```
+
+`STATIC_ROOT` ni `staticfiles/` chini ya mradi (portable). Web server lazima ihudumie `media/` nje ya `DEBUG`.
+
+SQLite inaendelea kuwa default ya lab. Production DB (Postgres n.k.) bado haijaunganishwa katika slice hii — badilisha `DB_*` baadaye ukiwa tayari.
+
+## Token API
+
+`/api-token-auth/` (DRF) ipo kwa urithi / majaribio; hakuna API kamili ya domain bado. Usifungue public bila hardening.
+
+## Majukumu ya kawaida
+
+```bash
+py manage.py createsuperuser
+py manage.py check
+py manage.py test usimamizi
+```
+
+## Muundo
+
+- `madrasa_sys/` — project (settings package, urls, wsgi)
+- `usimamizi/` — app ya biashara (models, views, templates, static)

@@ -1,0 +1,17 @@
+# Core
+Django==4.2.30
+djangorestframework==3.16.1
+python-dotenv==1.1.0
+
+# Uploads / images
+Pillow==11.2.1
+
+# PDF exports (xhtml2pdf + runtime deps used by the app)
+xhtml2pdf==0.2.17
+reportlab==4.5.1
+arabic-reshaper==3.0.0
+html5lib==1.1
+pypdf==6.14.2
+svglib==2.0.2
+cssselect2==0.8.0
+lxml==6.1.1
