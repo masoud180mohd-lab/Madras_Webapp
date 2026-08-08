@@ -79,7 +79,9 @@ py manage.py check
 py manage.py test usimamizi
 ```
 
+Critical-path tests (`usimamizi/tests/`): auth (login/logout), attendance uniqueness, marks, fees, AuthZ permissions, no-cache middleware, model integrity, forms.
+
 ## Muundo
 
 - `madrasa_sys/` — project (settings package, urls, wsgi)
-- `usimamizi/` — app ya biashara (models, views, templates, static)
+- `usimamizi/` — app ya biashara (models, views/, templates, static, tests/)
