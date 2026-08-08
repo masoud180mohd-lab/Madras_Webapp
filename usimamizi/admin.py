@@ -17,6 +17,7 @@ from .models import (
     MwakaWaMasomo,
     Muhula,
     RekodiUkaguzi,
+    RekodiSimuMzazi,
 )
 
 
@@ -33,10 +34,11 @@ class MwanafunziAdmin(NoDeleteAdmin):
         "amehifadhiwa",
         "mahala_anapoishi",
         "jina_la_mzazi",
+        "uhusiano_wa_mlezi",
         "namba_ya_simu_mzazi",
         "tarehe_ya_kujiunga",
     )
-    search_fields = ("jina_kamili", "namba_ya_usajili")
+    search_fields = ("jina_kamili", "namba_ya_usajili", "jina_la_mzazi", "namba_ya_simu_mzazi")
     list_filter = ("amehifadhiwa", "mahala_anapoishi", "darasa")
 
     def get_readonly_fields(self, request, obj=None):
@@ -154,3 +156,22 @@ class RekodiUkaguziAdmin(NoDeleteAdmin):
 
     def has_add_permission(self, request):
         return False
+
+
+@admin.register(RekodiSimuMzazi)
+class RekodiSimuMzaziAdmin(NoDeleteAdmin):
+    list_display = (
+        "tarehe_ya_simu",
+        "mwanafunzi",
+        "namba_iliyopigwa",
+        "sababu",
+        "matokeo",
+        "iliyorekodiwa_na",
+    )
+    list_filter = ("sababu", "matokeo", "tarehe_ya_simu")
+    search_fields = (
+        "mwanafunzi__jina_kamili",
+        "namba_iliyopigwa",
+        "maelezo",
+        "iliyorekodiwa_na__username",
+    )

@@ -33,6 +33,7 @@ CAP_FEES = "fees"
 CAP_MATERIALS = "materials"
 CAP_MSETO = "mseto"
 CAP_VIEW_DIRECTORY = "view_directory"  # madarasa / masomo / walimu lists
+CAP_PARENT_CONTACT = "parent_contact"  # mawasiliano + call log (ofisi)
 
 # Explicit Django model perms that grant a capability (office staff path).
 PERM_CAPABILITIES = {
@@ -70,6 +71,11 @@ PERM_CAPABILITIES = {
         "usimamizi.view_somo",
         "usimamizi.view_mwalimu",
     ),
+    CAP_PARENT_CONTACT: (
+        "usimamizi.view_rekodisimumzazi",
+        "usimamizi.add_rekodisimumzazi",
+        "usimamizi.change_rekodisimumzazi",
+    ),
 }
 
 ROLE_CAPABILITIES = {
@@ -84,6 +90,7 @@ ROLE_CAPABILITIES = {
             CAP_MATERIALS,
             CAP_MSETO,
             CAP_VIEW_DIRECTORY,
+            CAP_PARENT_CONTACT,
         }
     ),
     CHEO_KAWAIDA: frozenset(
@@ -157,6 +164,19 @@ def user_has_capability(user, *capabilities):
         for perm in PERM_CAPABILITIES.get(cap, ()):
             if user.has_perm(perm):
                 return True
+
+    # Ofisi ya ada inaweza kufuatilia wazazi bila ruhusa tofauti.
+    if CAP_PARENT_CONTACT in needed and _has_fees_via_perm(user, cheo):
+        return True
+    return False
+
+
+def _has_fees_via_perm(user, cheo):
+    if cheo and CAP_FEES in ROLE_CAPABILITIES.get(cheo, frozenset()):
+        return True
+    for perm in PERM_CAPABILITIES.get(CAP_FEES, ()):
+        if user.has_perm(perm):
+            return True
     return False
 
 

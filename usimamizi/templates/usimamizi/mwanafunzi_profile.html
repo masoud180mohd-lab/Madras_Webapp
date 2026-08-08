@@ -86,9 +86,13 @@
             </h3>
             <ul class="info-list">
                 <li><span class="info-label">Mzazi / Mlezi:</span> <span class="info-value">{{ mwanafunzi.jina_la_mzazi|default:"-" }}</span></li>
+                <li><span class="info-label">Uhusiano:</span> <span class="info-value">{{ mwanafunzi.get_uhusiano_wa_mlezi_display|default:"-" }}</span></li>
                 <li><span class="info-label">Namba ya Simu:</span> <span class="info-value mwanafunzi_profile-inline-4">{{ mwanafunzi.namba_ya_simu_mzazi|default:"-" }}</span></li>
                 <li><span class="info-label">Mahali Anapoishi:</span> <span class="info-value">{{ mwanafunzi.mahala_anapoishi|default:"-" }}</span></li>
             </ul>
+            {% if anaweza_fuata_wazazi %}
+            <a href="{% url 'mwanafunzi_mawasiliano' mwanafunzi.id %}" class="app-btn app-btn-outline app-btn-sm" style="margin-top:12px;">Fuatilia / rekodi simu</a>
+            {% endif %}
         </div>
     </div>
 
@@ -97,6 +101,9 @@
         <a href="?tab=malipo" class="profile-tab {% if tab_teule == 'malipo' %}profile-tab-active{% endif %}">Malipo</a>
         <a href="?tab=mahudhurio" class="profile-tab {% if tab_teule == 'mahudhurio' %}profile-tab-active{% endif %}">Mahudhurio</a>
         <a href="?tab=rekodi" class="profile-tab {% if tab_teule == 'rekodi' %}profile-tab-active{% endif %}">Rekodi</a>
+        {% if anaweza_fuata_wazazi %}
+        <a href="?tab=mawasiliano" class="profile-tab {% if tab_teule == 'mawasiliano' %}profile-tab-active{% endif %}">Simu</a>
+        {% endif %}
     </div>
 
     {% if tab_teule == 'muhtasari' %}
@@ -238,6 +245,47 @@
                         <li class="empty-line">Hakuna rekodi za sabaq ya usiku.</li>
                     {% endfor %}
                 </ul>
+            </div>
+        </div>
+    {% elif tab_teule == 'mawasiliano' and anaweza_fuata_wazazi %}
+        <div class="app-card finance-section">
+            <h2 class="info-card-title">Rekodi simu kwa mzazi</h2>
+            <form method="post" action="{% url 'rekodi_simu_kutoka_profile' mwanafunzi.id %}" class="styled-form" style="margin-top:12px;">
+                {% csrf_token %}
+                {% for field in call_form %}
+                <div class="field-group" style="margin-bottom:12px;">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+                <button type="submit" class="app-btn app-btn-primary">Hifadhi simu</button>
+            </form>
+            <div class="app-table-wrap" style="margin-top:24px;">
+                <table class="app-table data-table">
+                    <thead>
+                        <tr>
+                            <th>Tarehe</th>
+                            <th>Namba</th>
+                            <th>Sababu</th>
+                            <th>Matokeo</th>
+                            <th>Alirekodi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in rekodi_simu %}
+                        <tr>
+                            <td>{{ r.tarehe_ya_simu|date:"d M Y H:i" }}</td>
+                            <td>{{ r.namba_iliyopigwa|default:"—" }}</td>
+                            <td>{{ r.get_sababu_display }}</td>
+                            <td>{{ r.get_matokeo_display }}</td>
+                            <td>{% if r.iliyorekodiwa_na %}{{ r.iliyorekodiwa_na.get_full_name|default:r.iliyorekodiwa_na.username }}{% else %}—{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5">Hakuna simu zilizorekodiwa bado.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     {% endif %}

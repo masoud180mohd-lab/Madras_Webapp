@@ -23,6 +23,7 @@ from .models import (
     MsetoMtihani,
     PandeMurajaa,
     RekodiHifdhu,
+    RekodiSimuMzazi,
     validate_picha,
 )
 
@@ -41,7 +42,7 @@ class MwanafunziForm(forms.ModelForm):
         fields = [
             'jina_kamili', 'tarehe_ya_kuzaliwa', 'jinsia', 'darasa',
             'programu_ya_usiku', 'juzuu_aliyohifadhi', 'mahala_anapoishi',
-            'jina_la_mzazi', 'namba_ya_simu_mzazi', 'picha',
+            'jina_la_mzazi', 'uhusiano_wa_mlezi', 'namba_ya_simu_mzazi', 'picha',
         ]
         labels = {
             'jina_kamili': 'Jina Kamili',
@@ -52,6 +53,7 @@ class MwanafunziForm(forms.ModelForm):
             'juzuu_aliyohifadhi': 'Juzuu Aliyohifadhi',
             'mahala_anapoishi': 'Mahala Anapoishi',
             'jina_la_mzazi': 'Jina la Mzazi / Mlezi',
+            'uhusiano_wa_mlezi': 'Uhusiano',
             'namba_ya_simu_mzazi': 'Namba ya Simu ya Mzazi',
             'picha': 'Picha ya Mwanafunzi',
         }
@@ -228,6 +230,70 @@ class MtihaniForm(forms.ModelForm):
             self.fields['mseto'].queryset = qs
         else:
             self.fields['mseto'].queryset = MsetoMtihani.objects.none()
+
+
+class MawasilianoContactForm(forms.ModelForm):
+    """Hariri haraka mawasiliano ya mzazi (ofisi)."""
+
+    class Meta:
+        model = Mwanafunzi
+        fields = ["jina_la_mzazi", "uhusiano_wa_mlezi", "namba_ya_simu_mzazi"]
+        labels = {
+            "jina_la_mzazi": "Jina la mzazi / mlezi",
+            "uhusiano_wa_mlezi": "Uhusiano",
+            "namba_ya_simu_mzazi": "Namba ya simu",
+        }
+        widgets = {
+            "jina_la_mzazi": forms.TextInput(attrs={"class": "app-input"}),
+            "uhusiano_wa_mlezi": forms.Select(attrs={"class": "app-input"}),
+            "namba_ya_simu_mzazi": forms.TextInput(
+                attrs={"class": "app-input", "inputmode": "tel"}
+            ),
+        }
+
+
+class RekodiSimuMzaziForm(forms.ModelForm):
+    class Meta:
+        model = RekodiSimuMzazi
+        fields = ["namba_iliyopigwa", "sababu", "matokeo", "maelezo", "tarehe_ya_simu"]
+        labels = {
+            "namba_iliyopigwa": "Namba iliyopigwa",
+            "sababu": "Sababu ya simu",
+            "matokeo": "Matokeo",
+            "maelezo": "Maelezo / ahadi",
+            "tarehe_ya_simu": "Tarehe na saa",
+        }
+        widgets = {
+            "namba_iliyopigwa": forms.TextInput(
+                attrs={"class": "app-input", "inputmode": "tel"}
+            ),
+            "sababu": forms.Select(attrs={"class": "app-input"}),
+            "matokeo": forms.Select(attrs={"class": "app-input"}),
+            "maelezo": forms.Textarea(attrs={"class": "app-input", "rows": 3}),
+            "tarehe_ya_simu": forms.DateTimeInput(
+                attrs={"class": "app-input", "type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M",
+            ),
+        }
+
+    def __init__(self, *args, mwanafunzi=None, **kwargs):
+        from django.utils import timezone as dj_tz
+
+        super().__init__(*args, **kwargs)
+        self.fields["tarehe_ya_simu"].input_formats = [
+            "%Y-%m-%dT%H:%M",
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%d %H:%M",
+        ]
+        if not self.is_bound:
+            if mwanafunzi:
+                self.fields["namba_iliyopigwa"].initial = (
+                    mwanafunzi.namba_ya_simu_mzazi or ""
+                )
+            if not getattr(self.instance, "pk", None):
+                self.fields["tarehe_ya_simu"].initial = dj_tz.localtime(
+                    dj_tz.now()
+                ).strftime("%Y-%m-%dT%H:%M")
 
 
 class DarasaForm(forms.ModelForm):

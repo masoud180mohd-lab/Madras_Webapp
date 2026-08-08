@@ -20,6 +20,7 @@ Utekelezaji: [`usimamizi/permissions.py`](../usimamizi/permissions.py).
 - Matokeo / PDF / CSV za mtihani → `exams` / `mseto`
 - Mwaka / muhula (`/madrasa/mwaka/`) → `mseto` (Mkuu + Jaji)
 - Ukaguzi (`/madrasa/ukaguzi/`) → `manage_students` au `fees` (nani alirekodi mahudhurio/malipo)
+- Mawasiliano / call log (`/madrasa/mawasiliano/`) → `parent_contact` (Mkuu; ofisi yenye `fees` au ruhusa za `RekodiSimuMzazi`)
 
 ## Wasifu wa Mwalimu
 

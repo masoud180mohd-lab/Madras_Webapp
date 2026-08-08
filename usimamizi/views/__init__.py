@@ -43,6 +43,11 @@ from .manage import (
     hariri_aina_malipo,
     futa_aina_malipo,
 )
+from .contacts import (
+    orodha_mawasiliano,
+    mwanafunzi_mawasiliano,
+    rekodi_simu_kutoka_profile,
+)
 from .payments import ukurasa_malipo, weka_malipo, pakua_risiti
 from .pdfs import pakua_pdf_mahudhurio, pakua_pdf_sabaq
 
@@ -89,6 +94,9 @@ __all__ = [
     "ongeza_aina_malipo",
     "hariri_aina_malipo",
     "futa_aina_malipo",
+    "orodha_mawasiliano",
+    "mwanafunzi_mawasiliano",
+    "rekodi_simu_kutoka_profile",
     "ukurasa_malipo",
     "weka_malipo",
     "pakua_risiti",

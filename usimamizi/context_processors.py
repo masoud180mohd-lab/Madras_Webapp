@@ -4,6 +4,7 @@ from .permissions import (
     CAP_FEES,
     CAP_MANAGE_STUDENTS,
     CAP_MSETO,
+    CAP_PARENT_CONTACT,
     CAP_SABAQ,
     CAP_VIEW_DIRECTORY,
     CAP_VIEW_STUDENTS,
@@ -25,6 +26,7 @@ def authz_flags(request):
         "anaweza_mseto": user_has_capability(user, CAP_MSETO),
         "anaweza_malipo": user_has_capability(user, CAP_FEES),
         "anaweza_orodha": user_has_capability(user, CAP_VIEW_DIRECTORY),
+        "anaweza_fuata_wazazi": user_has_capability(user, CAP_PARENT_CONTACT),
     }
 
 

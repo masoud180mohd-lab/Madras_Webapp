@@ -1,0 +1,102 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_mawasiliano.css' %}?v=20260809pc">
+{% endblock %}
+
+{% block page_eyebrow %}Mawasiliano{% endblock %}
+{% block title %}{{ mwanafunzi.jina_kamili }} · simu · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="mawasiliano-page">
+    <header class="mawasiliano-hero">
+        <div>
+            <h1 class="mawasiliano-title">{{ mwanafunzi.jina_kamili }}</h1>
+            <p class="mawasiliano-lead">
+                {{ mwanafunzi.namba_ya_usajili }}
+                · {{ mwanafunzi.darasa.jina|default:"Bila darasa" }}
+                {% if anaweza_ona_wanafunzi %}
+                · <a href="{% url 'mwanafunzi_profile' mwanafunzi.id %}">Wasifu kamili</a>
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'orodha_mawasiliano' %}" class="app-btn app-btn-outline app-btn-sm">Rudi orodha</a>
+    </header>
+
+    <div class="mawasiliano-detail-grid">
+        <section class="app-card">
+            <h2 class="mawasiliano-side-title">Mawasiliano</h2>
+            <form method="post" class="styled-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="sasisha_mawasiliano">
+                {% for field in contact_form %}
+                <div class="field-group" style="margin-bottom:12px;">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+                <button type="submit" class="app-btn app-btn-secondary">Hifadhi mawasiliano</button>
+            </form>
+            {% if mwanafunzi.namba_ya_simu_mzazi %}
+            <p class="mawasiliano-tel">
+                <a class="app-btn app-btn-primary" href="tel:{{ mwanafunzi.namba_ya_simu_mzazi }}">Piga {{ mwanafunzi.namba_ya_simu_mzazi }}</a>
+            </p>
+            {% endif %}
+        </section>
+
+        <section class="app-card">
+            <h2 class="mawasiliano-side-title">Rekodi simu</h2>
+            <form method="post" class="styled-form">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="rekodi_simu">
+                {% for field in call_form %}
+                <div class="field-group" style="margin-bottom:12px;">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+                {% endfor %}
+                <button type="submit" class="app-btn app-btn-primary">Hifadhi simu</button>
+            </form>
+        </section>
+    </div>
+
+    <section class="app-card" style="margin-top:20px;">
+        <h2 class="mawasiliano-side-title">Historia ya simu</h2>
+        <div class="app-table-wrap">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th>Tarehe</th>
+                        <th>Namba</th>
+                        <th>Sababu</th>
+                        <th>Matokeo</th>
+                        <th>Maelezo</th>
+                        <th>Alirekodi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rekodi %}
+                    <tr>
+                        <td>{{ r.tarehe_ya_simu|date:"d M Y H:i" }}</td>
+                        <td>{{ r.namba_iliyopigwa|default:"—" }}</td>
+                        <td>{{ r.get_sababu_display }}</td>
+                        <td>{{ r.get_matokeo_display }}</td>
+                        <td>{{ r.maelezo|default:"—"|truncatechars:80 }}</td>
+                        <td>
+                            {% if r.iliyorekodiwa_na %}
+                                {{ r.iliyorekodiwa_na.get_full_name|default:r.iliyorekodiwa_na.username }}
+                            {% else %}—{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6">Hakuna simu zilizorekodiwa.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+{% endblock %}

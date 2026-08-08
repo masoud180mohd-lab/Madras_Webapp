@@ -57,6 +57,17 @@ urlpatterns = [
     path('madarasa/<int:darasa_id>/mseto/<int:mseto_id>/ripoti/csv/', views.pakua_csv_matokeo_jumla, name='pakua_csv_matokeo_jumla'),
     path('mwaka/', views.ukurasa_mwaka_masomo, name='mwaka_masomo'),
     path('ukaguzi/', views.orodha_ukaguzi, name='orodha_ukaguzi'),
+    path('mawasiliano/', views.orodha_mawasiliano, name='orodha_mawasiliano'),
+    path(
+        'mawasiliano/<int:mwanafunzi_id>/',
+        views.mwanafunzi_mawasiliano,
+        name='mwanafunzi_mawasiliano',
+    ),
+    path(
+        'mawasiliano/<int:mwanafunzi_id>/simu/',
+        views.rekodi_simu_kutoka_profile,
+        name='rekodi_simu_kutoka_profile',
+    ),
     
     path('hifdhu/kundi/<int:somo_id>/', views.wanafunzi_hifdhu, name='wanafunzi_hifdhu'),
     path('ripoti/watoro/', views.ripoti_watoro, name='ripoti_watoro'),

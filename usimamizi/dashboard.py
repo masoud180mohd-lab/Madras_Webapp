@@ -17,6 +17,7 @@ from .permissions import (
     CAP_EXAMS,
     CAP_FEES,
     CAP_MANAGE_STUDENTS,
+    CAP_PARENT_CONTACT,
     CAP_VIEW_DIRECTORY,
     CAP_VIEW_STUDENTS,
     get_user_cheo,
@@ -195,6 +196,15 @@ def _append_quick_actions(user, context):
                 "label": "Malipo",
                 "hint": "Ada na risiti",
                 "url": reverse("malipo"),
+            }
+        )
+
+    if user_has_capability(user, CAP_PARENT_CONTACT):
+        actions.append(
+            {
+                "label": "Mawasiliano",
+                "hint": "Wazazi na kumbukumbu za simu",
+                "url": reverse("orodha_mawasiliano"),
             }
         )
 

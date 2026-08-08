@@ -26,6 +26,7 @@ from ..forms import (
     MtihaniForm,
     MsetoMtihaniForm,
     MalipoForm,
+    RekodiSimuMzaziForm,
     SabaqRekodiForm,
     parse_mapande_from_post,
     parse_maksi_post,
@@ -39,6 +40,7 @@ from ..permissions import (
     CAP_MANAGE_STUDENTS,
     CAP_MATERIALS,
     CAP_MSETO,
+    CAP_PARENT_CONTACT,
     CAP_SABAQ,
     CAP_VIEW_DIRECTORY,
     CAP_VIEW_STUDENTS,
@@ -193,6 +195,16 @@ def mwanafunzi_profile(request, mwanafunzi_id):
         .order_by('-tarehe')
     )
     jumla_malipo = malipo_yote.aggregate(jumla=Sum('kiasi_kilicholipwa'))['jumla'] or 0
+    anaweza_fuata_wazazi = user_has_capability(
+        request.user, CAP_PARENT_CONTACT
+    )
+    rekodi_simu = []
+    call_form = None
+    if anaweza_fuata_wazazi:
+        rekodi_simu = mwanafunzi.rekodi_simu.select_related(
+            "iliyorekodiwa_na"
+        ).all()[:30]
+        call_form = RekodiSimuMzaziForm(mwanafunzi=mwanafunzi)
 
     return render(request, 'usimamizi/mwanafunzi_profile.html', {
         'mwanafunzi': mwanafunzi,
@@ -206,6 +218,9 @@ def mwanafunzi_profile(request, mwanafunzi_id):
         'anaweza_simamia_wanafunzi': user_has_capability(
             request.user, CAP_MANAGE_STUDENTS
         ),
+        'anaweza_fuata_wazazi': anaweza_fuata_wazazi,
+        'rekodi_simu': rekodi_simu,
+        'call_form': call_form,
     })
 
 

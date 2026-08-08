@@ -99,6 +99,19 @@ class Mwanafunzi(models.Model):
     mahala_anapoishi = models.CharField(max_length=100, null=True, blank=True)
     jina_la_mzazi = models.CharField(max_length=100, null=True, blank=True)
     namba_ya_simu_mzazi = models.CharField(max_length=15, null=True, blank=True)
+    uhusiano_wa_mlezi = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        choices=[
+            ("", "—"),
+            ("Baba", "Baba"),
+            ("Mama", "Mama"),
+            ("Mlezi", "Mlezi"),
+            ("Mwingine", "Mwingine"),
+        ],
+        help_text="Uhusiano wa mzazi/mlezi anayewasiliana na ofisi",
+    )
     jinsia = models.CharField(max_length=2, choices=[('ME', 'Mwanamume (ME)'), ('KE', 'Mwanamke (KE)')], default='ME')
     darasa = models.ForeignKey(Darasa, on_delete=models.SET_NULL, null=True, blank=True)
     programu_ya_usiku = models.ForeignKey(Somo, on_delete=models.SET_NULL, null=True, blank=True, related_name='wanafunzi_usiku', help_text="Chagua kama anasoma usiku (Acha wazi kama hasomi usiku)")
@@ -534,3 +547,63 @@ class RekodiUkaguzi(models.Model):
     def __str__(self):
         who = self.mtumiaji.username if self.mtumiaji else "—"
         return f"{self.get_kitendo_display()} · {who} · {self.tarehe_ya_kitendo}"
+
+
+class RekodiSimuMzazi(models.Model):
+    """Call log — ofisi ifuatilie wazazi/walizi."""
+
+    SABABU_ADA = "ada"
+    SABABU_MAHUDHURIO = "mahudhurio"
+    SABABU_JUMLA = "jumla"
+    SABABU_NYINGINE = "nyingine"
+    SABABU_CHOICES = (
+        (SABABU_ADA, "Ada / malipo"),
+        (SABABU_MAHUDHURIO, "Mahudhurio / utoro"),
+        (SABABU_JUMLA, "Habari za jumla"),
+        (SABABU_NYINGINE, "Nyingine"),
+    )
+
+    MATOKEO_ALIJIBU = "alijibu"
+    MATOKEO_HAKUJIBU = "hakujibu"
+    MATOKEO_IMEZIMWA = "imezimwa"
+    MATOKEO_SIYO_SAHIHI = "siyo_sahihi"
+    MATOKEO_AKAAHIDI = "akaahidi"
+    MATOKEO_NYINGINE = "nyingine"
+    MATOKEO_CHOICES = (
+        (MATOKEO_ALIJIBU, "Alijibu"),
+        (MATOKEO_HAKUJIBU, "Hakujibu"),
+        (MATOKEO_IMEZIMWA, "Simu imezimwa"),
+        (MATOKEO_SIYO_SAHIHI, "Namba si sahihi"),
+        (MATOKEO_AKAAHIDI, "Akaahidi (malipo/kuja)"),
+        (MATOKEO_NYINGINE, "Nyingine"),
+    )
+
+    mwanafunzi = models.ForeignKey(
+        Mwanafunzi,
+        on_delete=models.CASCADE,
+        related_name="rekodi_simu",
+    )
+    namba_iliyopigwa = models.CharField(max_length=20, blank=True, default="")
+    sababu = models.CharField(
+        max_length=20, choices=SABABU_CHOICES, default=SABABU_ADA, db_index=True
+    )
+    matokeo = models.CharField(
+        max_length=20, choices=MATOKEO_CHOICES, default=MATOKEO_ALIJIBU, db_index=True
+    )
+    maelezo = models.TextField(blank=True, default="")
+    tarehe_ya_simu = models.DateTimeField(default=timezone.now, db_index=True)
+    iliyorekodiwa_na = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="rekodi_simu_mzazi",
+    )
+
+    class Meta:
+        ordering = ["-tarehe_ya_simu"]
+        verbose_name = "Rekodi ya simu ya mzazi"
+        verbose_name_plural = "Rekodi za simu za wazazi"
+
+    def __str__(self):
+        return f"{self.mwanafunzi} · {self.get_matokeo_display()} · {self.tarehe_ya_simu}"

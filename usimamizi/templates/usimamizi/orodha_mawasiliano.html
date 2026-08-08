@@ -1,0 +1,112 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_mawasiliano.css' %}?v=20260809pc">
+{% endblock %}
+
+{% block page_eyebrow %}Ofisi · wazazi{% endblock %}
+{% block title %}Mawasiliano · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="mawasiliano-page">
+    <header class="mawasiliano-hero">
+        <div>
+            <h1 class="mawasiliano-title">Mawasiliano ya wazazi</h1>
+            <p class="mawasiliano-lead">Tafuta namba, sasisha mawasiliano, na rekodi simu za ufuatiliaji.</p>
+        </div>
+    </header>
+
+    <form method="get" class="mawasiliano-filter">
+        <input type="search" name="q" value="{{ q }}" class="app-input" placeholder="Jina, MR, mzazi, namba…">
+        <select name="darasa" class="app-input">
+            <option value="">Madarasa yote</option>
+            {% for d in madarasa %}
+            <option value="{{ d.id }}" {% if darasa_filter == d.id|stringformat:"s" %}selected{% endif %}>{{ d.jina }}</option>
+            {% endfor %}
+        </select>
+        <select name="hali" class="app-input">
+            <option value="wote" {% if hali == 'wote' %}selected{% endif %}>Wote</option>
+            <option value="zina_namba" {% if hali == 'zina_namba' %}selected{% endif %}>Zina namba</option>
+            <option value="bila_namba" {% if hali == 'bila_namba' %}selected{% endif %}>Bila namba</option>
+        </select>
+        <button type="submit" class="app-btn app-btn-primary">Tafuta</button>
+    </form>
+
+    <div class="mawasiliano-grid">
+        <div class="app-card">
+            <div class="app-table-wrap">
+                <table class="app-table">
+                    <thead>
+                        <tr>
+                            <th>Mwanafunzi</th>
+                            <th>Mzazi</th>
+                            <th>Simu</th>
+                            <th>Simu ya mwisho</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in wanafunzi %}
+                        <tr>
+                            <td>
+                                <strong>{{ m.jina_kamili }}</strong>
+                                <div class="mawasiliano-meta">{{ m.namba_ya_usajili }} · {{ m.darasa.jina|default:"Bila darasa" }}</div>
+                            </td>
+                            <td>
+                                {{ m.jina_la_mzazi|default:"—" }}
+                                {% if m.uhusiano_wa_mlezi %}
+                                <div class="mawasiliano-meta">{{ m.get_uhusiano_wa_mlezi_display }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if m.namba_ya_simu_mzazi %}
+                                    <a href="tel:{{ m.namba_ya_simu_mzazi }}">{{ m.namba_ya_simu_mzazi }}</a>
+                                {% else %}
+                                    <span class="mawasiliano-missing">Hakuna namba</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if m.simu_mwisho %}
+                                    {{ m.simu_mwisho|date:"d M Y H:i" }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'mwanafunzi_mawasiliano' m.id %}" class="app-btn app-btn-outline app-btn-sm">Fuatilia</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="app-empty-state">
+                                    <p class="app-empty-state-title">Hakuna matokeo</p>
+                                    <p class="app-empty-state-copy">Badilisha kichujio au sajili namba kwenye wasifu wa mwanafunzi.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <aside class="mawasiliano-side">
+            <section class="app-card">
+                <h2 class="mawasiliano-side-title">Simu za karibuni</h2>
+                <ul class="mawasiliano-recent">
+                    {% for r in simu_za_karibuni %}
+                    <li>
+                        <a href="{% url 'mwanafunzi_mawasiliano' r.mwanafunzi_id %}">{{ r.mwanafunzi.jina_kamili }}</a>
+                        <span>{{ r.get_matokeo_display }} · {{ r.tarehe_ya_simu|date:"d M H:i" }}</span>
+                    </li>
+                    {% empty %}
+                    <li class="mawasiliano-empty">Hakuna simu bado.</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </aside>
+    </div>
+</section>
+{% endblock %}
