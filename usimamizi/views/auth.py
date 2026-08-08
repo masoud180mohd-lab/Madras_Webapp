@@ -67,6 +67,7 @@ def toka(request):
 
 @login_required(login_url='ingia')
 def ukurasa_wa_mwanzo(request):
-    matangazo = Tangazo.objects.all().order_by('-tarehe_iliyotolewa')[:5]
-    return render(request, 'usimamizi/mwanzo.html', {'matangazo': matangazo})
+    from ..dashboard import build_dashboard_context
+
+    return render(request, 'usimamizi/mwanzo.html', build_dashboard_context(request.user))
 

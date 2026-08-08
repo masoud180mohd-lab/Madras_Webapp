@@ -2,59 +2,81 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mwanzo.css' %}?v=20260808m002">
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mwanzo.css' %}?v=20260808m008">
 {% endblock %}
 
-{% block page_eyebrow %}Mwanzo · matangazo{% endblock %}
+{% block page_eyebrow %}Mwanzo · dashibodi{% endblock %}
 
 {% block title %}Mwanzo · Madrasatul Rasulillah{% endblock %}
 
 {% block maudhui %}
-<div class="mwanzo-inline-1">
-    <img src="{% static 'usimamizi/images/logo.png' %}" alt="Logo ya Madrasa" class="mwanzo-inline-2">
-    
-    <h1 class="mwanzo-inline-3">AL-MADRASATUL RASULILLAH</h1>
-    <h3 class="mwanzo-inline-4">MWERA, ZANZIBAR</h3>
-    
-    <hr class="mwanzo-inline-5">
-</div>
-
-<div class="mwanzo-inline-6">
-    <div class="mwanzo-inline-7">
-        
-        <h3 class="mwanzo-inline-8">
-            <span class="mwanzo-inline-9">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-                </svg>
-            </span> 
-            Matangazo na Taarifa Muhimu
-        </h3>
-        
-        {% for tangazo in matangazo %}
-        <div class="mwanzo-inline-10">
-            <h4 class="mwanzo-inline-11">{{ tangazo.kichwa_cha_habari }}</h4>
-            <p class="mwanzo-inline-12">
-                {{ tangazo.maelezo }}
+<section class="dash-welcome" aria-labelledby="dash-welcome-title">
+    <div class="dash-welcome-brand">
+        <img src="{% static 'usimamizi/images/logo.png' %}" alt="" class="dash-welcome-logo" width="72" height="72">
+        <div>
+            <p class="dash-welcome-kicker">Al-Madrasatul Rasulillah · Mwera</p>
+            <h1 id="dash-welcome-title" class="dash-welcome-title">Karibu, {{ jina_la_mtumiaji }}</h1>
+            <p class="dash-welcome-meta">
+                {% if cheo %}<span class="dash-role">{{ cheo }}</span>{% endif %}
+                <time datetime="{{ leo|date:'Y-m-d' }}">{{ leo|date:"l, d F Y" }}</time>
             </p>
-            <span class="mwanzo-inline-13">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                Imetolewa: {{ tangazo.tarehe_iliyotolewa|date:"d M, Y" }}
-            </span>
         </div>
-        {% empty %}
-        <div class="app-empty-state mwanzo-inline-14">
-            <p class="app-empty-state-title">Hakuna matangazo</p>
-            <p class="app-empty-state-copy">Hakuna matangazo yoyote mapya kwa sasa. Matangazo huwekwa kupitia admin.</p>
-        </div>
-        {% endfor %}
-
     </div>
-</div>
+    <p class="dash-welcome-copy">Hii ni nyumbani ya kazi — angalia hali ya leo, kisha chagua kitendo kinachofuata.</p>
+</section>
+
+{% if vipimo %}
+<section class="dash-metrics" aria-label="Vipimo vya uendeshaji">
+    {% for kipimo in vipimo %}
+    <a href="{{ kipimo.url }}" class="dash-metric{% if kipimo.tone == 'warning' %} is-warning{% elif kipimo.tone == 'ok' %} is-ok{% endif %}">
+        <span class="dash-metric-label">{{ kipimo.label }}</span>
+        <span class="dash-metric-value">{{ kipimo.value }}</span>
+        <span class="dash-metric-hint">{{ kipimo.hint }}</span>
+    </a>
+    {% endfor %}
+</section>
+{% endif %}
+
+{% if vitendo_haraka %}
+<section class="dash-actions" aria-labelledby="dash-actions-title">
+    <div class="dash-section-head">
+        <h2 id="dash-actions-title" class="dash-section-title">Vitendo haraka</h2>
+        <p class="dash-section-copy">Njia fupi kulingana na ruhusa zako.</p>
+    </div>
+    <ul class="dash-action-list">
+        {% for kitendo in vitendo_haraka %}
+        <li>
+            <a href="{{ kitendo.url }}" class="dash-action">
+                <span class="dash-action-label">{{ kitendo.label }}</span>
+                <span class="dash-action-hint">{{ kitendo.hint }}</span>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endif %}
+
+<section class="dash-announcements" aria-labelledby="dash-announcements-title">
+    <div class="dash-section-head">
+        <h2 id="dash-announcements-title" class="dash-section-title">Matangazo</h2>
+        <p class="dash-section-copy">Taarifa muhimu kwa wafanyakazi wa madrasa.</p>
+    </div>
+
+    {% for tangazo in matangazo %}
+    <article class="dash-tangazo">
+        <h3 class="dash-tangazo-title">{{ tangazo.kichwa_cha_habari }}</h3>
+        <p class="dash-tangazo-body">{{ tangazo.maelezo }}</p>
+        <p class="dash-tangazo-date">
+            <time datetime="{{ tangazo.tarehe_iliyotolewa|date:'Y-m-d' }}">
+                Imetolewa: {{ tangazo.tarehe_iliyotolewa|date:"d M, Y" }}
+            </time>
+        </p>
+    </article>
+    {% empty %}
+    <div class="app-empty-state">
+        <p class="app-empty-state-title">Hakuna matangazo</p>
+        <p class="app-empty-state-copy">Hakuna matangazo yoyote mapya kwa sasa. Matangazo huwekwa kupitia admin.</p>
+    </div>
+    {% endfor %}
+</section>
 {% endblock %}

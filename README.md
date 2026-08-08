@@ -79,7 +79,7 @@ py manage.py check
 py manage.py test usimamizi
 ```
 
-Critical-path tests (`usimamizi/tests/`): auth (login/logout), attendance uniqueness, marks, fees, AuthZ permissions, no-cache middleware, model integrity, forms.
+Critical-path tests (`usimamizi/tests/`): auth (login/logout), attendance uniqueness, marks, fees, AuthZ permissions, no-cache middleware, model integrity, forms, staff dashboard (role widgets).
 
 ## Muundo
 
