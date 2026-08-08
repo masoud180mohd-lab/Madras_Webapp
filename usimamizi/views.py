@@ -1,12 +1,10 @@
 import csv
 import os
-from functools import wraps
 from urllib.parse import urlparse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Q, Count, Sum
 from django.contrib.auth import authenticate, login, logout
@@ -17,10 +15,28 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.utils.timezone import localtime
+from django.urls import reverse
 
 from .models import Mwanafunzi, Hudhurio, Tangazo, Mwalimu, Darasa, Somo, Nyenzo, Mtihani, Matokeo, RekodiHifdhu, PandeMurajaa, AinaMalipo, Malipo, MsetoMtihani
 from .forms import MwanafunziForm, NyenzoForm, MtihaniForm, MsetoMtihaniForm
 from .utils import hesabu_daraja, jenga_ripoti_jumla
+from .permissions import (
+    CAP_ATTENDANCE,
+    CAP_EXAMS,
+    CAP_FEES,
+    CAP_MANAGE_STUDENTS,
+    CAP_MATERIALS,
+    CAP_MSETO,
+    CAP_SABAQ,
+    CAP_VIEW_DIRECTORY,
+    CAP_VIEW_STUDENTS,
+    linked_mwalimu_or_none,
+    require_linked_mwalimu,
+    ruhusa_capability,
+    ruhusa_inahitajika,
+    user_has_app_permission,
+    user_has_capability,
+)
 
 
 def link_callback(uri, rel):
@@ -61,26 +77,6 @@ def paginate_items(request, items, per_page=20):
     query_params.pop('page', None)
     return page_obj, query_params.urlencode()
 
-
-def user_has_app_permission(user, *permissions):
-    if not user.is_authenticated:
-        return False
-    if user.is_superuser:
-        return True
-    if Mwalimu.objects.filter(user=user, cheo='Mwalimu Mkuu').exists():
-        return True
-    return any(user.has_perm(permission) for permission in permissions)
-
-
-def ruhusa_inahitajika(*permissions):
-    def decorator(view_func):
-        @wraps(view_func)
-        def wrapper(request, *args, **kwargs):
-            if user_has_app_permission(request.user, *permissions):
-                return view_func(request, *args, **kwargs)
-            raise PermissionDenied
-        return wrapper
-    return decorator
 
 def ingia(request):
     if request.method == 'POST':
@@ -141,6 +137,7 @@ def mahudhurio_darasa(request, darasa_id):
     return render(request, 'usimamizi/mahudhurio_darasa.html', context)
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_STUDENTS)
 def orodha_wanafunzi(request):
     neno_la_kutafuta = request.GET.get('q', '')
     jinsia_filter = request.GET.get('jinsia', '')
@@ -167,7 +164,7 @@ def orodha_wanafunzi(request):
         'neno_la_kutafuta': neno_la_kutafuta,
         'jinsia_filter': jinsia_filter,
         'darasa_filter': darasa_filter,
-        'anaweza_sajili_mwanafunzi': user_has_app_permission(request.user, 'usimamizi.add_mwanafunzi'),
+        'anaweza_sajili_mwanafunzi': user_has_capability(request.user, CAP_MANAGE_STUDENTS),
     }
     return render(request, 'usimamizi/orodha_wanafunzi.html', context)
 
@@ -210,16 +207,19 @@ def hariri_mwanafunzi(request, id):
     })
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_DIRECTORY)
 def orodha_walimu(request):
     walimu = Mwalimu.objects.all()
     return render(request, 'usimamizi/orodha_walimu.html', {'walimu': walimu})
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_DIRECTORY)
 def orodha_madarasa(request):
     madarasa = Darasa.objects.all()
     return render(request, 'usimamizi/orodha_madarasa.html', {'madarasa': madarasa})
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_STUDENTS)
 def wanafunzi_darasa(request, darasa_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
     wanafunzi = Mwanafunzi.objects.filter(darasa=darasa)
@@ -237,6 +237,7 @@ def wanafunzi_darasa(request, darasa_id):
     })
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_STUDENTS, CAP_ATTENDANCE)
 def ripoti_watoro(request):
     """
     Function hii inatafuta watoro kuanzia Jumamosi iliyopita mpaka sasa.
@@ -291,11 +292,13 @@ def ripoti_watoro(request):
     })
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_DIRECTORY, CAP_EXAMS, CAP_MATERIALS)
 def orodha_masomo(request):
     masomo = Somo.objects.all()
     return render(request, 'usimamizi/orodha_masomo.html', {'masomo': masomo})
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_DIRECTORY, CAP_EXAMS, CAP_MATERIALS)
 def somo_detail(request, somo_id):
     somo = get_object_or_404(Somo, id=somo_id)
     if somo.ni_la_hifdhu:
@@ -307,6 +310,7 @@ def somo_detail(request, somo_id):
         return render(request, 'usimamizi/somo_kawaida.html', {'somo': somo, 'nyenzo': nyenzo, 'mitihani': mitihani})
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_STUDENTS, CAP_SABAQ, CAP_ATTENDANCE)
 def wanafunzi_hifdhu(request, somo_id):
     somo = get_object_or_404(Somo, id=somo_id)
     wanafunzi = Mwanafunzi.objects.filter(programu_ya_usiku=somo).order_by('jina_kamili')
@@ -410,6 +414,7 @@ def weka_maksi(request, mtihani_id):
     })
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_STUDENTS)
 def mwanafunzi_profile(request, mwanafunzi_id):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
     tab_teule = request.GET.get('tab', 'muhtasari')
@@ -435,7 +440,9 @@ def mwanafunzi_profile(request, mwanafunzi_id):
 @ruhusa_inahitajika('usimamizi.add_rekodihifdhu')
 def rekodi_sabaq(request, mwanafunzi_id, aina):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
-    mwalimu = get_object_or_404(Mwalimu, user=request.user)
+    mwalimu = require_linked_mwalimu(request)
+    if mwalimu is None:
+        return redirect('mwanzo')
 
     darasa = mwanafunzi.darasa if aina == 'Darasa' else None
     somo = mwanafunzi.programu_ya_usiku if aina == 'Usiku' else None
@@ -480,6 +487,7 @@ def rekodi_sabaq(request, mwanafunzi_id, aina):
 # ==========================================
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_STUDENTS)
 def ripoti_mwanafunzi(request, mwanafunzi_id, aina):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
 
@@ -512,6 +520,7 @@ def ripoti_mwanafunzi(request, mwanafunzi_id, aina):
     return render(request, 'usimamizi/ripoti_mwanafunzi.html', context)
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_STUDENTS, CAP_ATTENDANCE)
 def pakua_pdf_mahudhurio(request, mwanafunzi_id, aina, muda):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
     aina_hudhurio = 'Kawaida' if aina == 'Darasa' else 'Hifdhu'
@@ -544,6 +553,7 @@ def pakua_pdf_mahudhurio(request, mwanafunzi_id, aina, muda):
     return response
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_VIEW_STUDENTS, CAP_SABAQ)
 def pakua_pdf_sabaq(request, mwanafunzi_id, aina, muda):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
     sabaq = RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi=aina).order_by('-tarehe')
@@ -575,6 +585,7 @@ def pakua_pdf_sabaq(request, mwanafunzi_id, aina, muda):
     return response
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_FEES)
 def ukurasa_malipo(request):
     wanafunzi = Mwanafunzi.objects.all().order_by('jina_kamili')
     aina_za_malipo = AinaMalipo.objects.all().order_by('-tarehe_ya_kuanzishwa')
@@ -647,7 +658,7 @@ def ukurasa_malipo(request):
         'neno_la_kutafuta': neno_la_kutafuta,
         'hali_teule': hali_teule, # Tunapeleka Hali kwenye HTML
         'darasa_filter': darasa_filter,
-        'anaweza_weka_malipo': user_has_app_permission(request.user, 'usimamizi.add_malipo'),
+        'anaweza_weka_malipo': user_has_capability(request.user, CAP_FEES) and user_has_app_permission(request.user, 'usimamizi.add_malipo'),
     }
     return render(request, 'usimamizi/malipo.html', context)
 
@@ -656,7 +667,7 @@ def ukurasa_malipo(request):
 def weka_malipo(request, mwanafunzi_id, aina_id):
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
     aina_ya_malipo = get_object_or_404(AinaMalipo, id=aina_id)
-    mwalimu = get_object_or_404(Mwalimu, user=request.user)
+    mwalimu = linked_mwalimu_or_none(request.user)
 
     malipo_yake = Malipo.objects.filter(mwanafunzi=mwanafunzi, aina_ya_malipo=aina_ya_malipo)
     jumla_yake = sum([p.kiasi_kilicholipwa for p in malipo_yake])
@@ -677,8 +688,7 @@ def weka_malipo(request, mwanafunzi_id, aina_id):
                 maelezo_ya_ziada=maelezo
             )
             messages.success(request, f'✅ Malipo ya Tsh {kiasi}/= kutoka kwa {mwanafunzi.jina_kamili} yamepokelewa!')
-            # Turudi kwenye ukurasa mkuu huku tukikumbuka Aina iliyokuwa inatazamwa
-            return redirect(f"/madrasa/malipo/?aina={aina_id}")
+            return redirect(f"{reverse('malipo')}?aina={aina_id}")
 
     context = {
         'mwanafunzi': mwanafunzi,
@@ -689,6 +699,7 @@ def weka_malipo(request, mwanafunzi_id, aina_id):
     return render(request, 'usimamizi/weka_malipo.html', context)
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_FEES)
 def pakua_risiti(request, malipo_id):
     malipo = get_object_or_404(Malipo, id=malipo_id)
     mwanafunzi = malipo.mwanafunzi
@@ -721,6 +732,7 @@ def pakua_risiti(request, malipo_id):
 # RIPOTI YA MTIHANI (MATOKEO YA DARASA LAKO)
 # ==========================================
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_EXAMS)
 def tazama_matokeo(request, mtihani_id):
     mtihani = get_object_or_404(Mtihani, id=mtihani_id)
     somo = mtihani.somo
@@ -755,6 +767,7 @@ def tazama_matokeo(request, mtihani_id):
 # KUTENGENEZA PDF YA MATOKEO
 # ==========================================
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_EXAMS)
 def pakua_pdf_matokeo(request, mtihani_id):
     mtihani = get_object_or_404(Mtihani, id=mtihani_id)
     somo = mtihani.somo
@@ -835,6 +848,7 @@ def mseto_mitihani_darasa(request, darasa_id):
 
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_MSETO, CAP_EXAMS)
 def ripoti_jumla(request, darasa_id, mseto_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
     mseto = get_object_or_404(MsetoMtihani, id=mseto_id, darasa=darasa)
@@ -848,6 +862,7 @@ def ripoti_jumla(request, darasa_id, mseto_id):
 
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_MSETO, CAP_EXAMS)
 def pakua_pdf_matokeo_jumla(request, darasa_id, mseto_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
     mseto = get_object_or_404(MsetoMtihani, id=mseto_id, darasa=darasa)
@@ -877,6 +892,7 @@ def pakua_pdf_matokeo_jumla(request, darasa_id, mseto_id):
 
 
 @login_required(login_url='ingia')
+@ruhusa_capability(CAP_MSETO, CAP_EXAMS)
 def pakua_csv_matokeo_jumla(request, darasa_id, mseto_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
     mseto = get_object_or_404(MsetoMtihani, id=mseto_id, darasa=darasa)

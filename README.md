@@ -56,6 +56,10 @@ py manage.py collectstatic
 
 SQLite inaendelea kuwa default ya lab. Production DB (Postgres n.k.) bado haijaunganishwa katika slice hii — badilisha `DB_*` baadaye ukiwa tayari.
 
+## Majukumu (AuthZ)
+
+Angalia [docs/ROLES.md](docs/ROLES.md) — matrix ya Mwalimu Mkuu / Kawaida / Jaji / ofisi.
+
 ## Data integrity (M-003)
 
 - Mahudhurio: unique kwa `(mwanafunzi, tarehe, aina_ya_rekodi)` — rekodi moja kwa siku/aina.
