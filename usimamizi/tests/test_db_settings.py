@@ -52,6 +52,28 @@ class DatabaseSettingsBuilderTests(SimpleTestCase):
         self.assertEqual(cfg["HOST"], "db.example")
         self.assertEqual(cfg["PORT"], "5433")
 
-    def test_parse_rejects_mysql(self):
+    def test_mysql_url_and_discrete(self):
+        cfg = parse_database_url(
+            "mysql://pa_user:secret@pa_user.mysql.pythonanywhere-services.com:3306/pa_user$madrasa"
+        )
+        self.assertEqual(cfg["ENGINE"], "django.db.backends.mysql")
+        self.assertEqual(cfg["NAME"], "pa_user$madrasa")
+        self.assertEqual(cfg["HOST"], "pa_user.mysql.pythonanywhere-services.com")
+
+        db = build_databases(
+            self.base,
+            environ={
+                "DB_ENGINE": "django.db.backends.mysql",
+                "DB_NAME": "user$madrasa",
+                "DB_USER": "user",
+                "DB_PASSWORD": "x",
+                "DB_HOST": "user.mysql.pythonanywhere-services.com",
+                "DB_PORT": "3306",
+            },
+        )
+        self.assertEqual(db["default"]["ENGINE"], "django.db.backends.mysql")
+        self.assertEqual(db["default"]["OPTIONS"].get("charset"), "utf8mb4")
+
+    def test_parse_rejects_unknown(self):
         with self.assertRaises(ValueError):
-            parse_database_url("mysql://u:p@localhost/db")
+            parse_database_url("oracle://u:p@localhost/db")

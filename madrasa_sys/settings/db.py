@@ -1,4 +1,4 @@
-"""Build Django DATABASES['default'] from env (SQLite lab / Postgres prod)."""
+"""Build Django DATABASES['default'] from env (SQLite lab / Postgres or MySQL prod)."""
 
 from __future__ import annotations
 
@@ -17,13 +17,15 @@ def _sqlite_default(base_dir: Path) -> Dict[str, Any]:
 
 def parse_database_url(url: str) -> Dict[str, Any]:
     """
-    Parse postgres:// or postgresql:// URL into a Django DATABASES entry.
-    Raises ValueError for unsupported schemes.
+    Parse DATABASE_URL into a Django DATABASES entry.
+    Supports postgres(ql)://, mysql://, mariadb://, sqlite://.
     """
     parsed = urlparse(url.strip())
     scheme = (parsed.scheme or "").lower()
     if scheme in {"postgres", "postgresql"}:
         engine = "django.db.backends.postgresql"
+    elif scheme in {"mysql", "mariadb"}:
+        engine = "django.db.backends.mysql"
     elif scheme == "sqlite":
         # sqlite:///absolute/or/relative/path
         name = unquote(parsed.path or "")
@@ -37,7 +39,7 @@ def parse_database_url(url: str) -> Dict[str, Any]:
     else:
         raise ValueError(
             f"Unsupported DATABASE_URL scheme {scheme!r}; "
-            "use postgres:// or postgresql://"
+            "use postgres://, postgresql://, mysql://, or mariadb://"
         )
 
     name = unquote((parsed.path or "").lstrip("/"))
@@ -91,5 +93,8 @@ def build_databases(
     if config["ENGINE"] != "django.db.backends.sqlite3":
         config["CONN_MAX_AGE"] = conn_max_age
         config.setdefault("OPTIONS", {})
+        if config["ENGINE"] == "django.db.backends.mysql":
+            # Avoid strict surprises with older dumps; PA MySQL is utf8mb4 by default.
+            config["OPTIONS"].setdefault("charset", "utf8mb4")
 
     return {"default": config}

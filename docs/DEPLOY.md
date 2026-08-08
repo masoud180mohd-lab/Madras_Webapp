@@ -1,7 +1,11 @@
 # Deploy — Ubuntu VPS + Postgres + Nginx + Gunicorn
 
-Target stack for **Al-Madrasatul Rasulillah** MIS (Django SSR, `media/` uploads).
-Lab stays on SQLite; **production must use Postgres** (`madrasa_sys.settings.production` rejects SQLite).
+> **Uko PythonAnywhere?** Usifuate faili hii. Fungua  
+> **[DEPLOY_PYTHONANYWHERE.md](DEPLOY_PYTHONANYWHERE.md)** badala yake.  
+> “VPS” = server yako mwenyewe; PythonAnywhere si VPS.
+
+Target stack kwa mwenye VPS (Django SSR, `media/` uploads).
+Lab stays on SQLite; **production rejects SQLite** (use Postgres here, or MySQL on PA).
 
 See also: [ROLES.md](ROLES.md), [API.md](API.md), [`.env.example`](../.env.example).
 

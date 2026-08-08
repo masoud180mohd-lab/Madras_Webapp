@@ -38,18 +38,12 @@ Fungua: [http://127.0.0.1:8000/madrasa/ingia/](http://127.0.0.1:8000/madrasa/ing
 
 Nakili `.env.example` → `.env` na urekebishe. **Usicommmit `.env`.**
 
-### Production / Postgres
+### Production / hosting
 
-- Lab: SQLite (`db.sqlite3`) — hakuna `DB_*` inahitajika.
-- Production: **Postgres** via `DATABASE_URL` au `DB_ENGINE=django.db.backends.postgresql` (+ `DB_NAME` / `USER` / `PASSWORD` / `HOST`). Settings za production **zinakataa** SQLite.
-- Checklist kamili (Ubuntu VPS + Nginx + Gunicorn + TLS + backups): **[docs/DEPLOY.md](docs/DEPLOY.md)**.
-
-Muhtasari:
-
-1. `DJANGO_ENV=production` + `DJANGO_SECRET_KEY` yenye nguvu
-2. `DJANGO_ALLOWED_HOSTS` + `DJANGO_CSRF_TRUSTED_ORIGINS` (`https://…`)
-3. Postgres `DB_*` au `DATABASE_URL`
-4. `pip install -r requirements.txt` → `migrate` → `collectstatic` → Gunicorn + Nginx
+- Lab: SQLite (`db.sqlite3`).
+- Production **inakataa SQLite**.
+- **PythonAnywhere (ilipendekezwa kwako):** MySQL + WSGI — fuata **[docs/DEPLOY_PYTHONANYWHERE.md](docs/DEPLOY_PYTHONANYWHERE.md)**.
+- **VPS** (server yako): Postgres + Nginx — [docs/DEPLOY.md](docs/DEPLOY.md).
 
 ```bash
 py manage.py check --deploy
