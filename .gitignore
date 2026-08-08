@@ -24,6 +24,8 @@ env/
 .env
 .env.*
 !.env.example
+!.env.pythonanywhere.example
+deploy/pythonanywhere/secrets.env
 
 # Local static collect + uploads
 staticfiles/
