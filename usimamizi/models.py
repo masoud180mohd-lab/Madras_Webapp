@@ -244,9 +244,129 @@ class Nyenzo(models.Model):
     def __str__(self):
         return self.jina_la_faili
 
+
+class MwakaWaMasomo(models.Model):
+    """Mwaka wa kitaaluma — mfano 2025/2026 — msingi wa ripoti na muhula."""
+
+    jina = models.CharField(
+        max_length=40,
+        unique=True,
+        help_text="Mfano: 2025/2026",
+    )
+    mwaka_kuanzia = models.PositiveIntegerField(help_text="Mwaka wa kuanza (mfano 2025)")
+    mwaka_kuisha = models.PositiveIntegerField(help_text="Mwaka wa kuisha (mfano 2026)")
+    tarehe_kuanzia = models.DateField(null=True, blank=True)
+    tarehe_kuisha = models.DateField(null=True, blank=True)
+    ni_hai = models.BooleanField(
+        default=False,
+        help_text="Mwaka unaotumika sasa kwa ripoti na mseto",
+    )
+
+    class Meta:
+        ordering = ["-mwaka_kuanzia", "-id"]
+        verbose_name = "Mwaka wa masomo"
+        verbose_name_plural = "Miaka ya masomo"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["ni_hai"],
+                condition=models.Q(ni_hai=True),
+                name="unique_active_mwaka_wa_masomo",
+            ),
+        ]
+
+    def __str__(self):
+        return self.jina
+
+    def save(self, *args, **kwargs):
+        from django.db import transaction
+
+        with transaction.atomic():
+            if self.ni_hai:
+                others = type(self).objects.filter(ni_hai=True)
+                if self.pk:
+                    others = others.exclude(pk=self.pk)
+                others.update(ni_hai=False)
+            super().save(*args, **kwargs)
+
+
+class Muhula(models.Model):
+    """Muhula ndani ya mwaka wa masomo (1, 2, au 3)."""
+
+    NAMBA_CHOICES = (
+        (1, "Muhula wa 1"),
+        (2, "Muhula wa 2"),
+        (3, "Muhula wa 3"),
+    )
+
+    mwaka = models.ForeignKey(
+        MwakaWaMasomo,
+        on_delete=models.CASCADE,
+        related_name="muhula",
+    )
+    namba = models.PositiveSmallIntegerField(choices=NAMBA_CHOICES)
+    jina = models.CharField(
+        max_length=80,
+        blank=True,
+        help_text="Acha wazi ili jina lijazwe otomatiki (Muhula wa N)",
+    )
+    tarehe_kuanzia = models.DateField(null=True, blank=True)
+    tarehe_kuisha = models.DateField(null=True, blank=True)
+    ni_hai = models.BooleanField(
+        default=False,
+        help_text="Muhula unaotumika sasa",
+    )
+
+    class Meta:
+        ordering = ["mwaka", "namba"]
+        verbose_name_plural = "Muhula"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["mwaka", "namba"],
+                name="unique_muhula_per_mwaka",
+            ),
+            models.UniqueConstraint(
+                fields=["ni_hai"],
+                condition=models.Q(ni_hai=True),
+                name="unique_active_muhula",
+            ),
+        ]
+
+    def __str__(self):
+        label = self.jina or dict(self.NAMBA_CHOICES).get(self.namba, f"Muhula {self.namba}")
+        return f"{label} · {self.mwaka.jina}"
+
+    def save(self, *args, **kwargs):
+        from django.db import transaction
+
+        if not (self.jina or "").strip():
+            self.jina = dict(self.NAMBA_CHOICES).get(self.namba, f"Muhula {self.namba}")
+
+        with transaction.atomic():
+            if self.ni_hai:
+                others = type(self).objects.filter(ni_hai=True)
+                if self.pk:
+                    others = others.exclude(pk=self.pk)
+                others.update(ni_hai=False)
+            super().save(*args, **kwargs)
+            if self.ni_hai and not self.mwaka.ni_hai:
+                year_others = MwakaWaMasomo.objects.filter(ni_hai=True).exclude(
+                    pk=self.mwaka_id
+                )
+                year_others.update(ni_hai=False)
+                MwakaWaMasomo.objects.filter(pk=self.mwaka_id).update(ni_hai=True)
+
+
 class MsetoMtihani(models.Model):
     """Mseto wa mitihani ya muhula — unaunganisha mitihani ya masomo yote ya darasa."""
     darasa = models.ForeignKey(Darasa, on_delete=models.CASCADE, related_name='mseto_mitihani')
+    muhula = models.ForeignKey(
+        Muhula,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="mseto_zote",
+        help_text="Unganisha mseto na muhula wa kitaaluma kwa ripoti sahihi",
+    )
     jina = models.CharField(max_length=100, help_text="Mfano: Muhula wa 1 - 2026")
     tarehe = models.DateField(null=True, blank=True)
     maelezo = models.TextField(blank=True, null=True)

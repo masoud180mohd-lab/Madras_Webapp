@@ -18,6 +18,7 @@ Utekelezaji: [`usimamizi/permissions.py`](../usimamizi/permissions.py).
 - Wasifu / ripoti / PDF za mwanafunzi → `view_students`
 - Malipo / risiti → `fees`
 - Matokeo / PDF / CSV za mtihani → `exams` / `mseto`
+- Mwaka / muhula (`/madrasa/mwaka/`) → `mseto` (Mkuu + Jaji)
 
 ## Wasifu wa Mwalimu
 

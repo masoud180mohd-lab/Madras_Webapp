@@ -4,9 +4,12 @@ from decimal import Decimal
 
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
+from .academic import get_active_muhula
 from .models import (
     Hudhurio,
     Malipo,
+    Muhula,
+    MwakaWaMasomo,
     Mwanafunzi,
     Nyenzo,
     Mtihani,
@@ -116,14 +119,83 @@ class NyenzoForm(forms.ModelForm):
         }
 
 
+class MwakaWaMasomoForm(forms.ModelForm):
+    class Meta:
+        model = MwakaWaMasomo
+        fields = [
+            "jina",
+            "mwaka_kuanzia",
+            "mwaka_kuisha",
+            "tarehe_kuanzia",
+            "tarehe_kuisha",
+            "ni_hai",
+        ]
+        widgets = {
+            "tarehe_kuanzia": forms.DateInput(attrs={"type": "date"}),
+            "tarehe_kuisha": forms.DateInput(attrs={"type": "date"}),
+        }
+
+    def clean(self):
+        cleaned = super().clean()
+        start = cleaned.get("mwaka_kuanzia")
+        end = cleaned.get("mwaka_kuisha")
+        if start and end and end < start:
+            self.add_error("mwaka_kuisha", "Mwaka wa kuisha hawezi kuwa kabla ya kuanza.")
+        # Clear other active years before UniqueConstraint validation on this instance.
+        if cleaned.get("ni_hai"):
+            others = MwakaWaMasomo.objects.filter(ni_hai=True)
+            if self.instance.pk:
+                others = others.exclude(pk=self.instance.pk)
+            others.update(ni_hai=False)
+        return cleaned
+
+
+class MuhulaForm(forms.ModelForm):
+    class Meta:
+        model = Muhula
+        fields = [
+            "mwaka",
+            "namba",
+            "jina",
+            "tarehe_kuanzia",
+            "tarehe_kuisha",
+            "ni_hai",
+        ]
+        widgets = {
+            "tarehe_kuanzia": forms.DateInput(attrs={"type": "date"}),
+            "tarehe_kuisha": forms.DateInput(attrs={"type": "date"}),
+        }
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("ni_hai"):
+            others = Muhula.objects.filter(ni_hai=True)
+            if self.instance.pk:
+                others = others.exclude(pk=self.instance.pk)
+            others.update(ni_hai=False)
+        return cleaned
+
+
 class MsetoMtihaniForm(forms.ModelForm):
     class Meta:
         model = MsetoMtihani
-        fields = ['jina', 'tarehe', 'maelezo']
+        fields = ["jina", "muhula", "tarehe", "maelezo"]
         widgets = {
-            'tarehe': forms.DateInput(attrs={'type': 'date'}),
-            'maelezo': forms.Textarea(attrs={'rows': 2}),
+            "tarehe": forms.DateInput(attrs={"type": "date"}),
+            "maelezo": forms.Textarea(attrs={"rows": 2}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["muhula"].queryset = Muhula.objects.select_related("mwaka").order_by(
+            "-mwaka__mwaka_kuanzia", "namba"
+        )
+        self.fields["muhula"].required = False
+        self.fields["muhula"].empty_label = "-- Chagua muhula (hiari) --"
+        active = get_active_muhula()
+        if active and not self.is_bound and not self.instance.pk:
+            self.initial.setdefault("muhula", active.pk)
+            self.initial.setdefault("jina", f"{active.jina} · {active.mwaka.jina}")
 
 
 class MtihaniForm(forms.ModelForm):
@@ -139,7 +211,12 @@ class MtihaniForm(forms.ModelForm):
         self.fields['mseto'].required = False
         self.fields['mseto'].empty_label = '-- Hakuna (Mtihani peke yake) --'
         if darasa:
-            self.fields['mseto'].queryset = MsetoMtihani.objects.filter(darasa=darasa)
+            qs = (
+                MsetoMtihani.objects.filter(darasa=darasa)
+                .select_related("muhula", "muhula__mwaka")
+                .order_by("-muhula__mwaka__mwaka_kuanzia", "-muhula__namba", "-id")
+            )
+            self.fields['mseto'].queryset = qs
         else:
             self.fields['mseto'].queryset = MsetoMtihani.objects.none()
 

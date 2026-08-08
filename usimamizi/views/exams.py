@@ -175,7 +175,11 @@ def pakua_pdf_matokeo(request, mtihani_id):
 @ruhusa_inahitajika('usimamizi.add_msetomtihani')
 def mseto_mitihani_darasa(request, darasa_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
-    mseto_zote = MsetoMtihani.objects.filter(darasa=darasa).prefetch_related('mitihani__somo')
+    mseto_zote = (
+        MsetoMtihani.objects.filter(darasa=darasa)
+        .select_related("muhula", "muhula__mwaka")
+        .prefetch_related("mitihani__somo")
+    )
 
     if request.method == 'POST':
         form = MsetoMtihaniForm(request.POST)

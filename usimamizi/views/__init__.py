@@ -28,6 +28,7 @@ from .exams import (
     pakua_pdf_matokeo_jumla,
     pakua_csv_matokeo_jumla,
 )
+from .academic import ukurasa_mwaka_masomo
 from .payments import ukurasa_malipo, weka_malipo, pakua_risiti
 from .pdfs import pakua_pdf_mahudhurio, pakua_pdf_sabaq
 
@@ -61,6 +62,7 @@ __all__ = [
     "ripoti_jumla",
     "pakua_pdf_matokeo_jumla",
     "pakua_csv_matokeo_jumla",
+    "ukurasa_mwaka_masomo",
     "ukurasa_malipo",
     "weka_malipo",
     "pakua_risiti",

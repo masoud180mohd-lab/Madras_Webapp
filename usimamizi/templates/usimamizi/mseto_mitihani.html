@@ -26,9 +26,10 @@
 
     <div class="help-box">
         <b>Jinsi inavyofanya kazi:</b><br>
-        1. Unda mseto (mfano: <i>Muhula wa 1 - 2026</i>)<br>
-        2. Kwa kila somo, ongeza mtihani na uchague mseto huo kwenye fomu ya mtihani<br>
-        3. Jaza maksi kama kawaida, kisha rudi hapa kuona <b>Ripoti ya Jumla</b>
+        1. Hakikisha <a href="{% url 'mwaka_masomo' %}">mwaka/muhula hai</a> umechaguliwa<br>
+        2. Unda mseto na uunganishe na muhula (mfano: <i>Muhula wa 1 · 2026</i>)<br>
+        3. Kwa kila somo, ongeza mtihani na uchague mseto huo<br>
+        4. Jaza maksi, kisha rudi hapa kuona <b>Ripoti ya Jumla</b>
     </div>
 
     <div class="card">
@@ -48,6 +49,7 @@
                 <thead>
                     <tr>
                         <th>Jina la Mseto</th>
+                        <th>Muhula</th>
                         <th>Tarehe</th>
                         <th>Mitihani Iliyounganishwa</th>
                         <th>Kitendo</th>
@@ -57,6 +59,7 @@
                     {% for item in mseto_na_hali %}
                     <tr>
                         <td class="mseto_mitihani-inline-3">{{ item.mseto.jina }}</td>
+                        <td>{% if item.mseto.muhula %}{{ item.mseto.muhula }}{% else %}—{% endif %}</td>
                         <td>{{ item.mseto.tarehe|date:"d M Y"|default:"-" }}</td>
                         <td>
                             {% if item.mitihani_iliyounganishwa == item.jumla_masomo and item.jumla_masomo > 0 %}

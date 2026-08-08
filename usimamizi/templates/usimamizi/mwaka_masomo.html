@@ -1,0 +1,96 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mwaka_masomo.css' %}?v=20260808m009">
+{% endblock %}
+
+{% block page_eyebrow %}Mwaka na muhula{% endblock %}
+{% block title %}Mwaka wa masomo · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="mwaka-page">
+    <header class="mwaka-hero">
+        <h1 class="mwaka-title">Mwaka na muhula</h1>
+        <p class="mwaka-lead">Weka kipindi hai cha kitaaluma — mseto wa mitihani unaunganishwa na muhula kwa ripoti sahihi.</p>
+        <p class="mwaka-current">
+            Hai sasa:
+            {% if mwaka_hai and muhula_hai %}
+                <strong>{{ muhula_hai.jina }} · {{ mwaka_hai.jina }}</strong>
+            {% elif mwaka_hai %}
+                <strong>{{ mwaka_hai.jina }}</strong> (chagua muhula)
+            {% else %}
+                <strong>Hakuna kipindi kilichochaguliwa</strong>
+            {% endif %}
+        </p>
+    </header>
+
+    <div class="mwaka-grid">
+        <section class="mwaka-panel" aria-labelledby="miaka-title">
+            <h2 id="miaka-title" class="mwaka-panel-title">Miaka iliyosajiliwa</h2>
+            {% for mwaka in miaka %}
+            <article class="mwaka-card{% if mwaka.ni_hai %} is-active{% endif %}">
+                <div class="mwaka-card-head">
+                    <h3>{{ mwaka.jina }}</h3>
+                    {% if mwaka.ni_hai %}<span class="mwaka-badge">Hai</span>{% endif %}
+                </div>
+                <p class="mwaka-meta">{{ mwaka.mwaka_kuanzia }}–{{ mwaka.mwaka_kuisha }}</p>
+                {% if not mwaka.ni_hai %}
+                <form method="post" class="mwaka-inline-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="weka_mwaka_hai">
+                    <input type="hidden" name="mwaka_id" value="{{ mwaka.id }}">
+                    <button type="submit" class="app-btn app-btn-secondary">Weka mwaka huu hai</button>
+                </form>
+                {% endif %}
+
+                <ul class="mwaka-muhula-list">
+                    {% for muhula in mwaka.muhula.all %}
+                    <li class="{% if muhula.ni_hai %}is-active{% endif %}">
+                        <span>{{ muhula.jina }}{% if muhula.ni_hai %} · hai{% endif %}</span>
+                        {% if not muhula.ni_hai %}
+                        <form method="post" class="mwaka-inline-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="weka_muhula_hai">
+                            <input type="hidden" name="muhula_id" value="{{ muhula.id }}">
+                            <button type="submit" class="app-btn app-btn-primary">Weka hai</button>
+                        </form>
+                        {% endif %}
+                    </li>
+                    {% empty %}
+                    <li class="mwaka-empty">Hakuna muhula bado — ongeza hapa chini.</li>
+                    {% endfor %}
+                </ul>
+            </article>
+            {% empty %}
+            <div class="app-empty-state">
+                <p class="app-empty-state-title">Hakuna mwaka</p>
+                <p class="app-empty-state-copy">Unda mwaka wa kwanza kwa kutumia fomu upande wa kulia.</p>
+            </div>
+            {% endfor %}
+        </section>
+
+        <aside class="mwaka-side">
+            <section class="mwaka-panel" aria-labelledby="unda-mwaka-title">
+                <h2 id="unda-mwaka-title" class="mwaka-panel-title">Unda mwaka</h2>
+                <form method="post" class="styled-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="unda_mwaka">
+                    {{ mwaka_form.as_p }}
+                    <button type="submit" class="app-btn app-btn-primary">Hifadhi mwaka</button>
+                </form>
+            </section>
+
+            <section class="mwaka-panel" aria-labelledby="unda-muhula-title">
+                <h2 id="unda-muhula-title" class="mwaka-panel-title">Unda muhula</h2>
+                <form method="post" class="styled-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="unda_muhula">
+                    {{ muhula_form.as_p }}
+                    <button type="submit" class="app-btn app-btn-primary">Hifadhi muhula</button>
+                </form>
+            </section>
+        </aside>
+    </div>
+</section>
+{% endblock %}

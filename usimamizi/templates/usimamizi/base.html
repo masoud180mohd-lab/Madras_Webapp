@@ -105,6 +105,18 @@
   </a>
   {% endif %}
 
+  {% if anaweza_mseto %}
+  <a href="{% url 'mwaka_masomo' %}" class="nav-link{% if request.resolver_match.url_name == 'mwaka_masomo' %} is-active{% endif %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      Mwaka / Muhula
+  </a>
+  {% endif %}
+
   {% if anaweza_mahudhurio or anaweza_ona_wanafunzi %}
   <a href="{% url 'ripoti_watoro' %}" class="nav-link{% if request.resolver_match.url_name == 'ripoti_watoro' %} is-active{% endif %}">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -133,7 +145,14 @@
     <button type="button" class="menu-btn" id="openNavBtn" aria-label="Fungua menyu" aria-controls="mySidebar" aria-expanded="false">☰</button>
     <div class="header-titles">
         <h1 class="header-brand">Al-Madrasatul Rasulillah</h1>
-        <p class="header-subtitle">{% block page_eyebrow %}Usimamizi wa madrasa{% endblock %}</p>
+        <p class="header-subtitle">
+            {% block page_eyebrow %}Usimamizi wa madrasa{% endblock %}
+            {% if muhula_hai %}
+                <span class="header-period"> · {{ muhula_hai.jina }} · {{ muhula_hai.mwaka.jina }}</span>
+            {% elif mwaka_hai %}
+                <span class="header-period"> · {{ mwaka_hai.jina }}</span>
+            {% endif %}
+        </p>
     </div>
 
     <div class="user-actions">

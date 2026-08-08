@@ -61,6 +61,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "usimamizi.context_processors.authz_flags",
+                "usimamizi.context_processors.academic_period",
             ],
         },
     },

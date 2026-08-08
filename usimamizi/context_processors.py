@@ -3,6 +3,7 @@ from .permissions import (
     CAP_EXAMS,
     CAP_FEES,
     CAP_MANAGE_STUDENTS,
+    CAP_MSETO,
     CAP_SABAQ,
     CAP_VIEW_DIRECTORY,
     CAP_VIEW_STUDENTS,
@@ -21,6 +22,20 @@ def authz_flags(request):
         "anaweza_mahudhurio": user_has_capability(user, CAP_ATTENDANCE),
         "anaweza_sabaq": user_has_capability(user, CAP_SABAQ),
         "anaweza_mitihani": user_has_capability(user, CAP_EXAMS),
+        "anaweza_mseto": user_has_capability(user, CAP_MSETO),
         "anaweza_malipo": user_has_capability(user, CAP_FEES),
         "anaweza_orodha": user_has_capability(user, CAP_VIEW_DIRECTORY),
+    }
+
+
+def academic_period(request):
+    """Active academic year/term for shell chrome."""
+    user = getattr(request, "user", None)
+    if not user or not user.is_authenticated:
+        return {}
+    from .academic import get_active_muhula, get_active_mwaka
+
+    return {
+        "mwaka_hai": get_active_mwaka(),
+        "muhula_hai": get_active_muhula(),
     }
