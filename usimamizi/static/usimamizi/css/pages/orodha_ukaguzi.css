@@ -1,0 +1,38 @@
+.ukaguzi-page { max-width: 1100px; }
+
+.ukaguzi-hero {
+    margin-bottom: 20px;
+    padding: 20px 22px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(31, 107, 69, 0.1), transparent 55%), var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--sidebar-edge);
+}
+
+.ukaguzi-title {
+    margin: 0;
+    font-family: var(--font-brand);
+    font-size: 1.7rem;
+    color: var(--title-color);
+}
+
+.ukaguzi-lead {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+}
+
+.ukaguzi-filter {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ukaguzi-filter label {
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.ukaguzi-filter .app-select {
+    max-width: 280px;
+}

@@ -1,0 +1,80 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_ukaguzi.css' %}?v=20260809audit">
+{% endblock %}
+
+{% block page_eyebrow %}Ukaguzi · nani alirekodi{% endblock %}
+{% block title %}Ukaguzi · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="ukaguzi-page">
+    <header class="ukaguzi-hero">
+        <h1 class="ukaguzi-title">Ukaguzi wa rekodi</h1>
+        <p class="ukaguzi-lead">Historia ya nani alirekodi mahudhurio na malipo.</p>
+    </header>
+
+    <form method="get" class="ukaguzi-filter">
+        <label for="kitendo">Aina</label>
+        <select id="kitendo" name="kitendo" class="app-select" onchange="this.form.submit()">
+            <option value="">Zote</option>
+            {% for value, label in kitendo_choices %}
+            <option value="{{ value }}" {% if kitendo_filter == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <div class="app-card">
+        <div class="app-table-wrap">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th>Wakati</th>
+                        <th>Kitendo</th>
+                        <th>Mtumiaji</th>
+                        <th>Maelezo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rekodi %}
+                    <tr>
+                        <td>{{ row.tarehe_ya_kitendo|date:"d M Y H:i" }}</td>
+                        <td><span class="app-badge app-badge-info">{{ row.get_kitendo_display }}</span></td>
+                        <td>
+                            {% if row.mtumiaji %}
+                                {{ row.mtumiaji.get_full_name|default:row.mtumiaji.username }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>{{ row.maelezo }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">
+                            <div class="app-empty-state">
+                                <p class="app-empty-state-title">Hakuna rekodi</p>
+                                <p class="app-empty-state-copy">Rekodi za ukaguzi zitaonekana baada ya kurekodi mahudhurio au malipo.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.previous_page_number }}">Nyuma</a>
+            {% endif %}
+            <span class="page-current">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a class="page-link" href="?{% if pagination_query %}{{ pagination_query }}&{% endif %}page={{ page_obj.next_page_number }}">Mbele</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

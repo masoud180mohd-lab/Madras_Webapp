@@ -30,6 +30,7 @@ from ..forms import (
     parse_maksi_post,
     build_hudhurio_rows,
 )
+from ..audit import andika_ukaguzi_malipo
 from ..utils import hesabu_daraja, jenga_ripoti_jumla
 from ..permissions import (
     CAP_ATTENDANCE,
@@ -165,14 +166,16 @@ def weka_malipo(request, mwanafunzi_id, aina_id):
     if request.method == 'POST':
         form = MalipoForm(request.POST, max_kiasi=deni if deni > 0 else None)
         if form.is_valid():
-            Malipo.objects.create(
+            malipo = Malipo.objects.create(
                 mwanafunzi=mwanafunzi,
                 aina_ya_malipo=aina_ya_malipo,
                 kiasi_kilicholipwa=form.cleaned_data['kiasi'],
                 njia_ya_malipo=form.cleaned_data['njia'],
                 mpokeaji=mwalimu,
+                iliyorekodiwa_na=request.user,
                 maelezo_ya_ziada=form.cleaned_data.get('maelezo') or None,
             )
+            andika_ukaguzi_malipo(user=request.user, malipo=malipo)
             messages.success(
                 request,
                 f"✅ Malipo ya Tsh {form.cleaned_data['kiasi']}/= kutoka kwa {mwanafunzi.jina_kamili} yamepokelewa!",

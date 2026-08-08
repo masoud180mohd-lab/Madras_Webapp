@@ -194,6 +194,13 @@ class Hudhurio(models.Model):
         choices=[('Kawaida', 'Madrasa ya Kawaida'), ('Hifdhu', 'Somo la Hifdhu')],
         default='Kawaida',
     )
+    iliyorekodiwa_na = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="hudhurio_zilizorekodiwa",
+    )
 
     class Meta:
         constraints = [
@@ -466,6 +473,14 @@ class Malipo(models.Model):
         ('Simu', 'Simu / Benki')
     ], default='Cash')
     mpokeaji = models.ForeignKey(Mwalimu, on_delete=models.SET_NULL, null=True)
+    iliyorekodiwa_na = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="malipo_zilizorekodiwa",
+        help_text="Akaunti iliyorekodi malipo (hata kama hakuna wasifu wa Mwalimu)",
+    )
     maelezo_ya_ziada = models.TextField(blank=True, null=True)
 
     def __str__(self):
@@ -473,3 +488,49 @@ class Malipo(models.Model):
 
     class Meta:
         ordering = ['-tarehe_ya_malipo']
+
+
+class RekodiUkaguzi(models.Model):
+    """Append-only audit trail — nani alirekodi nini na lini."""
+
+    KITENDO_MAHUDHURIO_KAWAIDA = "mahudhurio_kawaida"
+    KITENDO_MAHUDHURIO_HIFDHU = "mahudhurio_hifdhu"
+    KITENDO_MALIPO = "malipo"
+    KITENDO_CHOICES = (
+        (KITENDO_MAHUDHURIO_KAWAIDA, "Mahudhurio (kawaida)"),
+        (KITENDO_MAHUDHURIO_HIFDHU, "Mahudhurio (hifdhu)"),
+        (KITENDO_MALIPO, "Malipo"),
+    )
+
+    mtumiaji = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="rekodi_ukaguzi",
+    )
+    kitendo = models.CharField(max_length=40, choices=KITENDO_CHOICES, db_index=True)
+    maelezo = models.CharField(max_length=500)
+    darasa = models.ForeignKey(
+        Darasa, on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    somo = models.ForeignKey(
+        Somo, on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    mwanafunzi = models.ForeignKey(
+        Mwanafunzi, on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
+    malipo = models.ForeignKey(
+        "Malipo", on_delete=models.SET_NULL, null=True, blank=True, related_name="ukaguzi"
+    )
+    idadi_ya_rekodi = models.PositiveIntegerField(null=True, blank=True)
+    tarehe_ya_kitendo = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-tarehe_ya_kitendo"]
+        verbose_name = "Rekodi ya ukaguzi"
+        verbose_name_plural = "Rekodi za ukaguzi"
+
+    def __str__(self):
+        who = self.mtumiaji.username if self.mtumiaji else "—"
+        return f"{self.get_kitendo_display()} · {who} · {self.tarehe_ya_kitendo}"

@@ -139,6 +139,7 @@
                             <th>Aina ya Malipo</th>
                             <th class="mwanafunzi_profile-inline-7">Kiasi (Tsh)</th>
                             <th class="mwanafunzi_profile-inline-8">Njia</th>
+                            <th>Alirekodi</th>
                             <th class="mwanafunzi_profile-inline-7">Risiti</th>
                         </tr>
                     </thead>
@@ -149,12 +150,21 @@
                             <td><b class="mwanafunzi_profile-inline-10">{{ m.aina_ya_malipo.jina }}</b></td>
                             <td class="money-text mwanafunzi_profile-inline-7">{{ m.kiasi_kilicholipwa }}/=</td>
                             <td class="mwanafunzi_profile-inline-8"><span class="app-badge app-badge-neutral method-badge">{{ m.njia_ya_malipo }}</span></td>
+                            <td>
+                                {% if m.iliyorekodiwa_na %}
+                                    {{ m.iliyorekodiwa_na.get_full_name|default:m.iliyorekodiwa_na.username }}
+                                {% elif m.mpokeaji %}
+                                    {{ m.mpokeaji }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
                             <td class="mwanafunzi_profile-inline-7">
                                 <a href="{% url 'pakua_risiti' m.id %}" class="app-btn app-btn-outline app-btn-sm btn-download-sm">Pakua PDF</a>
                             </td>
                         </tr>
                         {% empty %}
-                        <tr><td colspan="5" class="mwanafunzi_profile-inline-11">Mwanafunzi huyu bado hajasajiliwa kuwa na malipo yoyote.</td></tr>
+                        <tr><td colspan="6" class="mwanafunzi_profile-inline-11">Mwanafunzi huyu bado hajasajiliwa kuwa na malipo yoyote.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>

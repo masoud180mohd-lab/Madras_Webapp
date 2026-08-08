@@ -16,6 +16,7 @@ from .models import (
     MsetoMtihani,
     MwakaWaMasomo,
     Muhula,
+    RekodiUkaguzi,
 )
 
 
@@ -51,8 +52,8 @@ class MwanafunziAdmin(NoDeleteAdmin):
 
 
 class HudhurioAdmin(NoDeleteAdmin):
-    list_display = ("mwanafunzi", "tarehe", "yupo", "sababu_kama_hayupo")
-    list_filter = ("tarehe", "yupo")
+    list_display = ("mwanafunzi", "tarehe", "yupo", "aina_ya_rekodi", "iliyorekodiwa_na")
+    list_filter = ("tarehe", "yupo", "aina_ya_rekodi")
 
 
 class MaendeleoAdmin(NoDeleteAdmin):
@@ -127,6 +128,29 @@ class MalipoAdmin(NoDeleteAdmin):
         "aina_ya_malipo",
         "kiasi_kilicholipwa",
         "tarehe_ya_malipo",
+        "iliyorekodiwa_na",
+        "mpokeaji",
     )
     list_filter = ("aina_ya_malipo", "njia_ya_malipo")
     search_fields = ("mwanafunzi__jina_kamili",)
+
+
+@admin.register(RekodiUkaguzi)
+class RekodiUkaguziAdmin(NoDeleteAdmin):
+    list_display = ("tarehe_ya_kitendo", "kitendo", "mtumiaji", "maelezo", "idadi_ya_rekodi")
+    list_filter = ("kitendo", "tarehe_ya_kitendo")
+    search_fields = ("maelezo", "mtumiaji__username", "mwanafunzi__jina_kamili")
+    readonly_fields = (
+        "mtumiaji",
+        "kitendo",
+        "maelezo",
+        "darasa",
+        "somo",
+        "mwanafunzi",
+        "malipo",
+        "idadi_ya_rekodi",
+        "tarehe_ya_kitendo",
+    )
+
+    def has_add_permission(self, request):
+        return False

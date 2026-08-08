@@ -175,7 +175,11 @@ def mwanafunzi_profile(request, mwanafunzi_id):
     tab_teule = request.GET.get('tab', 'muhtasari')
     mahudhurio_kawaida = Hudhurio.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Kawaida').order_by('-tarehe')
     mahudhurio_hifdhu = Hudhurio.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Hifdhu').order_by('-tarehe')
-    malipo_yote = mwanafunzi.malipo_yote.select_related('aina_ya_malipo').order_by('-tarehe_ya_malipo')
+    malipo_yote = (
+        mwanafunzi.malipo_yote.select_related(
+            'aina_ya_malipo', 'mpokeaji', 'iliyorekodiwa_na'
+        ).order_by('-tarehe_ya_malipo')
+    )
     sabaq_darasa = (
         RekodiHifdhu.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Darasa')
         .select_related('somo', 'mwalimu')

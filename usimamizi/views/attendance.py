@@ -30,6 +30,7 @@ from ..forms import (
     parse_maksi_post,
     build_hudhurio_rows,
 )
+from ..audit import andika_ukaguzi_mahudhurio
 from ..utils import hesabu_daraja, jenga_ripoti_jumla
 from ..permissions import (
     CAP_ATTENDANCE,
@@ -49,6 +50,13 @@ from ..permissions import (
     user_has_capability,
 )
 
+def _jina_la_mtumiaji(user):
+    if not user:
+        return None
+    full = (user.get_full_name() or "").strip()
+    return full or user.username
+
+
 @login_required(login_url='ingia')
 @ruhusa_inahitajika('usimamizi.add_hudhurio')
 def mahudhurio_darasa(request, darasa_id):
@@ -57,11 +65,16 @@ def mahudhurio_darasa(request, darasa_id):
     leo = date.today()
 
     # KODI MPYA: Cheki kama mahudhurio ya leo yapo tayari kwa darasa hili
-    tayari_yapo = Hudhurio.objects.filter(
-        mwanafunzi__darasa=darasa,
-        tarehe=leo,
-        aina_ya_rekodi='Kawaida'
-    ).exists()
+    sample = (
+        Hudhurio.objects.filter(
+            mwanafunzi__darasa=darasa,
+            tarehe=leo,
+            aina_ya_rekodi='Kawaida',
+        )
+        .select_related('iliyorekodiwa_na')
+        .first()
+    )
+    tayari_yapo = sample is not None
 
     if request.method == 'POST':
         # Kama yapo tayari, zuia isihifadhi tena
@@ -70,14 +83,31 @@ def mahudhurio_darasa(request, darasa_id):
             return redirect('mahudhurio_darasa', darasa_id=darasa.id)
 
         rows = build_hudhurio_rows(
-            wanafunzi, request.POST, aina_ya_rekodi='Kawaida', tarehe=leo
+            wanafunzi,
+            request.POST,
+            aina_ya_rekodi='Kawaida',
+            tarehe=leo,
+            iliyorekodiwa_na=request.user,
         )
         Hudhurio.objects.bulk_create(rows)
+        andika_ukaguzi_mahudhurio(
+            user=request.user,
+            darasa=darasa,
+            aina_ya_rekodi='Kawaida',
+            idadi=len(rows),
+            tarehe=leo,
+        )
         messages.success(request, f'✅ Mahudhurio ya {darasa.jina} yamehifadhiwa kikamilifu!')
         return redirect('wanafunzi_darasa', darasa_id=darasa.id)
 
     # Tumeongeza 'tayari_yapo' iende kwenye HTML
-    context = {'darasa': darasa, 'wanafunzi': wanafunzi, 'leo': leo, 'tayari_yapo': tayari_yapo}
+    context = {
+        'darasa': darasa,
+        'wanafunzi': wanafunzi,
+        'leo': leo,
+        'tayari_yapo': tayari_yapo,
+        'aliyerekodi': _jina_la_mtumiaji(sample.iliyorekodiwa_na) if sample else None,
+    }
     return render(request, 'usimamizi/mahudhurio_darasa.html', context)
 
 @login_required(login_url='ingia')
@@ -88,11 +118,16 @@ def chukua_mahudhurio_hifdhu(request, somo_id):
     leo = date.today()
 
     # KODI MPYA: Cheki kama mahudhurio ya leo yapo tayari kwa somo hili
-    tayari_yapo = Hudhurio.objects.filter(
-        mwanafunzi__programu_ya_usiku=somo,
-        tarehe=leo,
-        aina_ya_rekodi='Hifdhu'
-    ).exists()
+    sample = (
+        Hudhurio.objects.filter(
+            mwanafunzi__programu_ya_usiku=somo,
+            tarehe=leo,
+            aina_ya_rekodi='Hifdhu',
+        )
+        .select_related('iliyorekodiwa_na')
+        .first()
+    )
+    tayari_yapo = sample is not None
 
     if request.method == 'POST':
         # Kama yapo tayari, zuia
@@ -101,11 +136,32 @@ def chukua_mahudhurio_hifdhu(request, somo_id):
             return redirect('chukua_mahudhurio_hifdhu', somo_id=somo.id)
 
         rows = build_hudhurio_rows(
-            wanafunzi, request.POST, aina_ya_rekodi='Hifdhu', tarehe=leo
+            wanafunzi,
+            request.POST,
+            aina_ya_rekodi='Hifdhu',
+            tarehe=leo,
+            iliyorekodiwa_na=request.user,
         )
         Hudhurio.objects.bulk_create(rows)
+        andika_ukaguzi_mahudhurio(
+            user=request.user,
+            somo=somo,
+            aina_ya_rekodi='Hifdhu',
+            idadi=len(rows),
+            tarehe=leo,
+        )
         messages.success(request, f'✅ Mahudhurio ya Usiku ({somo.jina}) yamehifadhiwa!')
         return redirect('orodha_masomo')
 
-    return render(request, 'usimamizi/mahudhurio_hifdhu.html', {'wanafunzi': wanafunzi, 'leo': leo, 'somo': somo, 'tayari_yapo': tayari_yapo})
+    return render(
+        request,
+        'usimamizi/mahudhurio_hifdhu.html',
+        {
+            'wanafunzi': wanafunzi,
+            'leo': leo,
+            'somo': somo,
+            'tayari_yapo': tayari_yapo,
+            'aliyerekodi': _jina_la_mtumiaji(sample.iliyorekodiwa_na) if sample else None,
+        },
+    )
 

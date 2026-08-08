@@ -335,7 +335,7 @@ def parse_maksi_post(wanafunzi, post_data):
     return scores, errors
 
 
-def build_hudhurio_rows(wanafunzi, post_data, *, aina_ya_rekodi, tarehe):
+def build_hudhurio_rows(wanafunzi, post_data, *, aina_ya_rekodi, tarehe, iliyorekodiwa_na=None):
     """Build Hudhurio instances for bulk_create from attendance grid POST."""
     rows = []
     for mwanafunzi in wanafunzi:
@@ -350,6 +350,7 @@ def build_hudhurio_rows(wanafunzi, post_data, *, aina_ya_rekodi, tarehe):
                 sababu_kama_hayupo=sababu or None,
                 aina_ya_rekodi=aina_ya_rekodi,
                 tarehe=tarehe,
+                iliyorekodiwa_na=iliyorekodiwa_na,
             )
         )
     return rows
