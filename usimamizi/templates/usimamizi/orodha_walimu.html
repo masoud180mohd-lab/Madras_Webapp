@@ -1,29 +1,30 @@
 {% extends 'usimamizi/base.html' %}
-
-
 {% load static %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_walimu.css' %}?v=20260706a">
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_walimu.css' %}?v=20260809crud">
 {% endblock %}
 
 {% block maudhui %}
 <div class="orodha_walimu-inline-1">
-    
-    <h2 class="orodha_walimu-inline-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-        </svg>
-        Orodha ya Walimu na Viongozi
-    </h2>
+    <div class="orodha-page-head">
+        <h2 class="orodha_walimu-inline-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Orodha ya Walimu na Viongozi
+        </h2>
+        {% if anaweza_simamia_wanafunzi %}
+        <a href="{% url 'ongeza_mwalimu' %}" class="app-btn app-btn-primary">Sajili mwalimu</a>
+        {% endif %}
+    </div>
 
     <div class="orodha_walimu-inline-3">
-        
         {% for mwalimu in walimu %}
-        <div class="orodha_walimu-inline-4">
-            
+        <div class="orodha_walimu-inline-4{% if not mwalimu.user.is_active %} is-inactive{% endif %}">
             <div class="orodha_walimu-inline-5">
                 {% if mwalimu.picha %}
                     <img src="{{ mwalimu.picha.url }}" alt="Picha ya {{ mwalimu.user.get_full_name }}" class="orodha_walimu-inline-6">
@@ -41,21 +42,22 @@
                 <h3 class="orodha_walimu-inline-9">
                     {{ mwalimu.user.get_full_name|default:mwalimu.user.username }}
                 </h3>
-                <p class="orodha_walimu-inline-10">{{ mwalimu.cheo }}</p>
+                <p class="orodha_walimu-inline-10">{{ mwalimu.cheo }}{% if not mwalimu.user.is_active %} · imeondolewa{% endif %}</p>
                 <hr class="orodha_walimu-inline-11">
-                
                 <p class="orodha_walimu-inline-12">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                     </svg>
                     {{ mwalimu.namba_ya_simu|default:"Namba haijawekwa" }}
                 </p>
+                {% if anaweza_simamia_wanafunzi %}
+                <a href="{% url 'hariri_mwalimu' mwalimu.id %}" class="app-btn app-btn-outline app-btn-sm orodha-card-action">Hariri</a>
+                {% endif %}
             </div>
         </div>
         {% empty %}
         <p class="orodha_walimu-inline-13">Hakuna walimu waliopatikana.</p>
         {% endfor %}
-
     </div>
 </div>
 {% endblock %}

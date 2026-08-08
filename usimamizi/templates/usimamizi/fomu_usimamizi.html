@@ -1,0 +1,40 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/fomu_usimamizi.css' %}?v=20260809crud">
+{% endblock %}
+
+{% block page_eyebrow %}Usimamizi{% endblock %}
+{% block title %}{{ kichwa }} · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="usimamizi-form-page">
+    <header class="usimamizi-form-hero">
+        <div>
+            <h1 class="usimamizi-form-title">{{ kichwa }}</h1>
+            {% if maelezo %}<p class="usimamizi-form-lead">{{ maelezo }}</p>{% endif %}
+        </div>
+        <a href="{% url rudi_url %}" class="app-btn app-btn-outline app-btn-sm">Rudi</a>
+    </header>
+
+    <div class="usimamizi-form-card">
+        <form method="post" class="styled-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form %}
+            <div class="field-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+                {{ field.errors }}
+            </div>
+            {% endfor %}
+            <div class="usimamizi-form-actions">
+                <button type="submit" class="app-btn app-btn-primary">{{ kitufe }}</button>
+                <a href="{% url rudi_url %}" class="app-btn app-btn-outline">Ghairi</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

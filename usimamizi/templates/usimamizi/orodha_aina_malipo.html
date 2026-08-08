@@ -1,0 +1,64 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_aina_malipo.css' %}?v=20260809crud">
+{% endblock %}
+
+{% block page_eyebrow %}Ada{% endblock %}
+{% block title %}Aina za ada · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="aina-page">
+    <header class="aina-hero">
+        <div>
+            <h1 class="aina-title">Aina za ada</h1>
+            <p class="aina-lead">Simamia aina za malipo zinazotumika kwenye ukurasa wa Malipo.</p>
+        </div>
+        <a href="{% url 'ongeza_aina_malipo' %}" class="app-btn app-btn-primary">Ongeza aina</a>
+    </header>
+
+    <div class="app-card">
+        <div class="app-table-wrap">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th>Jina</th>
+                        <th>Kiasi</th>
+                        <th>Tarehe</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aina in aina_za_malipo %}
+                    <tr>
+                        <td>
+                            <strong>{{ aina.jina }}</strong>
+                            {% if aina.maelezo %}<div class="aina-meta">{{ aina.maelezo|truncatechars:80 }}</div>{% endif %}
+                        </td>
+                        <td>{{ aina.kiasi_kinachotakiwa }}/=</td>
+                        <td>{{ aina.tarehe_ya_kuanzishwa|date:"d M Y" }}</td>
+                        <td class="aina-actions">
+                            <a href="{% url 'hariri_aina_malipo' aina.id %}" class="app-btn app-btn-outline app-btn-sm">Hariri</a>
+                            <form method="post" action="{% url 'futa_aina_malipo' aina.id %}" onsubmit="return confirm('Futa aina hii ya ada?');">
+                                {% csrf_token %}
+                                <button type="submit" class="app-btn app-btn-outline app-btn-sm aina-btn-danger">Futa</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">
+                            <div class="app-empty-state">
+                                <p class="app-empty-state-title">Hakuna aina za ada</p>
+                                <p class="app-empty-state-copy">Anza kwa kuongeza aina ya kwanza.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

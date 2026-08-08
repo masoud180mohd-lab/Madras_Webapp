@@ -1,38 +1,50 @@
 {% extends 'usimamizi/base.html' %}
-
-
 {% load static %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_madarasa.css' %}?v=20260706a">
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_madarasa.css' %}?v=20260809crud">
 {% endblock %}
 
 {% block maudhui %}
 <div class="orodha_madarasa-inline-1">
-    
-    <h2 class="orodha_madarasa-inline-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-            <line x1="8" y1="21" x2="16" y2="21"></line>
-            <line x1="12" y1="17" x2="12" y2="21"></line>
-        </svg>
-        Madarasa
-    </h2>
+    <div class="orodha-page-head">
+        <h2 class="orodha_madarasa-inline-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            Madarasa
+        </h2>
+        {% if anaweza_simamia_wanafunzi %}
+        <a href="{% url 'ongeza_darasa' %}" class="app-btn app-btn-primary">Ongeza darasa</a>
+        {% endif %}
+    </div>
 
     <div class="orodha_madarasa-inline-3">
         {% for darasa in madarasa %}
-        <a href="{% url 'wanafunzi_darasa' darasa.id %}" class="orodha_madarasa-inline-4">
-            <div class="orodha_madarasa-inline-5">
-                
-                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="orodha_madarasa-inline-6">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                
-                <h2 class="orodha_madarasa-inline-7">{{ darasa.jina }}</h2>
+        <div class="orodha_madarasa-card">
+            <a href="{% url 'wanafunzi_darasa' darasa.id %}" class="orodha_madarasa-inline-4">
+                <div class="orodha_madarasa-inline-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="orodha_madarasa-inline-6">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <h2 class="orodha_madarasa-inline-7">{{ darasa.jina }}</h2>
+                </div>
+            </a>
+            {% if anaweza_simamia_wanafunzi %}
+            <div class="orodha_madarasa-manage">
+                <a href="{% url 'hariri_darasa' darasa.id %}" class="app-btn app-btn-outline app-btn-sm">Hariri</a>
+                <form method="post" action="{% url 'futa_darasa' darasa.id %}" onsubmit="return confirm('Futa darasa hili?');">
+                    {% csrf_token %}
+                    <button type="submit" class="app-btn app-btn-outline app-btn-sm orodha-btn-danger">Futa</button>
+                </form>
             </div>
-        </a>
+            {% endif %}
+        </div>
         {% empty %}
         <div class="orodha_madarasa-inline-8">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="orodha_madarasa-inline-9">

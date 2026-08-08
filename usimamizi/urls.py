@@ -14,8 +14,17 @@ urlpatterns = [
     path('wanafunzi/hifadhi/<int:mwanafunzi_id>/', views.hifadhi_mwanafunzi, name='hifadhi_mwanafunzi'),
     path('wanafunzi/rudisha/<int:mwanafunzi_id>/', views.rudisha_mwanafunzi, name='rudisha_mwanafunzi'),
     path('walimu/', views.orodha_walimu, name='orodha_walimu'),
+    path('walimu/ongeza/', views.ongeza_mwalimu, name='ongeza_mwalimu'),
+    path('walimu/hariri/<int:mwalimu_id>/', views.hariri_mwalimu, name='hariri_mwalimu'),
     path('madarasa/', views.orodha_madarasa, name='orodha_madarasa'),
+    path('madarasa/ongeza/', views.ongeza_darasa, name='ongeza_darasa'),
+    path('madarasa/hariri/<int:darasa_id>/', views.hariri_darasa, name='hariri_darasa'),
+    path('madarasa/futa/<int:darasa_id>/', views.futa_darasa, name='futa_darasa'),
     path('madarasa/<int:darasa_id>/', views.wanafunzi_darasa, name='wanafunzi_darasa'),
+    path('aina-malipo/', views.orodha_aina_malipo, name='orodha_aina_malipo'),
+    path('aina-malipo/ongeza/', views.ongeza_aina_malipo, name='ongeza_aina_malipo'),
+    path('aina-malipo/hariri/<int:aina_id>/', views.hariri_aina_malipo, name='hariri_aina_malipo'),
+    path('aina-malipo/futa/<int:aina_id>/', views.futa_aina_malipo, name='futa_aina_malipo'),
     path('mwanafunzi/profile/<int:mwanafunzi_id>/', views.mwanafunzi_profile, name='mwanafunzi_profile'),
     
     # Mahudhurio

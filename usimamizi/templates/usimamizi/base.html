@@ -105,6 +105,16 @@
   </a>
   {% endif %}
 
+  {% if anaweza_simamia_wanafunzi %}
+  <a href="{% url 'orodha_aina_malipo' %}" class="nav-link{% if request.resolver_match.url_name == 'orodha_aina_malipo' or request.resolver_match.url_name == 'ongeza_aina_malipo' or request.resolver_match.url_name == 'hariri_aina_malipo' %} is-active{% endif %}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+      Aina za Ada
+  </a>
+  {% endif %}
+
   {% if anaweza_mseto %}
   <a href="{% url 'mwaka_masomo' %}" class="nav-link{% if request.resolver_match.url_name == 'mwaka_masomo' %} is-active{% endif %}">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

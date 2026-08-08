@@ -1,0 +1,47 @@
+.aina-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 8px 4px 40px;
+}
+
+.aina-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.aina-title {
+    margin: 0 0 6px;
+    font-size: 1.6rem;
+    color: var(--text-main);
+}
+
+.aina-lead {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.aina-meta {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.aina-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.aina-actions form {
+    display: inline;
+    margin: 0;
+}
+
+.aina-btn-danger {
+    color: #b00020 !important;
+    border-color: #f0c0c0 !important;
+}

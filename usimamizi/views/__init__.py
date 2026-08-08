@@ -32,6 +32,17 @@ from .exams import (
 )
 from .academic import ukurasa_mwaka_masomo
 from .audit_views import orodha_ukaguzi
+from .manage import (
+    ongeza_darasa,
+    hariri_darasa,
+    futa_darasa,
+    ongeza_mwalimu,
+    hariri_mwalimu,
+    orodha_aina_malipo,
+    ongeza_aina_malipo,
+    hariri_aina_malipo,
+    futa_aina_malipo,
+)
 from .payments import ukurasa_malipo, weka_malipo, pakua_risiti
 from .pdfs import pakua_pdf_mahudhurio, pakua_pdf_sabaq
 
@@ -69,6 +80,15 @@ __all__ = [
     "pakua_csv_matokeo_jumla",
     "ukurasa_mwaka_masomo",
     "orodha_ukaguzi",
+    "ongeza_darasa",
+    "hariri_darasa",
+    "futa_darasa",
+    "ongeza_mwalimu",
+    "hariri_mwalimu",
+    "orodha_aina_malipo",
+    "ongeza_aina_malipo",
+    "hariri_aina_malipo",
+    "futa_aina_malipo",
     "ukurasa_malipo",
     "weka_malipo",
     "pakua_risiti",

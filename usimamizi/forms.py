@@ -3,13 +3,20 @@ from pathlib import Path
 from decimal import Decimal
 
 from django import forms
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import transaction
+
 from .academic import get_active_muhula
 from .models import (
+    AinaMalipo,
+    Darasa,
     Hudhurio,
     Malipo,
     Muhula,
     MwakaWaMasomo,
+    Mwalimu,
     Mwanafunzi,
     Nyenzo,
     Mtihani,
@@ -18,6 +25,8 @@ from .models import (
     RekodiHifdhu,
     validate_picha,
 )
+
+User = get_user_model()
 
 try:
     from PIL import Image, ImageOps
@@ -219,6 +228,152 @@ class MtihaniForm(forms.ModelForm):
             self.fields['mseto'].queryset = qs
         else:
             self.fields['mseto'].queryset = MsetoMtihani.objects.none()
+
+
+class DarasaForm(forms.ModelForm):
+    class Meta:
+        model = Darasa
+        fields = ["jina", "maelezo"]
+        widgets = {
+            "jina": forms.TextInput(attrs={"class": "app-input"}),
+            "maelezo": forms.Textarea(attrs={"class": "app-input", "rows": 3}),
+        }
+
+
+class AinaMalipoForm(forms.ModelForm):
+    class Meta:
+        model = AinaMalipo
+        fields = ["jina", "kiasi_kinachotakiwa", "maelezo"]
+        widgets = {
+            "jina": forms.TextInput(attrs={"class": "app-input"}),
+            "kiasi_kinachotakiwa": forms.NumberInput(
+                attrs={"class": "app-input", "step": "0.01", "min": "0"}
+            ),
+            "maelezo": forms.Textarea(attrs={"class": "app-input", "rows": 3}),
+        }
+
+
+class MwalimuCreateForm(forms.Form):
+    username = forms.CharField(
+        max_length=150,
+        label="Jina la akaunti",
+        widget=forms.TextInput(attrs={"class": "app-input", "autocomplete": "username"}),
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={"class": "app-input", "autocomplete": "new-password"}
+        ),
+        label="Nenosiri",
+        strip=False,
+    )
+    first_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label="Jina la kwanza",
+        widget=forms.TextInput(attrs={"class": "app-input"}),
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label="Jina la ukoo",
+        widget=forms.TextInput(attrs={"class": "app-input"}),
+    )
+    cheo = forms.ChoiceField(
+        choices=Mwalimu._meta.get_field("cheo").choices,
+        label="Cheo",
+        widget=forms.Select(attrs={"class": "app-input"}),
+    )
+    namba_ya_simu = forms.CharField(
+        max_length=15,
+        required=False,
+        label="Namba ya simu",
+        widget=forms.TextInput(attrs={"class": "app-input"}),
+    )
+    picha = forms.ImageField(required=False, label="Picha", validators=[validate_picha])
+
+    def clean_username(self):
+        username = self.cleaned_data["username"].strip()
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError("Jina la akaunti linatumika tayari.")
+        return username
+
+    def clean_password(self):
+        password = self.cleaned_data["password"]
+        validate_password(password)
+        return password
+
+    def save(self):
+        data = self.cleaned_data
+        with transaction.atomic():
+            user = User.objects.create_user(
+                username=data["username"],
+                password=data["password"],
+                first_name=data.get("first_name") or "",
+                last_name=data.get("last_name") or "",
+            )
+            mwalimu = Mwalimu(
+                user=user,
+                cheo=data["cheo"],
+                namba_ya_simu=data.get("namba_ya_simu") or None,
+            )
+            if data.get("picha"):
+                mwalimu.picha = data["picha"]
+            mwalimu.save()
+        return mwalimu
+
+
+class MwalimuEditForm(forms.ModelForm):
+    first_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label="Jina la kwanza",
+        widget=forms.TextInput(attrs={"class": "app-input"}),
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label="Jina la ukoo",
+        widget=forms.TextInput(attrs={"class": "app-input"}),
+    )
+    is_active = forms.BooleanField(
+        required=False,
+        label="Akaunti hai (inaweza kuingia)",
+        help_text="Ondoa tiki ili kumzuia mwalimu kuingia bila kufuta akaunti.",
+    )
+
+    class Meta:
+        model = Mwalimu
+        fields = ["cheo", "namba_ya_simu", "picha"]
+        labels = {
+            "cheo": "Cheo",
+            "namba_ya_simu": "Namba ya simu",
+            "picha": "Picha",
+        }
+        widgets = {
+            "cheo": forms.Select(attrs={"class": "app-input"}),
+            "namba_ya_simu": forms.TextInput(attrs={"class": "app-input"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        user = self.instance.user
+        self.fields["first_name"].initial = user.first_name
+        self.fields["last_name"].initial = user.last_name
+        self.fields["is_active"].initial = user.is_active
+        if "picha" in self.fields:
+            self.fields["picha"].required = False
+            self.fields["picha"].validators = [validate_picha]
+
+    def save(self, commit=True):
+        mwalimu = super().save(commit=False)
+        user = mwalimu.user
+        user.first_name = self.cleaned_data.get("first_name") or ""
+        user.last_name = self.cleaned_data.get("last_name") or ""
+        user.is_active = bool(self.cleaned_data.get("is_active"))
+        if commit:
+            user.save()
+            mwalimu.save()
+        return mwalimu
 
 
 class MalipoForm(forms.Form):
