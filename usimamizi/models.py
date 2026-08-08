@@ -1,7 +1,8 @@
 from pathlib import Path
+import re
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.contrib.auth.models import User
 from datetime import date
 
@@ -12,6 +13,8 @@ NYENZO_FORMATS = (
     "pdf", "doc", "docx", "ppt", "pptx", "xls", "xlsx", "txt",
     "jpg", "jpeg", "png", "webp",
 )
+MR_NUMBER_RE = re.compile(r"^MR-(\d+)$")
+
 
 
 def _validate_file_size(uploaded_file, max_size, label):
@@ -101,30 +104,59 @@ class Mwanafunzi(models.Model):
             return leo.year - self.tarehe_ya_kuzaliwa.year - ((leo.month, leo.day) < (self.tarehe_ya_kuzaliwa.month, self.tarehe_ya_kuzaliwa.day))
         return "-"
 
-    # 4. KODI YA KUTENGENEZA NAMBA MPYA ZA USAJILI (MR-001, MR-002...)
+    @classmethod
+    def _next_namba_ya_usajili(cls):
+        """Allocate next MR-### under a row lock (where the DB supports it)."""
+        max_n = 0
+        existing = (
+            cls.objects.select_for_update()
+            .exclude(namba_ya_usajili="")
+            .values_list("namba_ya_usajili", flat=True)
+        )
+        for value in existing.iterator():
+            match = MR_NUMBER_RE.match(value or "")
+            if match:
+                max_n = max(max_n, int(match.group(1)))
+        return f"MR-{max_n + 1:03d}"
+
     def save(self, *args, **kwargs):
-        if not self.namba_ya_usajili:
-            mwanafunzi_wa_mwisho = Mwanafunzi.objects.all().order_by('id').last()
-            if mwanafunzi_wa_mwisho and mwanafunzi_wa_mwisho.namba_ya_usajili.startswith('MR-'):
-                try:
-                    namba_ya_mwisho = int(mwanafunzi_wa_mwisho.namba_ya_usajili.split('-')[1])
-                    namba_mpya = namba_ya_mwisho + 1
-                except ValueError:
-                    namba_mpya = 1
-            else:
-                namba_mpya = 1
-            self.namba_ya_usajili = f"MR-{namba_mpya:03d}"
-        super().save(*args, **kwargs)
+        if self.namba_ya_usajili:
+            return super().save(*args, **kwargs)
+
+        last_error = None
+        for _ in range(5):
+            try:
+                with transaction.atomic():
+                    self.namba_ya_usajili = self._next_namba_ya_usajili()
+                    return super().save(*args, **kwargs)
+            except IntegrityError as exc:
+                last_error = exc
+                self.namba_ya_usajili = ""
+        raise last_error
 
     def __str__(self):
         return f"{self.namba_ya_usajili} - {self.jina_kamili}"
 
+
 class Hudhurio(models.Model):
     mwanafunzi = models.ForeignKey(Mwanafunzi, on_delete=models.CASCADE)
-    tarehe = models.DateField(auto_now_add=True)
+    # default (si auto_now_add) ili tarehe ya wazi ifanye kazi na unique iwe thabiti
+    tarehe = models.DateField(default=date.today)
     yupo = models.BooleanField(default=True)
     sababu_kama_hayupo = models.TextField(blank=True, null=True)
-    aina_ya_rekodi = models.CharField(max_length=20, choices=[('Kawaida', 'Madrasa ya Kawaida'), ('Hifdhu', 'Somo la Hifdhu')], default='Kawaida')
+    aina_ya_rekodi = models.CharField(
+        max_length=20,
+        choices=[('Kawaida', 'Madrasa ya Kawaida'), ('Hifdhu', 'Somo la Hifdhu')],
+        default='Kawaida',
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["mwanafunzi", "tarehe", "aina_ya_rekodi"],
+                name="unique_hudhurio_per_day_type",
+            ),
+        ]
 
     def __str__(self):
         hali = "Yupo" if self.yupo else "Hayupo"
@@ -252,6 +284,14 @@ class Matokeo(models.Model):
     mtihani = models.ForeignKey(Mtihani, on_delete=models.CASCADE)
     mwanafunzi = models.ForeignKey(Mwanafunzi, on_delete=models.CASCADE)
     maksi = models.FloatField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["mtihani", "mwanafunzi"],
+                name="unique_matokeo_per_mtihani_mwanafunzi",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.mwanafunzi.jina_kamili} - {self.maksi}"

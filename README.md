@@ -56,6 +56,13 @@ py manage.py collectstatic
 
 SQLite inaendelea kuwa default ya lab. Production DB (Postgres n.k.) bado haijaunganishwa katika slice hii — badilisha `DB_*` baadaye ukiwa tayari.
 
+## Data integrity (M-003)
+
+- Mahudhurio: unique kwa `(mwanafunzi, tarehe, aina_ya_rekodi)` — rekodi moja kwa siku/aina.
+- Matokeo: unique kwa `(mtihani, mwanafunzi)`.
+- Namba ya usajili `MR-###` inatolewa atomically (na retry ikigongana).
+- Migration `0011_integrity_constraints` inasafisha duplicates zilizokuwepo kabla ya kuweka constraint.
+
 ## Token API
 
 `/api-token-auth/` (DRF) ipo kwa urithi / majaribio; hakuna API kamili ya domain bado. Usifungue public bila hardening.
