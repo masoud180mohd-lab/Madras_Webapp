@@ -1,0 +1,61 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/maendeleo_mchana.css' %}?v=20260809mm">
+{% endblock %}
+
+{% block page_eyebrow %}Rekodi maendeleo{% endblock %}
+{% block title %}Rekodi · {{ somo.jina }} · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="maendeleo-page maendeleo-form-wrap">
+    <header class="maendeleo-hero">
+        <div>
+            <h1 class="maendeleo-title">Maendeleo ya mchana</h1>
+            <p class="maendeleo-lead">
+                <strong>{{ mwanafunzi.jina_kamili }}</strong> · {{ somo.jina }}
+                {% if somo.darasa %} · {{ somo.darasa.jina }}{% endif %}
+            </p>
+        </div>
+        <a href="{% url 'wanafunzi_maendeleo_mchana' somo.id %}" class="app-btn app-btn-outline app-btn-sm">Rudi</a>
+    </header>
+
+    <div class="app-card">
+        <form method="post" class="styled-form">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="field-group">
+                <label for="{{ form.mada_iliyosomwa.id_for_label }}">{{ form.mada_iliyosomwa.label }}</label>
+                {{ form.mada_iliyosomwa }}
+                {% if form.mada_iliyosomwa.help_text %}<span class="helptext">{{ form.mada_iliyosomwa.help_text }}</span>{% endif %}
+                {{ form.mada_iliyosomwa.errors }}
+            </div>
+
+            <div class="field-group">
+                <label for="{{ form.ukurasa_au_aya.id_for_label }}">{{ form.ukurasa_au_aya.label }}</label>
+                {{ form.ukurasa_au_aya }}
+                {{ form.ukurasa_au_aya.errors }}
+            </div>
+
+            <fieldset class="field-group maendeleo-hali">
+                <legend>{{ form.hali.label }}</legend>
+                {{ form.hali }}
+                {{ form.hali.errors }}
+            </fieldset>
+
+            <div class="field-group">
+                <label for="{{ form.maoni.id_for_label }}">{{ form.maoni.label }}</label>
+                {{ form.maoni }}
+                {{ form.maoni.errors }}
+            </div>
+
+            <div class="maendeleo-actions">
+                <button type="submit" class="app-btn app-btn-primary">Hifadhi maendeleo</button>
+                <a href="{% url 'wanafunzi_maendeleo_mchana' somo.id %}" class="app-btn app-btn-outline">Ghairi</a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

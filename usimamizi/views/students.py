@@ -19,7 +19,23 @@ from xhtml2pdf import pisa
 from django.utils.timezone import localtime
 from django.urls import reverse
 
-from ..models import Mwanafunzi, Hudhurio, Tangazo, Mwalimu, Darasa, Somo, Nyenzo, Mtihani, Matokeo, RekodiHifdhu, PandeMurajaa, AinaMalipo, Malipo, MsetoMtihani
+from ..models import (
+    Mwanafunzi,
+    Hudhurio,
+    Tangazo,
+    Mwalimu,
+    Darasa,
+    Somo,
+    Nyenzo,
+    Mtihani,
+    Matokeo,
+    RekodiHifdhu,
+    RekodiMaendeleoMchana,
+    PandeMurajaa,
+    AinaMalipo,
+    Malipo,
+    MsetoMtihani,
+)
 from ..forms import (
     MwanafunziForm,
     NyenzoForm,
@@ -206,6 +222,12 @@ def mwanafunzi_profile(request, mwanafunzi_id):
         ).all()[:30]
         call_form = RekodiSimuMzaziForm(mwanafunzi=mwanafunzi)
 
+    maendeleo_mchana = (
+        RekodiMaendeleoMchana.objects.filter(mwanafunzi=mwanafunzi)
+        .select_related("somo", "mwalimu__user")
+        .order_by("-tarehe")[:12]
+    )
+
     return render(request, 'usimamizi/mwanafunzi_profile.html', {
         'mwanafunzi': mwanafunzi,
         'tab_teule': tab_teule,
@@ -214,6 +236,7 @@ def mwanafunzi_profile(request, mwanafunzi_id):
         'malipo_yote': malipo_yote,
         'sabaq_darasa': sabaq_darasa,
         'sabaq_usiku': sabaq_usiku,
+        'maendeleo_mchana': maendeleo_mchana,
         'jumla_malipo': jumla_malipo,
         'anaweza_simamia_wanafunzi': user_has_capability(
             request.user, CAP_MANAGE_STUDENTS

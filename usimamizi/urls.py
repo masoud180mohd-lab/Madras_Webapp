@@ -34,6 +34,21 @@ urlpatterns = [
     # ==== NJIA MPYA ZENYE AKILI KWA AJILI YA SABAQ NA RIPOTI ====
     path('rekodi_sabaq/<int:mwanafunzi_id>/<str:aina>/', views.rekodi_sabaq, name='rekodi_sabaq'),
     path('ripoti/<int:mwanafunzi_id>/<str:aina>/', views.ripoti_mwanafunzi, name='ripoti_mwanafunzi'),
+    path(
+        'masomo/<int:somo_id>/maendeleo/',
+        views.wanafunzi_maendeleo_mchana,
+        name='wanafunzi_maendeleo_mchana',
+    ),
+    path(
+        'maendeleo/<int:mwanafunzi_id>/<int:somo_id>/rekodi/',
+        views.rekodi_maendeleo_mchana,
+        name='rekodi_maendeleo_mchana',
+    ),
+    path(
+        'maendeleo/<int:mwanafunzi_id>/ripoti/',
+        views.ripoti_maendeleo_mchana,
+        name='ripoti_maendeleo_mchana',
+    ),
     
     # Njia za PDFs (Zimesasishwa kubeba Kichujio cha Muda)
     path('pdf/mahudhurio/<int:mwanafunzi_id>/<str:aina>/<str:muda>/', views.pakua_pdf_mahudhurio, name='pakua_pdf_mahudhurio'),

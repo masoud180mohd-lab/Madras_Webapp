@@ -1,0 +1,61 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/maendeleo_mchana.css' %}?v=20260809mm">
+{% endblock %}
+
+{% block page_eyebrow %}Maendeleo ya mchana{% endblock %}
+{% block title %}{{ somo.jina }} · maendeleo · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="maendeleo-page">
+    <header class="maendeleo-hero">
+        <div>
+            <h1 class="maendeleo-title">{{ somo.jina }}</h1>
+            <p class="maendeleo-lead">
+                Rekodi maendeleo ya wanafunzi · {{ somo.darasa.jina }}
+            </p>
+        </div>
+        <a href="{% url 'somo_detail' somo.id %}" class="app-btn app-btn-outline app-btn-sm">Rudi somo</a>
+    </header>
+
+    <div class="app-card">
+        <div class="app-table-wrap">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th>Mwanafunzi</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mwanafunzi in wanafunzi %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'mwanafunzi_profile' mwanafunzi.id %}">{{ mwanafunzi.jina_kamili }}</a>
+                            <div class="maendeleo-meta">{{ mwanafunzi.namba_ya_usajili }}</div>
+                        </td>
+                        <td class="maendeleo-actions">
+                            {% if anaweza_sabaq %}
+                            <a href="{% url 'rekodi_maendeleo_mchana' mwanafunzi.id somo.id %}" class="app-btn app-btn-primary app-btn-sm">Rekodi</a>
+                            {% endif %}
+                            <a href="{% url 'ripoti_maendeleo_mchana' mwanafunzi.id %}?somo={{ somo.id }}" class="app-btn app-btn-outline app-btn-sm">Ripoti</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">
+                            <div class="app-empty-state">
+                                <p class="app-empty-state-title">Hakuna wanafunzi</p>
+                                <p class="app-empty-state-copy">Hakuna mwanafunzi hai katika darasa la somo hili.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -47,7 +47,12 @@ PERM_CAPABILITIES = {
         "usimamizi.change_mwanafunzi",
     ),
     CAP_ATTENDANCE: ("usimamizi.add_hudhurio", "usimamizi.change_hudhurio"),
-    CAP_SABAQ: ("usimamizi.add_rekodihifdhu", "usimamizi.change_rekodihifdhu"),
+    CAP_SABAQ: (
+        "usimamizi.add_rekodihifdhu",
+        "usimamizi.change_rekodihifdhu",
+        "usimamizi.add_rekodimaendeleomchana",
+        "usimamizi.change_rekodimaendeleomchana",
+    ),
     CAP_EXAMS: (
         "usimamizi.add_matokeo",
         "usimamizi.change_matokeo",
@@ -123,6 +128,7 @@ LEGACY_PERM_TO_CAPS = {
     "usimamizi.add_matokeo": (CAP_EXAMS,),
     "usimamizi.change_matokeo": (CAP_EXAMS,),
     "usimamizi.add_rekodihifdhu": (CAP_SABAQ,),
+    "usimamizi.add_rekodimaendeleomchana": (CAP_SABAQ,),
     "usimamizi.add_malipo": (CAP_FEES,),
     "usimamizi.add_msetomtihani": (CAP_MSETO,),
 }

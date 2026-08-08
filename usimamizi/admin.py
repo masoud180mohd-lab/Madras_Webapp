@@ -18,6 +18,7 @@ from .models import (
     Muhula,
     RekodiUkaguzi,
     RekodiSimuMzazi,
+    RekodiMaendeleoMchana,
 )
 
 
@@ -82,6 +83,20 @@ admin.site.register(Matokeo, NoDeleteAdmin)
 admin.site.register(PandeMurajaa, NoDeleteAdmin)
 admin.site.register(Mwanafunzi, MwanafunziAdmin)
 admin.site.register(RekodiHifdhu, MaendeleoAdmin)
+
+
+@admin.register(RekodiMaendeleoMchana)
+class RekodiMaendeleoMchanaAdmin(NoDeleteAdmin):
+    list_display = (
+        "tarehe",
+        "mwanafunzi",
+        "somo",
+        "mada_iliyosomwa",
+        "hali",
+        "mwalimu",
+    )
+    list_filter = ("hali", "somo", "tarehe")
+    search_fields = ("mwanafunzi__jina_kamili", "mada_iliyosomwa", "somo__jina")
 
 
 class MuhulaInline(admin.TabularInline):

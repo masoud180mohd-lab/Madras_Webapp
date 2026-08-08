@@ -1,0 +1,92 @@
+.maendeleo-page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 8px 4px 40px;
+}
+
+.maendeleo-form-wrap {
+    max-width: 640px;
+}
+
+.maendeleo-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.maendeleo-title {
+    margin: 0 0 6px;
+    font-size: 1.6rem;
+    color: var(--text-main);
+}
+
+.maendeleo-lead {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.maendeleo-meta {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.maendeleo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.maendeleo-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.maendeleo-filter .app-input {
+    min-width: 160px;
+}
+
+.maendeleo-hali ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.maendeleo-hali li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.maendeleo-page .field-group {
+    margin-bottom: 16px;
+}
+
+.maendeleo-page .field-group label,
+.maendeleo-page .field-group legend {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.maendeleo-page .helptext {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.maendeleo-page .errorlist {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    color: #b00020;
+}

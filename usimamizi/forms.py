@@ -23,6 +23,7 @@ from .models import (
     MsetoMtihani,
     PandeMurajaa,
     RekodiHifdhu,
+    RekodiMaendeleoMchana,
     RekodiSimuMzazi,
     validate_picha,
 )
@@ -472,6 +473,36 @@ class MalipoForm(forms.Form):
                 f"Hawezi kulipa zaidi ya deni (Tsh {self.max_kiasi}/=)."
             )
         return kiasi
+
+
+class MaendeleoMchanaForm(forms.ModelForm):
+    class Meta:
+        model = RekodiMaendeleoMchana
+        fields = ["mada_iliyosomwa", "ukurasa_au_aya", "hali", "maoni"]
+        labels = {
+            "mada_iliyosomwa": "Mada iliyosomwa",
+            "ukurasa_au_aya": "Ukurasa / aya",
+            "hali": "Tathmini",
+            "maoni": "Maoni ya mwalimu",
+        }
+        widgets = {
+            "mada_iliyosomwa": forms.TextInput(
+                attrs={
+                    "class": "app-input custom-input",
+                    "placeholder": "Mf. Mlango wa Udhu",
+                }
+            ),
+            "ukurasa_au_aya": forms.TextInput(
+                attrs={
+                    "class": "app-input custom-input",
+                    "placeholder": "Mf. uk. 12–15",
+                }
+            ),
+            "hali": forms.RadioSelect,
+            "maoni": forms.Textarea(
+                attrs={"class": "app-input custom-input", "rows": 3}
+            ),
+        }
 
 
 class SabaqRekodiForm(forms.Form):

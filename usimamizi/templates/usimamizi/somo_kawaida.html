@@ -24,9 +24,14 @@
             <p>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 Mwalimu: <b>{{ somo.mwalimu|default:"Hajapangiwa" }}</b>
-                
+                {% if somo.darasa %} · Darasa: <b>{{ somo.darasa.jina }}</b>{% endif %}
             </p>
         </div>
+        {% if anaweza_sabaq %}
+        <a href="{% url 'wanafunzi_maendeleo_mchana' somo.id %}" class="app-btn app-btn-primary">
+            Maendeleo ya mchana
+        </a>
+        {% endif %}
     </div>
 
     <div class="content-grid">

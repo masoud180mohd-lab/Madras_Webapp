@@ -1,0 +1,78 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/maendeleo_mchana.css' %}?v=20260809mm">
+{% endblock %}
+
+{% block page_eyebrow %}Ripoti ya maendeleo{% endblock %}
+{% block title %}Maendeleo · {{ mwanafunzi.jina_kamili }} · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="maendeleo-page">
+    <header class="maendeleo-hero">
+        <div>
+            <h1 class="maendeleo-title">Maendeleo ya mchana</h1>
+            <p class="maendeleo-lead">
+                {{ mwanafunzi.jina_kamili }} · {{ mwanafunzi.namba_ya_usajili }}
+                · <a href="{% url 'mwanafunzi_profile' mwanafunzi.id %}">Wasifu</a>
+            </p>
+        </div>
+    </header>
+
+    <form method="get" class="maendeleo-filter">
+        <select name="muda" class="app-input" onchange="this.form.submit()">
+            <option value="wote" {% if muda_teule == 'wote' %}selected{% endif %}>Muda wote</option>
+            <option value="wiki" {% if muda_teule == 'wiki' %}selected{% endif %}>Wiki hii</option>
+            <option value="mwezi_huu" {% if muda_teule == 'mwezi_huu' %}selected{% endif %}>Mwezi huu</option>
+            <option value="mwezi_uliopita" {% if muda_teule == 'mwezi_uliopita' %}selected{% endif %}>Mwezi uliopita</option>
+        </select>
+        <select name="somo" class="app-input" onchange="this.form.submit()">
+            <option value="">Masomo yote</option>
+            {% for s in masomo %}
+            <option value="{{ s.id }}" {% if somo_filter == s.id|stringformat:"s" %}selected{% endif %}>{{ s.jina }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <div class="app-card">
+        <div class="app-table-wrap">
+            <table class="app-table">
+                <thead>
+                    <tr>
+                        <th>Tarehe</th>
+                        <th>Somo</th>
+                        <th>Mada</th>
+                        <th>Ukurasa</th>
+                        <th>Hali</th>
+                        <th>Mwalimu</th>
+                        <th>Maoni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rekodi %}
+                    <tr>
+                        <td>{{ r.tarehe|date:"d M Y" }}</td>
+                        <td>{{ r.somo.jina }}</td>
+                        <td>{{ r.mada_iliyosomwa }}</td>
+                        <td>{{ r.ukurasa_au_aya|default:"—" }}</td>
+                        <td>{{ r.get_hali_display }}</td>
+                        <td>{% if r.mwalimu %}{{ r.mwalimu }}{% else %}—{% endif %}</td>
+                        <td>{{ r.maoni|default:"—"|truncatechars:60 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="app-empty-state">
+                                <p class="app-empty-state-title">Hakuna rekodi</p>
+                                <p class="app-empty-state-copy">Hakuna maendeleo ya mchana kwa kichujio hiki.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

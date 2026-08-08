@@ -21,6 +21,11 @@ from .subjects import (
     ongeza_mtihani,
 )
 from .sabaq import rekodi_sabaq, ripoti_mwanafunzi
+from .maendeleo import (
+    wanafunzi_maendeleo_mchana,
+    rekodi_maendeleo_mchana,
+    ripoti_maendeleo_mchana,
+)
 from .exams import (
     weka_maksi,
     tazama_matokeo,
@@ -76,6 +81,9 @@ __all__ = [
     "ongeza_mtihani",
     "rekodi_sabaq",
     "ripoti_mwanafunzi",
+    "wanafunzi_maendeleo_mchana",
+    "rekodi_maendeleo_mchana",
+    "ripoti_maendeleo_mchana",
     "weka_maksi",
     "tazama_matokeo",
     "pakua_pdf_matokeo",

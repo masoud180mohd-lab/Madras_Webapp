@@ -124,6 +124,11 @@
                 <span class="summary-label">Rekodi za Sabaq</span>
                 <strong>{{ sabaq_darasa.count|add:sabaq_usiku.count }}</strong>
             </div>
+            <div class="app-card summary-card">
+                <span class="summary-label">Maendeleo ya mchana</span>
+                <strong>{{ maendeleo_mchana|length }}</strong>
+                <a href="{% url 'ripoti_maendeleo_mchana' mwanafunzi.id %}" class="app-btn app-btn-outline app-btn-sm" style="margin-top:8px;">Ripoti</a>
+            </div>
         </div>
     {% elif tab_teule == 'malipo' %}
         <div class="app-card finance-section">
@@ -243,6 +248,22 @@
                         <li><span>{{ r.tarehe|date:"d M Y" }} - {{ r.sabaq_sura|default:"-" }}</span><strong>{{ r.sabaq_hali|default:"-" }}</strong></li>
                     {% empty %}
                         <li class="empty-line">Hakuna rekodi za sabaq ya usiku.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="app-card finance-section">
+                <div class="tab-card-header">
+                    <h2 class="info-card-title">Maendeleo ya mchana</h2>
+                    <a href="{% url 'ripoti_maendeleo_mchana' mwanafunzi.id %}" class="app-btn app-btn-outline app-btn-sm tab-download-btn">Ripoti</a>
+                </div>
+                <ul class="timeline-list">
+                    {% for r in maendeleo_mchana %}
+                        <li>
+                            <span>{{ r.tarehe|date:"d M Y" }} · {{ r.somo.jina }} — {{ r.mada_iliyosomwa }}</span>
+                            <strong>{{ r.get_hali_display }}</strong>
+                        </li>
+                    {% empty %}
+                        <li class="empty-line">Hakuna maendeleo ya mchana bado.</li>
                     {% endfor %}
                 </ul>
             </div>

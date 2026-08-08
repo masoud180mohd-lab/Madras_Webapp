@@ -264,6 +264,42 @@ class RekodiHifdhu(models.Model):
         ordering = ['-tarehe']
 
 
+class RekodiMaendeleoMchana(models.Model):
+    """Day-class subject progress — parity with night sabaq for non-hifdhu lessons."""
+
+    HALI_AMEELEWA = "Ameelewa"
+    HALI_HAJAELEWA = "Hajaelewa"
+    HALI_HAJASIKILIZWA = "Hajasikilizwa"
+    HALI_CHOICES = (
+        (HALI_AMEELEWA, "✅ Ameelewa"),
+        (HALI_HAJAELEWA, "❌ Hajaelewa"),
+        (HALI_HAJASIKILIZWA, "⏸️ Hajasikilizwa"),
+    )
+
+    mwanafunzi = models.ForeignKey(
+        Mwanafunzi, on_delete=models.CASCADE, related_name="maendeleo_mchana"
+    )
+    somo = models.ForeignKey(
+        Somo, on_delete=models.CASCADE, related_name="maendeleo_mchana"
+    )
+    mwalimu = models.ForeignKey(Mwalimu, on_delete=models.SET_NULL, null=True, blank=True)
+    tarehe = models.DateField(auto_now_add=True, db_index=True)
+    mada_iliyosomwa = models.CharField(
+        max_length=200, help_text="Mfano: Mlango wa Udhu"
+    )
+    ukurasa_au_aya = models.CharField(max_length=50, blank=True, null=True)
+    hali = models.CharField(max_length=20, choices=HALI_CHOICES)
+    maoni = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["-tarehe", "-id"]
+        verbose_name = "Rekodi ya maendeleo ya mchana"
+        verbose_name_plural = "Rekodi za maendeleo ya mchana"
+
+    def __str__(self):
+        return f"{self.somo.jina} · {self.mwanafunzi.jina_kamili} · {self.tarehe}"
+
+
 class PandeMurajaa(models.Model):
     rekodi = models.ForeignKey(RekodiHifdhu, on_delete=models.CASCADE, related_name='mapande')
     sura = models.CharField(max_length=50)

@@ -65,7 +65,16 @@ def somo_detail(request, somo_id):
     else:
         nyenzo = Nyenzo.objects.filter(somo=somo).order_by('-tarehe_iliyowekwa')
         mitihani = Mtihani.objects.filter(somo=somo).order_by('-tarehe')
-        return render(request, 'usimamizi/somo_kawaida.html', {'somo': somo, 'nyenzo': nyenzo, 'mitihani': mitihani})
+        return render(
+            request,
+            'usimamizi/somo_kawaida.html',
+            {
+                'somo': somo,
+                'nyenzo': nyenzo,
+                'mitihani': mitihani,
+                'anaweza_sabaq': user_has_capability(request.user, CAP_SABAQ),
+            },
+        )
 
 @login_required(login_url='ingia')
 @ruhusa_capability(CAP_VIEW_STUDENTS, CAP_SABAQ, CAP_ATTENDANCE)
