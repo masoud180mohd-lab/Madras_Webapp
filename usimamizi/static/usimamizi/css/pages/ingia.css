@@ -2,12 +2,15 @@
 /* Inasoma moja kwa moja mpangilio wa Giza wa simu/kompyuta */
 * {
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--font-ui);
         }
 
         body {
             margin: 0;
-            background-color: var(--bg-color);
+            background:
+                radial-gradient(circle at top left, rgba(31, 107, 69, 0.12), transparent 42%),
+                radial-gradient(circle at bottom right, rgba(184, 137, 61, 0.14), transparent 40%),
+                var(--bg-color);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -41,10 +44,18 @@
             border: 3px solid var(--border-color);
         }
 
+        .login-brand {
+            margin: 0 0 6px;
+            font-family: var(--font-brand);
+            font-size: 1.35rem;
+            color: var(--title-color);
+            font-weight: 700;
+        }
+
         .login-title {
             margin: 0 0 8px 0;
             color: var(--text-main);
-            font-size: 26px;
+            font-size: 1.55rem;
             font-weight: 800;
         }
 
@@ -81,7 +92,7 @@
 
         .input-group input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+            box-shadow: 0 0 0 3px var(--focus-ring);
         }
 
         .btn-login {
@@ -100,7 +111,7 @@
             justify-content: center;
             gap: 10px;
             margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+            box-shadow: 0 4px 12px var(--form-button-shadow);
         }
 
         .btn-login:hover {

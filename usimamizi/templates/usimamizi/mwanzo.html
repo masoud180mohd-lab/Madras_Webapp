@@ -2,8 +2,12 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mwanzo.css' %}?v=20260706a">
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mwanzo.css' %}?v=20260808m002">
 {% endblock %}
+
+{% block page_eyebrow %}Mwanzo · matangazo{% endblock %}
+
+{% block title %}Mwanzo · Madrasatul Rasulillah{% endblock %}
 
 {% block maudhui %}
 <div class="mwanzo-inline-1">
@@ -45,8 +49,9 @@
             </span>
         </div>
         {% empty %}
-        <div class="mwanzo-inline-14">
-            <p>Hakuna matangazo yoyote mapya kwa sasa.</p>
+        <div class="app-empty-state mwanzo-inline-14">
+            <p class="app-empty-state-title">Hakuna matangazo</p>
+            <p class="app-empty-state-copy">Hakuna matangazo yoyote mapya kwa sasa. Matangazo huwekwa kupitia admin.</p>
         </div>
         {% endfor %}
 

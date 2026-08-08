@@ -3,8 +3,12 @@
 
 {% load static %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_wanafunzi.css' %}?v=20260706a">
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_wanafunzi.css' %}?v=20260808m002">
 {% endblock %}
+
+{% block page_eyebrow %}Idara ya Taaluma · wanafunzi{% endblock %}
+
+{% block title %}Orodha ya Wanafunzi · Madrasatul Rasulillah{% endblock %}
 
 {% block maudhui %}
 <div class="page-shell orodha_wanafunzi-inline-1">
@@ -105,8 +109,14 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="2" class="orodha_wanafunzi-inline-7">
-                            Hakuna mwanafunzi aliyepatikana kwa kigezo ulichotafuta.
+                        <td colspan="2">
+                            <div class="app-empty-state">
+                                <p class="app-empty-state-title">Hakuna mwanafunzi</p>
+                                <p class="app-empty-state-copy">Hakuna mwanafunzi aliyepatikana kwa kigezo ulichotafuta.</p>
+                                {% if anaweza_sajili_mwanafunzi %}
+                                    <a href="{% url 'sajili_mwanafunzi' %}" class="app-btn app-btn-primary">Sajili Mwanafunzi</a>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
