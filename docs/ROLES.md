@@ -6,10 +6,10 @@ Mfumo unatumia **cheo cha Mwalimu** pamoja na **Django model permissions** (kwa 
 
 | Cheo | Capabilities |
 |------|----------------|
-| **Mwalimu Mkuu** | Zote (students, attendance, sabaq, exams, fees, materials, mseto, directories) |
+| **Mwalimu Mkuu** | Zote (students, attendance, sabaq, exams, fees, materials, mseto, directory, parent contact) |
 | **Mwalimu wa Kawaida** | View students, attendance, sabaq, exams, materials, directory — **si** fees wala usajili wa wanafunzi (isipokuwa Django perm) |
 | **Jaji** | View students, exams, mseto/results, directory — **si** fees, attendance write, sabaq |
-| **Ofisi** (User bila Mwalimu) | Kupitia Django perms pekee (`add_malipo`, `view_mwanafunzi`, n.k.) |
+| **Ofisi** (User bila Mwalimu) | Django perms (`add_malipo`, …). **Fees** au ruhusa za `RekodiSimuMzazi` → mawasiliano / call log |
 
 Utekelezaji: [`usimamizi/permissions.py`](../usimamizi/permissions.py).
 
