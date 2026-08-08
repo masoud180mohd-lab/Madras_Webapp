@@ -38,23 +38,23 @@ Fungua: [http://127.0.0.1:8000/madrasa/ingia/](http://127.0.0.1:8000/madrasa/ing
 
 Nakili `.env.example` → `.env` na urekebishe. **Usicommmit `.env`.**
 
-### Production checklist
+### Production / Postgres
 
-1. Weka `DJANGO_ENV=production`
-2. Weka `DJANGO_SECRET_KEY` yenye nguvu (si `django-insecure-…`)
-3. Production **forces** `DEBUG=False` (hata kama `.env` ina `DJANGO_DEBUG=True`)
-4. Weka `DJANGO_ALLOWED_HOSTS` (si `*`) na `DJANGO_CSRF_TRUSTED_ORIGINS` (`https://…`)
-5. Tengeneza `DJANGO_SECRET_KEY` ndefu (≥50 chars, random). `check --deploy` itaonya ikiwa fupi.
-6. Endesha:
+- Lab: SQLite (`db.sqlite3`) — hakuna `DB_*` inahitajika.
+- Production: **Postgres** via `DATABASE_URL` au `DB_ENGINE=django.db.backends.postgresql` (+ `DB_NAME` / `USER` / `PASSWORD` / `HOST`). Settings za production **zinakataa** SQLite.
+- Checklist kamili (Ubuntu VPS + Nginx + Gunicorn + TLS + backups): **[docs/DEPLOY.md](docs/DEPLOY.md)**.
+
+Muhtasari:
+
+1. `DJANGO_ENV=production` + `DJANGO_SECRET_KEY` yenye nguvu
+2. `DJANGO_ALLOWED_HOSTS` + `DJANGO_CSRF_TRUSTED_ORIGINS` (`https://…`)
+3. Postgres `DB_*` au `DATABASE_URL`
+4. `pip install -r requirements.txt` → `migrate` → `collectstatic` → Gunicorn + Nginx
 
 ```bash
 py manage.py check --deploy
 py manage.py collectstatic
 ```
-
-`STATIC_ROOT` ni `staticfiles/` chini ya mradi (portable). Web server lazima ihudumie `media/` nje ya `DEBUG`.
-
-SQLite inaendelea kuwa default ya lab. Production DB (Postgres n.k.) bado haijaunganishwa katika slice hii — badilisha `DB_*` baadaye ukiwa tayari.
 
 ## Majukumu (AuthZ)
 

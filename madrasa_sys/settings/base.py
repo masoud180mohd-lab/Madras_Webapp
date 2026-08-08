@@ -69,12 +69,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "madrasa_sys.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("DB_NAME", str(BASE_DIR / "db.sqlite3")),
-    }
-}
+from .db import build_databases  # noqa: E402
+
+DATABASES = build_databases(BASE_DIR)
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

@@ -3,6 +3,11 @@ Django==4.2.30
 djangorestframework==3.16.1
 python-dotenv==1.1.0
 
+# Production / Postgres (safe to install in lab; unused until DB_ENGINE/DATABASE_URL set)
+psycopg[binary]==3.2.9
+gunicorn==23.0.0
+whitenoise==6.9.0
+
 # Uploads / images
 Pillow==11.2.1
 
