@@ -1,0 +1,129 @@
+.hamisha-page {
+    max-width: 840px;
+}
+
+.hamisha-hero {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 22px;
+    padding: 22px 24px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(31, 107, 69, 0.1), transparent 60%), var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--sidebar-edge);
+}
+
+.hamisha-title {
+    margin: 0;
+    font-family: var(--font-brand);
+    font-size: 1.75rem;
+    color: var(--title-color);
+}
+
+.hamisha-lead {
+    margin: 8px 0 0;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 36rem;
+}
+
+.hamisha-filter,
+.hamisha-form {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.hamisha-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.hamisha-list-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.hamisha-subtitle {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--title-color);
+}
+
+.hamisha-check-all {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    cursor: pointer;
+}
+
+.hamisha-students {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--surface-bg);
+    max-height: 360px;
+    overflow: auto;
+}
+
+.hamisha-students li {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.hamisha-students li:last-child {
+    border-bottom: none;
+}
+
+.hamisha-students label {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: baseline;
+    cursor: pointer;
+}
+
+.hamisha-students-readonly li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.hamisha-meta {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.hamisha-empty,
+.hamisha-note {
+    color: var(--text-muted);
+}
+
+.hamisha-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+@media (max-width: 640px) {
+    .hamisha-hero {
+        padding: 18px;
+    }
+
+    .hamisha-actions .app-btn {
+        width: 100%;
+    }
+}

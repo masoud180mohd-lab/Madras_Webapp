@@ -18,7 +18,8 @@ from xhtml2pdf import pisa
 from django.utils.timezone import localtime
 from django.urls import reverse
 
-from ..models import Mwanafunzi, Hudhurio, Tangazo, Mwalimu, Darasa, Somo, Nyenzo, Mtihani, Matokeo, RekodiHifdhu, PandeMurajaa, AinaMalipo, Malipo, MsetoMtihani
+from ..academic import get_active_mwaka
+from ..models import Mwanafunzi, Hudhurio, Tangazo, Mwalimu, Darasa, Somo, Nyenzo, Mtihani, Matokeo, RekodiHifdhu, PandeMurajaa, AinaMalipo, Malipo, MsetoMtihani, MwakaWaMasomo
 from ..forms import (
     MwanafunziForm,
     NyenzoForm,
@@ -56,7 +57,19 @@ from .helpers import link_callback, paginate_items
 @ruhusa_capability(CAP_FEES)
 def ukurasa_malipo(request):
     wanafunzi = Mwanafunzi.objects.active().select_related('darasa').order_by('jina_kamili')
-    aina_za_malipo = AinaMalipo.objects.all().order_by('-tarehe_ya_kuanzishwa')
+    active_mwaka = get_active_mwaka()
+    mwaka_filter = request.GET.get('mwaka') or (
+        str(active_mwaka.id) if active_mwaka else 'yote'
+    )
+    aina_qs = AinaMalipo.objects.select_related('mwaka')
+    if mwaka_filter == 'bila':
+        aina_qs = aina_qs.filter(mwaka__isnull=True)
+    elif mwaka_filter != 'yote' and str(mwaka_filter).isdigit():
+        # Mwaka teule + ada za zamani bila mwaka (mpaka zisasishwe)
+        aina_qs = aina_qs.filter(
+            Q(mwaka_id=int(mwaka_filter)) | Q(mwaka__isnull=True)
+        )
+    aina_za_malipo = aina_qs.order_by('-mwaka__mwaka_kuanzia', 'mwezi', 'jina')
 
     # 1. Pata Vichujio kutoka kwenye URL
     neno_la_kutafuta = request.GET.get('q', '')
@@ -65,7 +78,7 @@ def ukurasa_malipo(request):
     darasa_filter = request.GET.get('darasa', '')
 
     if aina_id:
-        aina_teule = get_object_or_404(AinaMalipo, id=aina_id)
+        aina_teule = get_object_or_404(AinaMalipo.objects.select_related('mwaka'), id=aina_id)
     else:
         aina_teule = aina_za_malipo.first()
 
@@ -136,6 +149,9 @@ def ukurasa_malipo(request):
         'page_obj': page_obj,
         'pagination_query': pagination_query,
         'madarasa': madarasa,
+        'miaka': MwakaWaMasomo.objects.all().order_by('-mwaka_kuanzia'),
+        'mwaka_filter': mwaka_filter,
+        'mwaka_hai': active_mwaka,
         'neno_la_kutafuta': neno_la_kutafuta,
         'hali_teule': hali_teule,
         'darasa_filter': darasa_filter,

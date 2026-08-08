@@ -44,7 +44,7 @@ def main() -> int:
     if not SECRETS.exists():
         print(
             f"Missing {SECRETS}\n"
-            "1) Copy .env.pythonanywhere.example → deploy/pythonanywhere/secrets.env\n"
+            "1) Copy .env.pythonanywhere.example -> deploy/pythonanywhere/secrets.env\n"
             "2) Fill PA_API_TOKEN only (SQLite free plan)\n"
             "3) Run this script again."
         )
@@ -154,11 +154,24 @@ def main() -> int:
 
     r = requests.get(base + f"webapps/{domain}/static_files/", headers=headers, timeout=60)
     existing = r.json() if r.status_code == 200 else []
+    # /media/ must NOT be a public static map — Django protected_media requires login.
+    for m in existing:
+        if m.get("url") == "/media/":
+            mid = m.get("id")
+            if mid is not None:
+                dr = requests.delete(
+                    base + f"webapps/{domain}/static_files/{mid}/",
+                    headers=headers,
+                    timeout=60,
+                )
+                print(
+                    f"Removed public /media/ static map (id={mid}):",
+                    dr.status_code,
+                )
     wanted = {
         "/static/": f"{project}/staticfiles",
-        "/media/": f"{project}/media",
     }
-    have = {m.get("url"): m for m in existing}
+    have = {m.get("url"): m for m in existing if m.get("url") != "/media/"}
     for url, path in wanted.items():
         if url in have:
             mid = have[url]["id"]
@@ -178,7 +191,7 @@ def main() -> int:
         if rr.status_code not in (200, 201):
             print(f"Static mapping {url} failed:", rr.status_code, rr.text[:200])
         else:
-            print(f"Static mapping OK: {url} → {path}")
+            print(f"Static mapping OK: {url} -> {path}")
 
     r = requests.post(base + f"webapps/{domain}/reload/", headers=headers, timeout=120)
     if r.status_code not in (200, 201):

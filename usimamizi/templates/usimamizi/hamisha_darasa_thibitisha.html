@@ -1,0 +1,49 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/hamisha_darasa.css' %}?v=20260809p">
+{% endblock %}
+
+{% block page_eyebrow %}Taaluma · Thibitisha{% endblock %}
+{% block title %}Thibitisha uhamisho · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="hamisha-page">
+    <header class="hamisha-hero">
+        <div>
+            <h1 class="hamisha-title">Thibitisha uhamisho</h1>
+            <p class="hamisha-lead">
+                <strong>{{ idadi }}</strong> wanafunzi:
+                <strong>{{ darasa_kutoka.jina }}</strong> → <strong>{{ darasa_kwenda.jina }}</strong>
+            </p>
+        </div>
+    </header>
+
+    <ul class="hamisha-students hamisha-students-readonly">
+        {% for m in wanafunzi %}
+        <li>
+            <span>{{ m.jina_kamili }}</span>
+            <span class="hamisha-meta">{{ m.namba_ya_usajili }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% if maezo %}
+    <p class="hamisha-note">Maelezo: {{ maezo }}</p>
+    {% endif %}
+
+    <form method="post" class="hamisha-actions">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="thibitisha">
+        <input type="hidden" name="kutoka" value="{{ darasa_kutoka.id }}">
+        <input type="hidden" name="kwenda" value="{{ darasa_kwenda.id }}">
+        <input type="hidden" name="maezo" value="{{ maezo }}">
+        {% for m in wanafunzi %}
+        <input type="hidden" name="wanafunzi" value="{{ m.id }}">
+        {% endfor %}
+        <a href="{% url 'hamisha_darasa' %}?kutoka={{ darasa_kutoka.id }}" class="app-btn app-btn-outline">Ghairi</a>
+        <button type="submit" class="app-btn app-btn-primary">Thibitisha uhamisho</button>
+    </form>
+</section>
+{% endblock %}

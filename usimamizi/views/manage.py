@@ -5,8 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from ..academic import get_active_mwaka
 from ..forms import AinaMalipoForm, DarasaForm, MwalimuCreateForm, MwalimuEditForm
-from ..models import AinaMalipo, Darasa, Malipo, Mwalimu, Mwanafunzi, Somo
+from ..models import AinaMalipo, Darasa, Malipo, Mwalimu, MwakaWaMasomo, Mwanafunzi, Somo
 from ..permissions import CAP_MANAGE_STUDENTS, ruhusa_capability
 
 
@@ -138,11 +139,25 @@ def hariri_mwalimu(request, mwalimu_id):
 @login_required(login_url="ingia")
 @ruhusa_capability(CAP_MANAGE_STUDENTS)
 def orodha_aina_malipo(request):
-    aina = AinaMalipo.objects.all().order_by("-tarehe_ya_kuanzishwa")
+    active = get_active_mwaka()
+    mwaka_filter = request.GET.get("mwaka") or (
+        str(active.id) if active else "yote"
+    )
+    aina = AinaMalipo.objects.select_related("mwaka").all()
+    if mwaka_filter == "bila":
+        aina = aina.filter(mwaka__isnull=True)
+    elif mwaka_filter != "yote" and str(mwaka_filter).isdigit():
+        aina = aina.filter(mwaka_id=int(mwaka_filter))
+    aina = aina.order_by("-mwaka__mwaka_kuanzia", "mwezi", "jina")
     return render(
         request,
         "usimamizi/orodha_aina_malipo.html",
-        {"aina_za_malipo": aina},
+        {
+            "aina_za_malipo": aina,
+            "miaka": MwakaWaMasomo.objects.all().order_by("-mwaka_kuanzia"),
+            "mwaka_filter": mwaka_filter,
+            "mwaka_hai": active,
+        },
     )
 
 
@@ -163,7 +178,7 @@ def ongeza_aina_malipo(request):
         {
             "form": form,
             "kichwa": "Ongeza aina ya ada",
-            "maelezo": "Mfano: Ada ya mwezi, mchango wa mtihani.",
+            "maelezo": "Chagua mwaka (na mwezi hiari) ili ada ya Aprili isichanganywe na miaka tofauti.",
             "kitufe": "Hifadhi",
             "rudi_url": "orodha_aina_malipo",
         },

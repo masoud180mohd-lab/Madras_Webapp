@@ -6,7 +6,7 @@ Mfumo unatumia **cheo cha Mwalimu** pamoja na **Django model permissions** (kwa 
 
 | Cheo | Capabilities |
 |------|----------------|
-| **Mwalimu Mkuu** | Zote (students, attendance, sabaq, exams, fees, materials, mseto, directory, parent contact) |
+| **Mwalimu Mkuu** | Zote (students, attendance, sabaq, exams, fees, materials, mseto, directory, parent contact, **hamisha darasa**) |
 | **Mwalimu wa Kawaida** | View students, attendance, sabaq, exams, materials, directory — **si** fees wala usajili wa wanafunzi (isipokuwa Django perm) |
 | **Jaji** | View students, exams, mseto/results, directory — **si** fees, attendance write, sabaq |
 | **Ofisi** (User bila Mwalimu) | Django perms (`add_malipo`, …). **Fees** au ruhusa za `RekodiSimuMzazi` → mawasiliano / call log |
@@ -22,6 +22,7 @@ Utekelezaji: [`usimamizi/permissions.py`](../usimamizi/permissions.py).
 - Ukaguzi (`/madrasa/ukaguzi/`) → `manage_students` au `fees` (nani alirekodi mahudhurio/malipo)
 - Mawasiliano / call log (`/madrasa/mawasiliano/`) → `parent_contact` (Mkuu; ofisi yenye `fees` au ruhusa za `RekodiSimuMzazi`)
 - WhatsApp ya kawaida (`/madrasa/mawasiliano/whatsapp/`, `wa.me`) → ruhusa sawa na Mawasiliano; **si** Business API — opereta anabonyeza Send kwenye WhatsApp; kubofya “Fungua WhatsApp” inaandika rekodi `sababu=whatsapp` / `matokeo=imeanzishwa`
+- Hamisha darasa / promotion (`/madrasa/hamisha-darasa/`) → `promote_class` (**Mkuu / superuser tu** — ofisi yenye `change_mwanafunzi` **haiwezi**)
 
 ## Wasifu wa Mwalimu
 

@@ -13,9 +13,7 @@
     <header class="mawasiliano-hero">
         <div>
             <h1 class="mawasiliano-title">Tuma WhatsApp</h1>
-            <p class="mawasiliano-lead">
-                Ujumbe <strong>hautumwi kiotomatiki</strong> — bonyeza <em>Fungua WhatsApp</em>, kisha <strong>Send</strong> kwenye WhatsApp.
-            </p>
+            <p class="mawasiliano-lead">Andika ujumbe, chagua wazazi, kisha fungua WhatsApp.</p>
         </div>
         <a href="{% url 'orodha_mawasiliano' %}" class="app-btn app-btn-outline app-btn-sm">Rudi Mawasiliano</a>
     </header>
@@ -62,7 +60,12 @@
                             <strong>{{ row.mwanafunzi.jina_kamili }}</strong>
                             <div class="mawasiliano-meta">{{ row.mwanafunzi.namba_ya_usajili }} · {{ row.mwanafunzi.darasa.jina|default:"Bila darasa" }}</div>
                         </td>
-                        <td>{{ row.mwanafunzi.jina_la_mzazi|default:"—" }}</td>
+                        <td>
+                            {{ row.jina_mzazi|default:"—" }}
+                            {% if row.uhusiano_display %}
+                            <div class="mawasiliano-meta">{{ row.uhusiano_display }}</div>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if row.ina_namba_sahihi %}
                                 {{ row.namba_onyesho }}
@@ -75,7 +78,7 @@
                             {% if row.ina_namba_sahihi %}
                             <a
                                 class="app-btn app-btn-primary app-btn-sm"
-                                href="{% url 'fungua_whatsapp' row.mwanafunzi.id %}?ujumbe={{ ujumbe|urlencode }}&amp;next={% url 'tuma_whatsapp' %}"
+                                href="{% url 'fungua_whatsapp' row.mwanafunzi.id %}?mzazi={{ row.slot }}&amp;ujumbe={{ ujumbe|urlencode }}&amp;next={% url 'tuma_whatsapp' %}"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >Fungua WhatsApp</a>

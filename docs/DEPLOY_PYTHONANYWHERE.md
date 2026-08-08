@@ -107,7 +107,10 @@ application = get_wsgi_application()
 | URL            | Directory                                      |
 |----------------|------------------------------------------------|
 | `/static/`     | `/home/JINA_LAKO/Madras_Webapp/staticfiles`    |
-| `/media/`      | `/home/JINA_LAKO/Madras_Webapp/media`          |
+
+**Usiongeze** mapping ya `/media/` → folder `media`. Picha/nyenzo zinapitia Django (`protected_media`) — **login inahitajika**. Mapping ya umma inafungua picha bila kuingia.
+
+Ikiwa `/media/` ilikuwa imewekwa zamani: Web tab → Static files → **futa** mstari wa `/media/`, kisha Reload. (Script `pa_configure.py` pia inajaribu kuiondoa.)
 
 6. Bonyeza **Reload**.
 

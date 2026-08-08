@@ -126,9 +126,107 @@
 }
 
 .dash-actions,
-.dash-announcements {
+.dash-announcements,
+.dash-followup {
     margin-bottom: 28px;
     animation: dash-rise 0.55s ease-out 0.1s both;
+}
+
+.dash-followup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.dash-followup-panel {
+    padding: 18px 18px 14px;
+    border-radius: 12px;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
+    border-top: 3px solid var(--warning);
+}
+
+.dash-followup-head {
+    margin-bottom: 12px;
+}
+
+.dash-followup-title {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+    color: var(--title-color);
+}
+
+.dash-followup-summary {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+}
+
+.dash-followup-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dash-followup-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.dash-followup-name {
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.dash-followup-name:hover {
+    text-decoration: underline;
+}
+
+.dash-followup-meta {
+    margin-top: 2px;
+    font-size: 0.82rem;
+    color: var(--text-faint);
+    line-height: 1.35;
+}
+
+.dash-followup-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.dash-followup-amount {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--warning-text, var(--title-color));
+    white-space: nowrap;
+}
+
+.dash-followup-empty {
+    margin: 0;
+    padding: 12px 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+}
+
+.dash-followup-more {
+    display: inline-block;
+    margin-top: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.dash-followup-more:hover {
+    text-decoration: underline;
 }
 
 .dash-section-head {
@@ -229,7 +327,8 @@
     .dash-welcome,
     .dash-metrics,
     .dash-actions,
-    .dash-announcements {
+    .dash-announcements,
+    .dash-followup {
         animation: none;
     }
 

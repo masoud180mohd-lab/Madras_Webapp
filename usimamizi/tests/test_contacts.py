@@ -72,16 +72,22 @@ class ParentContactTests(TestCase):
             reverse("mwanafunzi_mawasiliano", args=[self.student.id]),
             {
                 "action": "sasisha_mawasiliano",
-                "jina_la_mzazi": "Mama Mpya",
-                "uhusiano_wa_mlezi": "Mama",
+                "jina_la_mzazi": "Baba Mpya",
+                "uhusiano_wa_mlezi": "Baba",
                 "namba_ya_simu_mzazi": "0777222333",
+                "jina_la_mzazi_pili": "Mama Mpya",
+                "uhusiano_wa_mlezi_pili": "Mama",
+                "namba_ya_simu_mzazi_pili": "0777333444",
             },
         )
         self.assertEqual(response.status_code, 302)
         self.student.refresh_from_db()
-        self.assertEqual(self.student.jina_la_mzazi, "Mama Mpya")
+        self.assertEqual(self.student.jina_la_mzazi, "Baba Mpya")
         self.assertEqual(self.student.namba_ya_simu_mzazi, "0777222333")
-        self.assertEqual(self.student.uhusiano_wa_mlezi, "Mama")
+        self.assertEqual(self.student.uhusiano_wa_mlezi, "Baba")
+        self.assertEqual(self.student.jina_la_mzazi_pili, "Mama Mpya")
+        self.assertEqual(self.student.namba_ya_simu_mzazi_pili, "0777333444")
+        self.assertEqual(self.student.uhusiano_wa_mlezi_pili, "Mama")
 
     def test_filter_bila_namba(self):
         Mwanafunzi.objects.create(jina_kamili="Bila Namba")
@@ -116,7 +122,6 @@ class ParentContactTests(TestCase):
         self.client.login(username="ofisi_pc", password="pass12345")
         response = self.client.get(reverse("tuma_whatsapp"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "hautumwi kiotomatiki")
         self.assertContains(response, "Mwanafunzi Contact")
         self.assertContains(response, "Fungua WhatsApp")
         self.assertNotContains(response, "Bila Namba WA")
@@ -137,6 +142,27 @@ class ParentContactTests(TestCase):
         self.assertEqual(log.matokeo, RekodiSimuMzazi.MATOKEO_IMEANZISHWA)
         self.assertEqual(log.iliyorekodiwa_na, self.office)
 
+    def test_second_parent_whatsapp_slot(self):
+        self.student.jina_la_mzazi_pili = "Mama Contact"
+        self.student.uhusiano_wa_mlezi_pili = "Mama"
+        self.student.namba_ya_simu_mzazi_pili = "0777111222"
+        self.student.save()
+        row_pili = recipient_whatsapp_row(self.student, "Salamu {jina}", slot=2)
+        self.assertTrue(row_pili["ina_namba_sahihi"])
+        self.assertEqual(row_pili["e164"], "255777111222")
+
+        self.client.login(username="ofisi_pc", password="pass12345")
+        response = self.client.get(
+            reverse("fungua_whatsapp", args=[self.student.id]) + "?mzazi=2&kigezo=jumla",
+            follow=False,
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url.startswith("https://wa.me/255777111222"))
+        campaign = self.client.get(reverse("tuma_whatsapp"))
+        self.assertEqual(campaign.status_code, 200)
+        self.assertContains(campaign, "Mama Contact")
+        self.assertContains(campaign, "0777111222")
+
     def test_detail_shows_whatsapp_when_valid(self):
         self.client.login(username="mkuu_pc", password="pass12345")
         response = self.client.get(
@@ -145,3 +171,4 @@ class ParentContactTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "WhatsApp")
         self.assertContains(response, reverse("fungua_whatsapp", args=[self.student.id]))
+        self.assertContains(response, "mzazi=1")

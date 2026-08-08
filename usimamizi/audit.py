@@ -70,3 +70,28 @@ def andika_ukaguzi_malipo(*, user, malipo):
         malipo=malipo,
         idadi_ya_rekodi=1,
     )
+
+
+def andika_ukaguzi_hamisha_darasa(
+    *,
+    user,
+    darasa_kutoka,
+    darasa_kwenda,
+    idadi,
+    maezo="",
+):
+    kutoka = darasa_kutoka.jina if darasa_kutoka else "—"
+    kwenda = darasa_kwenda.jina if darasa_kwenda else "—"
+    maelezo = (
+        f"{_display_user(user)} alihamisha wanafunzi {idadi} "
+        f"kutoka {kutoka} kwenda {kwenda}."
+    )
+    if maezo:
+        maelezo = f"{maelezo} Maelezo: {maezo}"
+    return andika_ukaguzi(
+        user=user,
+        kitendo=RekodiUkaguzi.KITENDO_HAMISHA_DARASA,
+        maelezo=maelezo,
+        darasa=darasa_kwenda,
+        idadi_ya_rekodi=idadi,
+    )

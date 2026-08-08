@@ -2,10 +2,10 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mwanzo.css' %}?v=20260809archive">
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/mwanzo.css' %}?v=20260809follow">
 {% endblock %}
 
-{% block page_eyebrow %}Mwanzo · dashibodi{% endblock %}
+{% block page_eyebrow %}Mwanzo · ufuatiliaji{% endblock %}
 
 {% block title %}Mwanzo · Madrasatul Rasulillah{% endblock %}
 
@@ -33,6 +33,83 @@
         <span class="dash-metric-hint">{{ kipimo.hint }}</span>
     </a>
     {% endfor %}
+</section>
+{% endif %}
+
+{% if ufuatiliaji_deni or ufuatiliaji_mahudhurio %}
+<section class="dash-followup" aria-labelledby="dash-followup-title">
+    <div class="dash-section-head">
+        <h2 id="dash-followup-title" class="dash-section-title">Ufuatiliaji</h2>
+        <p class="dash-section-copy">Deni la ada na mahudhurio — orodha ya kufanyia kazi ofisini (si arifa push).</p>
+    </div>
+    <div class="dash-followup-grid">
+        {% if ufuatiliaji_deni %}
+        <article class="dash-followup-panel">
+            <header class="dash-followup-head">
+                <h3 class="dash-followup-title">Deni la ada</h3>
+                <p class="dash-followup-summary">
+                    <strong>{{ ufuatiliaji_deni.idadi }}</strong> wanafunzi
+                    · Tsh {{ ufuatiliaji_deni.jumla|floatformat:"0" }}/=
+                    {% if ufuatiliaji_deni.mwaka_jina %} · {{ ufuatiliaji_deni.mwaka_jina }}{% endif %}
+                </p>
+            </header>
+            {% if ufuatiliaji_deni.orodha %}
+            <ul class="dash-followup-list">
+                {% for row in ufuatiliaji_deni.orodha %}
+                <li class="dash-followup-item">
+                    <div>
+                        <a href="{{ row.profile_url }}" class="dash-followup-name">{{ row.mwanafunzi.jina_kamili }}</a>
+                        <div class="dash-followup-meta">
+                            {{ row.mwanafunzi.darasa.jina|default:"Bila darasa" }}
+                            {% if row.aina_fupi %} · {{ row.aina_fupi|join:", " }}{% endif %}
+                        </div>
+                    </div>
+                    <div class="dash-followup-aside">
+                        <span class="dash-followup-amount">Tsh {{ row.deni|floatformat:"0" }}</span>
+                        <a href="{{ row.malipo_url }}" class="app-btn app-btn-outline app-btn-sm">Lipa</a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="dash-followup-empty">Hakuna deni linaloonekana kwa aina za ada za sasa.</p>
+            {% endif %}
+            <a href="{{ ufuatiliaji_deni.malipo_url }}" class="dash-followup-more">Fungua Malipo na Ada →</a>
+        </article>
+        {% endif %}
+
+        {% if ufuatiliaji_mahudhurio %}
+        <article class="dash-followup-panel">
+            <header class="dash-followup-head">
+                <h3 class="dash-followup-title">Mahudhurio</h3>
+                <p class="dash-followup-summary">
+                    <strong>{{ ufuatiliaji_mahudhurio.hayupo_leo }}</strong> hawapo leo
+                    · <strong>{{ ufuatiliaji_mahudhurio.watoro_wiki }}</strong> watoro wiki hii
+                </p>
+            </header>
+            {% if ufuatiliaji_mahudhurio.orodha %}
+            <ul class="dash-followup-list">
+                {% for row in ufuatiliaji_mahudhurio.orodha %}
+                <li class="dash-followup-item">
+                    <div>
+                        <a href="{{ row.profile_url }}" class="dash-followup-name">{{ row.mwanafunzi.jina_kamili }}</a>
+                        <div class="dash-followup-meta">{{ row.darasa }} · hayupo leo</div>
+                    </div>
+                    <div class="dash-followup-aside">
+                        {% if anaweza_mawasiliano %}
+                        <a href="{{ row.mawasiliano_url }}" class="app-btn app-btn-outline app-btn-sm">Simu</a>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="dash-followup-empty">Hakuna utoro wa kawaida uliorekodiwa leo.</p>
+            {% endif %}
+            <a href="{{ ufuatiliaji_mahudhurio.watoro_url }}" class="dash-followup-more">Ripoti ya watoro →</a>
+        </article>
+        {% endif %}
+    </div>
 </section>
 {% endif %}
 

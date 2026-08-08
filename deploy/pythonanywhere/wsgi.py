@@ -6,7 +6,7 @@ WSGI for PythonAnywhere — copy/upload to:
 import os
 import sys
 
-project_home = "/home/rasulillahmadras/Madras_Webapp"
+project_home = "/home/rasulillahmadras/madrasa_sys"
 if project_home not in sys.path:
     sys.path.insert(0, project_home)
 

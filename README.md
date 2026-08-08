@@ -58,6 +58,23 @@ Angalia [docs/ROLES.md](docs/ROLES.md) — matrix ya Mwalimu Mkuu / Kawaida / Ja
 
 Ofisi: `/madrasa/mawasiliano/` na **Tuma WhatsApp** (`/madrasa/mawasiliano/whatsapp/`).
 Hutumia `https://wa.me/…` tu (WhatsApp ya kawaida) — **hakuna** Business API wala kutuma kiotomatiki; opereta anathibitisha Send.
+Kila mwanafunzi anaweza kuwa na **mzazi wa kwanza + wa pili** (mf. Baba + Mama): jina, uhusiano, namba.
+
+## Dashboard / ufuatiliaji
+
+Mwanzo huonyesha vipimo + orodha fupi ya **deni la ada** na **mahudhurio** (hawapo leo / watoro wiki) kwa ruhusa husika — ufuatiliaji wa ofisi, si push notifications.
+
+## Usalama wa media
+
+`/media/...` (picha, nyenzo) inahudumiwa na Django **baada ya login** tu — si static ya umma. Kwenye PythonAnywhere **usiongeze** Static files mapping ya `/media/`.
+
+## Ada kwa mwaka / mwezi
+
+Aina za ada zinaweza kufungwa na **mwaka wa masomo** (+ mwezi hiari). Lebo: `Ada · Aprili · 2025/2026` — haitachanganyika na Aprili ya mwaka mwingine. Mapato → Aina za Ada; Malipo huchuja kwa mwaka hai.
+
+## Simu / majedwali
+
+Kwenye skrini ≤768px, majedwali ya `.app-table` / `.data-table` yanakuwa **kadi** (si scroll ya upande). Spreadsheet/alama: weka `table-keep-scroll` au tumia `.marks-table`.
 
 ## Hamisha darasa (M-012)
 

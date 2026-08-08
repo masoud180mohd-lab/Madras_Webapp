@@ -1,0 +1,97 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/hamisha_darasa.css' %}?v=20260809p">
+{% endblock %}
+
+{% block page_eyebrow %}Taaluma · Promotion{% endblock %}
+{% block title %}Hamisha darasa · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="hamisha-page">
+    <header class="hamisha-hero">
+        <div>
+            <h1 class="hamisha-title">Hamisha wanafunzi (darasa)</h1>
+            <p class="hamisha-lead">
+                Mwisho wa mwaka: chagua darasa la kutoka na la kwenda, kisha thibitisha uhamisho.
+            </p>
+        </div>
+        <a href="{% url 'mwaka_masomo' %}" class="app-btn app-btn-outline app-btn-sm">Mwaka / Muhula</a>
+    </header>
+
+    <form method="get" class="hamisha-filter">
+        <label class="hamisha-label" for="kutoka">Darasa la kutoka</label>
+        <select id="kutoka" name="kutoka" class="app-input" onchange="this.form.submit()">
+            <option value="">— Chagua —</option>
+            {% for d in madarasa %}
+            <option value="{{ d.id }}" {% if kutoka_id == d.id|stringformat:"s" %}selected{% endif %}>{{ d.jina }}</option>
+            {% endfor %}
+        </select>
+    </form>
+
+    {% if darasa_kutoka %}
+    <form method="post" class="hamisha-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="hakiki">
+        <input type="hidden" name="kutoka" value="{{ darasa_kutoka.id }}">
+
+        <label class="hamisha-label" for="kwenda">Darasa la kwenda</label>
+        <select id="kwenda" name="kwenda" class="app-input" required>
+            <option value="">— Chagua —</option>
+            {% for d in madarasa %}
+            {% if d.id != darasa_kutoka.id %}
+            <option value="{{ d.id }}" {% if kwenda_id == d.id|stringformat:"s" %}selected{% endif %}>{{ d.jina }}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
+
+        <div class="hamisha-list-head">
+            <h2 class="hamisha-subtitle">Wanafunzi hai — {{ darasa_kutoka.jina }} ({{ wanafunzi|length }})</h2>
+            {% if wanafunzi %}
+            <label class="hamisha-check-all">
+                <input type="checkbox" id="chaguaWote" checked>
+                Chagua wote
+            </label>
+            {% endif %}
+        </div>
+
+        {% if wanafunzi %}
+        <ul class="hamisha-students">
+            {% for m in wanafunzi %}
+            <li>
+                <label>
+                    <input type="checkbox" name="wanafunzi" value="{{ m.id }}" class="hamisha-student-cb" checked>
+                    <span>{{ m.jina_kamili }}</span>
+                    <span class="hamisha-meta">{{ m.namba_ya_usajili }}</span>
+                </label>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <label class="hamisha-label" for="maezo">Maelezo (hiari)</label>
+        <input type="text" id="maezo" name="maezo" class="app-input" maxlength="200" placeholder="Mf. Mwisho wa mwaka 2025/2026">
+
+        <div class="hamisha-actions">
+            <button type="submit" class="app-btn app-btn-primary">Endelea kuthibitisha</button>
+        </div>
+        {% else %}
+        <p class="hamisha-empty">Hakuna wanafunzi hai katika darasa hili.</p>
+        {% endif %}
+    </form>
+    {% endif %}
+</section>
+
+{% if wanafunzi %}
+<script>
+(function () {
+    var all = document.getElementById('chaguaWote');
+    if (!all) return;
+    var boxes = document.querySelectorAll('.hamisha-student-cb');
+    all.addEventListener('change', function () {
+        boxes.forEach(function (cb) { cb.checked = all.checked; });
+    });
+})();
+</script>
+{% endif %}
+{% endblock %}

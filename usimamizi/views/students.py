@@ -195,7 +195,7 @@ def mwanafunzi_profile(request, mwanafunzi_id):
     mahudhurio_hifdhu = Hudhurio.objects.filter(mwanafunzi=mwanafunzi, aina_ya_rekodi='Hifdhu').order_by('-tarehe')
     malipo_yote = (
         mwanafunzi.malipo_yote.select_related(
-            'aina_ya_malipo', 'mpokeaji', 'iliyorekodiwa_na'
+            'aina_ya_malipo', 'aina_ya_malipo__mwaka', 'mpokeaji', 'iliyorekodiwa_na'
         ).order_by('-tarehe_ya_malipo')
     )
     sabaq_darasa = (

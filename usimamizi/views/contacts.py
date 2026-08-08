@@ -19,7 +19,13 @@ from ..whatsapp import (
     build_wa_me_url,
     message_for_mwanafunzi,
     normalize_phone_tz,
-    recipient_whatsapp_row,
+    parse_mzazi_slot,
+    recipient_whatsapp_rows,
+)
+
+_Q_HAKUNA_NAMBA = (
+    (Q(namba_ya_simu_mzazi__isnull=True) | Q(namba_ya_simu_mzazi=""))
+    & (Q(namba_ya_simu_mzazi_pili__isnull=True) | Q(namba_ya_simu_mzazi_pili=""))
 )
 
 
@@ -42,17 +48,15 @@ def orodha_mawasiliano(request):
             | Q(namba_ya_usajili__icontains=q)
             | Q(jina_la_mzazi__icontains=q)
             | Q(namba_ya_simu_mzazi__icontains=q)
+            | Q(jina_la_mzazi_pili__icontains=q)
+            | Q(namba_ya_simu_mzazi_pili__icontains=q)
         )
     if darasa_id.isdigit():
         qs = qs.filter(darasa_id=int(darasa_id))
     if hali == "bila_namba":
-        qs = qs.filter(
-            Q(namba_ya_simu_mzazi__isnull=True) | Q(namba_ya_simu_mzazi="")
-        )
+        qs = qs.filter(_Q_HAKUNA_NAMBA)
     elif hali == "zina_namba":
-        qs = qs.exclude(
-            Q(namba_ya_simu_mzazi__isnull=True) | Q(namba_ya_simu_mzazi="")
-        )
+        qs = qs.exclude(_Q_HAKUNA_NAMBA)
 
     simu_za_karibuni = (
         RekodiSimuMzazi.objects.select_related(
@@ -103,20 +107,33 @@ def mwanafunzi_mawasiliano(request, mwanafunzi_id):
                 row.mwanafunzi = mwanafunzi
                 row.iliyorekodiwa_na = request.user
                 if not row.namba_iliyopigwa:
-                    row.namba_iliyopigwa = mwanafunzi.namba_ya_simu_mzazi or ""
+                    row.namba_iliyopigwa = (
+                        mwanafunzi.namba_ya_mzazi_ya_kwanza_inayopatikana()
+                    )
                 row.save()
                 messages.success(request, "Simu imerekodiwa.")
                 return redirect(
                     "mwanafunzi_mawasiliano", mwanafunzi_id=mwanafunzi.id
                 )
 
-    e164 = normalize_phone_tz(mwanafunzi.namba_ya_simu_mzazi)
-    whatsapp_fungua_url = None
-    if e164:
-        whatsapp_fungua_url = (
-            reverse("fungua_whatsapp", args=[mwanafunzi.id])
-            + "?"
-            + urlencode({"kigezo": "jumla"})
+    wazazi_actions = []
+    for info in mwanafunzi.mzazi_slots():
+        if not info["namba"]:
+            continue
+        e164 = normalize_phone_tz(info["namba"])
+        wa_url = None
+        if e164:
+            wa_url = (
+                reverse("fungua_whatsapp", args=[mwanafunzi.id])
+                + "?"
+                + urlencode({"kigezo": "jumla", "mzazi": str(info["slot"])})
+            )
+        wazazi_actions.append(
+            {
+                **info,
+                "ina_whatsapp": bool(e164),
+                "whatsapp_fungua_url": wa_url,
+            }
         )
 
     return render(
@@ -128,8 +145,7 @@ def mwanafunzi_mawasiliano(request, mwanafunzi_id):
             "call_form": call_form,
             "rekodi": rekodi,
             "rudi_url": reverse("orodha_mawasiliano"),
-            "ina_whatsapp": bool(e164),
-            "whatsapp_fungua_url": whatsapp_fungua_url,
+            "wazazi_actions": wazazi_actions,
         },
     )
 
@@ -146,7 +162,7 @@ def rekodi_simu_kutoka_profile(request, mwanafunzi_id):
         row.mwanafunzi = mwanafunzi
         row.iliyorekodiwa_na = request.user
         if not row.namba_iliyopigwa:
-            row.namba_iliyopigwa = mwanafunzi.namba_ya_simu_mzazi or ""
+            row.namba_iliyopigwa = mwanafunzi.namba_ya_mzazi_ya_kwanza_inayopatikana()
         row.save()
         messages.success(request, "Simu imerekodiwa.")
     else:
@@ -170,7 +186,7 @@ def tuma_whatsapp(request):
     qs = (
         Mwanafunzi.objects.active()
         .select_related("darasa")
-        .exclude(Q(namba_ya_simu_mzazi__isnull=True) | Q(namba_ya_simu_mzazi=""))
+        .exclude(_Q_HAKUNA_NAMBA)
         .order_by("jina_kamili")
     )
     if q:
@@ -179,11 +195,15 @@ def tuma_whatsapp(request):
             | Q(namba_ya_usajili__icontains=q)
             | Q(jina_la_mzazi__icontains=q)
             | Q(namba_ya_simu_mzazi__icontains=q)
+            | Q(jina_la_mzazi_pili__icontains=q)
+            | Q(namba_ya_simu_mzazi_pili__icontains=q)
         )
     if darasa_id.isdigit():
         qs = qs.filter(darasa_id=int(darasa_id))
 
-    rows = [recipient_whatsapp_row(m, ujumbe) for m in qs]
+    rows = []
+    for m in qs:
+        rows.extend(recipient_whatsapp_rows(m, ujumbe))
     valid_count = sum(1 for r in rows if r["ina_namba_sahihi"])
     invalid_count = len(rows) - valid_count
 
@@ -213,7 +233,9 @@ def fungua_whatsapp(request, mwanafunzi_id):
     Operator must still press Send in WhatsApp — no Business API.
     """
     mwanafunzi = get_object_or_404(Mwanafunzi, id=mwanafunzi_id)
-    e164 = normalize_phone_tz(mwanafunzi.namba_ya_simu_mzazi)
+    slot = parse_mzazi_slot(request.GET.get("mzazi") or 1)
+    namba = mwanafunzi.namba_ya_mzazi_slot(slot)
+    e164 = normalize_phone_tz(namba)
     next_url = request.GET.get("next") or reverse(
         "mwanafunzi_mawasiliano", args=[mwanafunzi.id]
     )
@@ -233,7 +255,7 @@ def fungua_whatsapp(request, mwanafunzi_id):
 
     RekodiSimuMzazi.objects.create(
         mwanafunzi=mwanafunzi,
-        namba_iliyopigwa=mwanafunzi.namba_ya_simu_mzazi or e164,
+        namba_iliyopigwa=namba or e164,
         sababu=RekodiSimuMzazi.SABABU_WHATSAPP,
         matokeo=RekodiSimuMzazi.MATOKEO_IMEANZISHWA,
         maelezo=(text[:500] if text else "WhatsApp imeanzishwa"),

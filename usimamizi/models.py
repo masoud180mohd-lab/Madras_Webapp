@@ -97,20 +97,52 @@ class Mwanafunzi(models.Model):
     tarehe_ya_kuzaliwa = models.DateField(null=True, blank=True)
 
     mahala_anapoishi = models.CharField(max_length=100, null=True, blank=True)
-    jina_la_mzazi = models.CharField(max_length=100, null=True, blank=True)
-    namba_ya_simu_mzazi = models.CharField(max_length=15, null=True, blank=True)
+    UHUSIANO_MLEZI_CHOICES = [
+        ("", "—"),
+        ("Baba", "Baba"),
+        ("Mama", "Mama"),
+        ("Mlezi", "Mlezi"),
+        ("Mwingine", "Mwingine"),
+    ]
+    jina_la_mzazi = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name="Jina la mzazi wa kwanza",
+    )
+    namba_ya_simu_mzazi = models.CharField(
+        max_length=15,
+        null=True,
+        blank=True,
+        verbose_name="Namba ya simu (mzazi wa kwanza)",
+    )
     uhusiano_wa_mlezi = models.CharField(
         max_length=20,
         blank=True,
         default="",
-        choices=[
-            ("", "—"),
-            ("Baba", "Baba"),
-            ("Mama", "Mama"),
-            ("Mlezi", "Mlezi"),
-            ("Mwingine", "Mwingine"),
-        ],
-        help_text="Uhusiano wa mzazi/mlezi anayewasiliana na ofisi",
+        choices=UHUSIANO_MLEZI_CHOICES,
+        help_text="Uhusiano wa mzazi/mlezi wa kwanza (mf. Baba au Mama)",
+        verbose_name="Uhusiano (mzazi wa kwanza)",
+    )
+    jina_la_mzazi_pili = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name="Jina la mzazi wa pili",
+    )
+    namba_ya_simu_mzazi_pili = models.CharField(
+        max_length=15,
+        null=True,
+        blank=True,
+        verbose_name="Namba ya simu (mzazi wa pili)",
+    )
+    uhusiano_wa_mlezi_pili = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        choices=UHUSIANO_MLEZI_CHOICES,
+        help_text="Uhusiano wa mzazi/mlezi wa pili (mf. Mama au Baba)",
+        verbose_name="Uhusiano (mzazi wa pili)",
     )
     jinsia = models.CharField(max_length=2, choices=[('ME', 'Mwanamume (ME)'), ('KE', 'Mwanamke (KE)')], default='ME')
     darasa = models.ForeignKey(Darasa, on_delete=models.SET_NULL, null=True, blank=True)
@@ -135,6 +167,41 @@ class Mwanafunzi(models.Model):
             leo = date.today()
             return leo.year - self.tarehe_ya_kuzaliwa.year - ((leo.month, leo.day) < (self.tarehe_ya_kuzaliwa.month, self.tarehe_ya_kuzaliwa.day))
         return "-"
+
+    def mzazi_slots(self):
+        """Mzazi wa kwanza + wa pili (jina, uhusiano, namba) — kwa UI/WhatsApp."""
+        return (
+            {
+                "slot": 1,
+                "jina": (self.jina_la_mzazi or "").strip(),
+                "namba": (self.namba_ya_simu_mzazi or "").strip(),
+                "uhusiano": self.uhusiano_wa_mlezi or "",
+                "uhusiano_display": self.get_uhusiano_wa_mlezi_display() or "",
+                "lebo": "Mzazi wa kwanza",
+            },
+            {
+                "slot": 2,
+                "jina": (self.jina_la_mzazi_pili or "").strip(),
+                "namba": (self.namba_ya_simu_mzazi_pili or "").strip(),
+                "uhusiano": self.uhusiano_wa_mlezi_pili or "",
+                "uhusiano_display": self.get_uhusiano_wa_mlezi_pili_display() or "",
+                "lebo": "Mzazi wa pili",
+            },
+        )
+
+    def namba_ya_mzazi_slot(self, slot: int = 1) -> str:
+        if int(slot) == 2:
+            return (self.namba_ya_simu_mzazi_pili or "").strip()
+        return (self.namba_ya_simu_mzazi or "").strip()
+
+    def namba_ya_mzazi_ya_kwanza_inayopatikana(self) -> str:
+        for item in self.mzazi_slots():
+            if item["namba"]:
+                return item["namba"]
+        return ""
+
+    def ana_namba_ya_mzazi(self) -> bool:
+        return bool(self.namba_ya_mzazi_ya_kwanza_inayopatikana())
 
     @classmethod
     def _next_namba_ya_usajili(cls):
@@ -504,13 +571,78 @@ class Matokeo(models.Model):
 # ==========================================
 
 class AinaMalipo(models.Model):
-    jina = models.CharField(max_length=100, help_text="Mfano: Ada ya Mwezi Aprili, Mchango wa Mtihani")
-    kiasi_kinachotakiwa = models.DecimalField(max_digits=10, decimal_places=2, help_text="Kiasi kamili kinachopaswa kulipwa")
+    """Aina ya ada — funga na mwaka (na mwezi hiari) ili Aprili 2025 ≠ Aprili 2026."""
+
+    MWEZI_CHOICES = (
+        (1, "Januari"),
+        (2, "Februari"),
+        (3, "Machi"),
+        (4, "Aprili"),
+        (5, "Mei"),
+        (6, "Juni"),
+        (7, "Julai"),
+        (8, "Agosti"),
+        (9, "Septemba"),
+        (10, "Oktoba"),
+        (11, "Novemba"),
+        (12, "Desemba"),
+    )
+
+    jina = models.CharField(
+        max_length=100,
+        help_text="Mfano: Ada ya mwezi, Mchango wa mtihani",
+    )
+    mwaka = models.ForeignKey(
+        "MwakaWaMasomo",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="aina_za_malipo",
+        help_text="Mwaka wa masomo unaohusiana na ada hii",
+    )
+    mwezi = models.PositiveSmallIntegerField(
+        choices=MWEZI_CHOICES,
+        null=True,
+        blank=True,
+        help_text="Kwa ada ya mwezi — chagua mwezi (pamoja na mwaka)",
+    )
+    kiasi_kinachotakiwa = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="Kiasi kamili kinachopaswa kulipwa",
+    )
     maelezo = models.TextField(blank=True, null=True)
     tarehe_ya_kuanzishwa = models.DateField(auto_now_add=True)
 
+    class Meta:
+        ordering = ["-mwaka__mwaka_kuanzia", "mwezi", "jina"]
+        verbose_name_plural = "Aina za malipo"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["mwaka", "mwezi"],
+                condition=models.Q(mwaka__isnull=False, mwezi__isnull=False),
+                name="unique_ada_mwezi_per_mwaka",
+            ),
+            models.UniqueConstraint(
+                fields=["mwaka", "jina"],
+                condition=models.Q(mwaka__isnull=False),
+                name="unique_ada_jina_per_mwaka",
+            ),
+        ]
+
+    @property
+    def lebo_kamili(self):
+        """Jina linaloonyesha mwaka/mwezi — kuepuka kuchanganya Aprili za miaka tofauti."""
+        bits = [self.jina or "Ada"]
+        month = self.get_mwezi_display() if self.mwezi else ""
+        if month and month not in bits[0]:
+            bits.append(month)
+        if self.mwaka_id:
+            bits.append(self.mwaka.jina)
+        return " · ".join(bits)
+
     def __str__(self):
-        return f"{self.jina} - {self.kiasi_kinachotakiwa}/="
+        return f"{self.lebo_kamili} - {self.kiasi_kinachotakiwa}/="
 
 class Malipo(models.Model):
     mwanafunzi = models.ForeignKey(Mwanafunzi, on_delete=models.CASCADE, related_name='malipo_yote')
@@ -545,10 +677,12 @@ class RekodiUkaguzi(models.Model):
     KITENDO_MAHUDHURIO_KAWAIDA = "mahudhurio_kawaida"
     KITENDO_MAHUDHURIO_HIFDHU = "mahudhurio_hifdhu"
     KITENDO_MALIPO = "malipo"
+    KITENDO_HAMISHA_DARASA = "hamisha_darasa"
     KITENDO_CHOICES = (
         (KITENDO_MAHUDHURIO_KAWAIDA, "Mahudhurio (kawaida)"),
         (KITENDO_MAHUDHURIO_HIFDHU, "Mahudhurio (hifdhu)"),
         (KITENDO_MALIPO, "Malipo"),
+        (KITENDO_HAMISHA_DARASA, "Hamisha darasa"),
     )
 
     mtumiaji = models.ForeignKey(

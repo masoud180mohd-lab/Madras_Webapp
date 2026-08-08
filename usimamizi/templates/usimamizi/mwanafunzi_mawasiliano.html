@@ -39,16 +39,19 @@
                 {% endfor %}
                 <button type="submit" class="app-btn app-btn-secondary">Hifadhi mawasiliano</button>
             </form>
-            {% if mwanafunzi.namba_ya_simu_mzazi %}
+            {% for z in wazazi_actions %}
             <p class="mawasiliano-tel">
-                <a class="app-btn app-btn-primary" href="tel:{{ mwanafunzi.namba_ya_simu_mzazi }}">Piga {{ mwanafunzi.namba_ya_simu_mzazi }}</a>
-                {% if ina_whatsapp and whatsapp_fungua_url %}
-                <a class="app-btn app-btn-secondary" href="{{ whatsapp_fungua_url }}" target="_blank" rel="noopener noreferrer" title="Haitumwi kiotomatiki — bonyeza Send kwenye WhatsApp">WhatsApp</a>
+                <span class="mawasiliano-meta">{{ z.uhusiano_display|default:z.lebo }}{% if z.jina %}: {{ z.jina }}{% endif %}</span><br>
+                <a class="app-btn app-btn-primary" href="tel:{{ z.namba }}">Piga {{ z.namba }}</a>
+                {% if z.ina_whatsapp and z.whatsapp_fungua_url %}
+                <a class="app-btn app-btn-secondary" href="{{ z.whatsapp_fungua_url }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>
                 {% else %}
                 <span class="mawasiliano-missing">WhatsApp: namba si sahihi</span>
                 {% endif %}
             </p>
-            {% endif %}
+            {% empty %}
+            <p class="mawasiliano-missing" style="margin-top:12px;">Hakuna namba bado — jaza mzazi wa kwanza au wa pili.</p>
+            {% endfor %}
         </section>
 
         <section class="app-card">

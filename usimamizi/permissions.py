@@ -34,8 +34,10 @@ CAP_MATERIALS = "materials"
 CAP_MSETO = "mseto"
 CAP_VIEW_DIRECTORY = "view_directory"  # madarasa / masomo / walimu lists
 CAP_PARENT_CONTACT = "parent_contact"  # mawasiliano + call log (ofisi)
+CAP_PROMOTE_CLASS = "promote_class"  # mwisho wa mwaka: hamisha darasa (Mkuu tu)
 
 # Explicit Django model perms that grant a capability (office staff path).
+# Note: CAP_PROMOTE_CLASS has no office perm mapping — Mkuu / superuser only.
 PERM_CAPABILITIES = {
     CAP_VIEW_STUDENTS: (
         "usimamizi.view_mwanafunzi",
@@ -96,6 +98,7 @@ ROLE_CAPABILITIES = {
             CAP_MSETO,
             CAP_VIEW_DIRECTORY,
             CAP_PARENT_CONTACT,
+            CAP_PROMOTE_CLASS,
         }
     ),
     CHEO_KAWAIDA: frozenset(

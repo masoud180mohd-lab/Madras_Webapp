@@ -81,22 +81,52 @@ def message_for_mwanafunzi(mwanafunzi, template_key: str = "", custom_text: str 
     return text.replace("{jina}", jina).replace("{mr}", mr)
 
 
-def recipient_whatsapp_row(mwanafunzi, text: str) -> dict:
-    """Attach normalized phone + wa.me URL (or invalid flag) for list rendering."""
-    e164 = normalize_phone_tz(mwanafunzi.namba_ya_simu_mzazi)
+def parse_mzazi_slot(raw) -> int:
+    """Accept 1 or 2; default 1."""
+    try:
+        slot = int(raw)
+    except (TypeError, ValueError):
+        return 1
+    return 2 if slot == 2 else 1
+
+
+def recipient_whatsapp_row(mwanafunzi, text: str, slot: int = 1) -> dict:
+    """Attach normalized phone + wa.me URL for one parent slot."""
+    slot = parse_mzazi_slot(slot)
+    slots = {s["slot"]: s for s in mwanafunzi.mzazi_slots()}
+    info = slots[slot]
+    e164 = normalize_phone_tz(info["namba"] or None)
+    lebo = info["uhusiano_display"] or info["lebo"]
+    jina_mzazi = info["jina"] or "—"
     if not e164:
         return {
             "mwanafunzi": mwanafunzi,
+            "slot": slot,
             "e164": None,
             "wa_url": None,
-            "namba_onyesho": (mwanafunzi.namba_ya_simu_mzazi or "").strip() or None,
+            "namba_onyesho": info["namba"] or None,
+            "jina_mzazi": jina_mzazi,
+            "uhusiano_display": lebo,
             "ina_namba_sahihi": False,
         }
     personalized = message_for_mwanafunzi(mwanafunzi, custom_text=text)
     return {
         "mwanafunzi": mwanafunzi,
+        "slot": slot,
         "e164": e164,
         "wa_url": build_wa_me_url(e164, personalized),
-        "namba_onyesho": mwanafunzi.namba_ya_simu_mzazi,
+        "namba_onyesho": info["namba"],
+        "jina_mzazi": jina_mzazi,
+        "uhusiano_display": lebo,
         "ina_namba_sahihi": True,
     }
+
+
+def recipient_whatsapp_rows(mwanafunzi, text: str) -> list[dict]:
+    """One campaign row per parent phone that is filled (valid or invalid)."""
+    rows = []
+    for info in mwanafunzi.mzazi_slots():
+        if not info["namba"]:
+            continue
+        rows.append(recipient_whatsapp_row(mwanafunzi, text, slot=info["slot"]))
+    return rows

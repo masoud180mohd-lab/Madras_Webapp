@@ -85,9 +85,10 @@
                 Mawasiliano ya Mlezi
             </h3>
             <ul class="info-list">
-                <li><span class="info-label">Mzazi / Mlezi:</span> <span class="info-value">{{ mwanafunzi.jina_la_mzazi|default:"-" }}</span></li>
-                <li><span class="info-label">Uhusiano:</span> <span class="info-value">{{ mwanafunzi.get_uhusiano_wa_mlezi_display|default:"-" }}</span></li>
-                <li><span class="info-label">Namba ya Simu:</span> <span class="info-value mwanafunzi_profile-inline-4">{{ mwanafunzi.namba_ya_simu_mzazi|default:"-" }}</span></li>
+                <li><span class="info-label">Mzazi wa kwanza:</span> <span class="info-value">{{ mwanafunzi.jina_la_mzazi|default:"-" }}{% if mwanafunzi.uhusiano_wa_mlezi %} ({{ mwanafunzi.get_uhusiano_wa_mlezi_display }}){% endif %}</span></li>
+                <li><span class="info-label">Simu (kwanza):</span> <span class="info-value mwanafunzi_profile-inline-4">{{ mwanafunzi.namba_ya_simu_mzazi|default:"-" }}</span></li>
+                <li><span class="info-label">Mzazi wa pili:</span> <span class="info-value">{{ mwanafunzi.jina_la_mzazi_pili|default:"-" }}{% if mwanafunzi.uhusiano_wa_mlezi_pili %} ({{ mwanafunzi.get_uhusiano_wa_mlezi_pili_display }}){% endif %}</span></li>
+                <li><span class="info-label">Simu (pili):</span> <span class="info-value mwanafunzi_profile-inline-4">{{ mwanafunzi.namba_ya_simu_mzazi_pili|default:"-" }}</span></li>
                 <li><span class="info-label">Mahali Anapoishi:</span> <span class="info-value">{{ mwanafunzi.mahala_anapoishi|default:"-" }}</span></li>
             </ul>
             {% if anaweza_fuata_wazazi %}
@@ -159,7 +160,7 @@
                         {% for m in malipo_yote %}
                         <tr>
                             <td class="mwanafunzi_profile-inline-9">{{ m.tarehe_ya_malipo|date:"d M Y" }}</td>
-                            <td><b class="mwanafunzi_profile-inline-10">{{ m.aina_ya_malipo.jina }}</b></td>
+                            <td><b class="mwanafunzi_profile-inline-10">{{ m.aina_ya_malipo.lebo_kamili }}</b></td>
                             <td class="money-text mwanafunzi_profile-inline-7">{{ m.kiasi_kilicholipwa }}/=</td>
                             <td class="mwanafunzi_profile-inline-8"><span class="app-badge app-badge-neutral method-badge">{{ m.njia_ya_malipo }}</span></td>
                             <td>

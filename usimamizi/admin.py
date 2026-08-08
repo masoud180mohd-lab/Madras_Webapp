@@ -37,9 +37,18 @@ class MwanafunziAdmin(NoDeleteAdmin):
         "jina_la_mzazi",
         "uhusiano_wa_mlezi",
         "namba_ya_simu_mzazi",
+        "jina_la_mzazi_pili",
+        "namba_ya_simu_mzazi_pili",
         "tarehe_ya_kujiunga",
     )
-    search_fields = ("jina_kamili", "namba_ya_usajili", "jina_la_mzazi", "namba_ya_simu_mzazi")
+    search_fields = (
+        "jina_kamili",
+        "namba_ya_usajili",
+        "jina_la_mzazi",
+        "namba_ya_simu_mzazi",
+        "jina_la_mzazi_pili",
+        "namba_ya_simu_mzazi_pili",
+    )
     list_filter = ("amehifadhiwa", "mahala_anapoishi", "darasa")
 
     def get_readonly_fields(self, request, obj=None):
@@ -135,7 +144,15 @@ class MsetoMtihaniAdmin(NoDeleteAdmin):
 
 @admin.register(AinaMalipo)
 class AinaMalipoAdmin(NoDeleteAdmin):
-    list_display = ("jina", "kiasi_kinachotakiwa", "tarehe_ya_kuanzishwa")
+    list_display = (
+        "jina",
+        "mwaka",
+        "mwezi",
+        "kiasi_kinachotakiwa",
+        "tarehe_ya_kuanzishwa",
+    )
+    list_filter = ("mwaka", "mwezi")
+    search_fields = ("jina", "mwaka__jina")
 
 
 @admin.register(Malipo)

@@ -142,9 +142,8 @@ server {
         alias /srv/madrasa/Madras_Webapp/staticfiles/;
     }
 
-    location /media/ {
-        alias /srv/madrasa/Madras_Webapp/media/;
-    }
+    # Do NOT alias /media/ publicly — Django serves it behind login
+    # (usimamizi.views.media_protected.protected_media).
 
     location / {
         proxy_set_header Host $host;
@@ -161,7 +160,7 @@ sudo ln -sf /etc/nginx/sites-available/madrasa /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-WhiteNoise is enabled in production settings as a fallback for static files; prefer Nginx `alias` for `/static/` and `/media/`.
+WhiteNoise is enabled in production settings as a fallback for static files; prefer Nginx `alias` for `/static/` only. `/media/` must go through Gunicorn (login-gated).
 
 ## 8. TLS (Certbot)
 

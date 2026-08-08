@@ -38,10 +38,10 @@
 
             <select name="aina" class="app-select custom-select malipo-inline-10">
                 {% for a in aina_za_malipo %}
-                    <option value="{{ a.id }}" {% if aina_teule.id == a.id %}selected{% endif %}>{{ a.jina }}</option>
+                    <option value="{{ a.id }}" {% if aina_teule.id == a.id %}selected{% endif %}>{{ a.lebo_kamili }}</option>
                 {% endfor %}
             </select>
-
+            <input type="hidden" name="mwaka" value="{{ mwaka_filter }}">
             <input type="hidden" name="hali" value="wote">
 
             <button type="submit" class="app-btn app-btn-primary btn-action-main">
@@ -52,10 +52,23 @@
     </div>
 
     <form method="GET" class="app-card app-toolbar filter-section">
+        <span class="malipo-inline-11">Mwaka:</span>
+        <select name="mwaka" class="app-select custom-select malipo-inline-12" onchange="this.form.submit()">
+            {% if mwaka_hai %}
+            <option value="{{ mwaka_hai.id }}" {% if mwaka_filter == mwaka_hai.id|stringformat:"s" %}selected{% endif %}>{{ mwaka_hai.jina }} (hai)</option>
+            {% endif %}
+            {% for y in miaka %}
+                {% if not mwaka_hai or y.id != mwaka_hai.id %}
+                <option value="{{ y.id }}" {% if mwaka_filter == y.id|stringformat:"s" %}selected{% endif %}>{{ y.jina }}</option>
+                {% endif %}
+            {% endfor %}
+            <option value="bila" {% if mwaka_filter == 'bila' %}selected{% endif %}>Bila mwaka (zamani)</option>
+            <option value="yote" {% if mwaka_filter == 'yote' %}selected{% endif %}>Miaka yote</option>
+        </select>
         <span class="malipo-inline-11">Aina ya Malipo:</span>
         <select name="aina" class="app-select custom-select malipo-inline-12" onchange="this.form.submit()">
             {% for a in aina_za_malipo %}
-                <option value="{{ a.id }}" {% if aina_teule.id == a.id %}selected{% endif %}>{{ a.jina }}</option>
+                <option value="{{ a.id }}" {% if aina_teule.id == a.id %}selected{% endif %}>{{ a.lebo_kamili }}</option>
             {% endfor %}
         </select>
         <select name="darasa" class="app-select custom-select malipo-inline-12" onchange="this.form.submit()">
@@ -103,15 +116,15 @@
         <h3 class="malipo-inline-18">Chagua kundi ili kuona orodha ya wanafunzi:</h3>
 
         <div class="malipo-inline-19">
-            <a href="?aina={{ aina_teule.id }}&hali=wote{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="app-btn app-btn-outline app-btn-sm filter-tab {% if hali_teule == 'wote' %}filter-tab-active-primary{% endif %}">
+            <a href="?mwaka={{ mwaka_filter }}&aina={{ aina_teule.id }}&hali=wote{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="app-btn app-btn-outline app-btn-sm filter-tab {% if hali_teule == 'wote' %}filter-tab-active-primary{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 Orodha Yote
             </a>
-            <a href="?aina={{ aina_teule.id }}&hali=wanaodaiwa{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="app-btn app-btn-outline app-btn-sm filter-tab {% if hali_teule == 'wanaodaiwa' %}filter-tab-active-danger{% endif %}">
+            <a href="?mwaka={{ mwaka_filter }}&aina={{ aina_teule.id }}&hali=wanaodaiwa{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="app-btn app-btn-outline app-btn-sm filter-tab {% if hali_teule == 'wanaodaiwa' %}filter-tab-active-danger{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 Wanaodaiwa
             </a>
-            <a href="?aina={{ aina_teule.id }}&hali=waliokamilisha{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="app-btn app-btn-outline app-btn-sm filter-tab {% if hali_teule == 'waliokamilisha' %}filter-tab-active-primary{% endif %}">
+            <a href="?mwaka={{ mwaka_filter }}&aina={{ aina_teule.id }}&hali=waliokamilisha{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="app-btn app-btn-outline app-btn-sm filter-tab {% if hali_teule == 'waliokamilisha' %}filter-tab-active-primary{% endif %}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 Waliokamilisha
             </a>

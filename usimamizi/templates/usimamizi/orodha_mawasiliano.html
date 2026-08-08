@@ -55,14 +55,25 @@
                                 <div class="mawasiliano-meta">{{ m.namba_ya_usajili }} · {{ m.darasa.jina|default:"Bila darasa" }}</div>
                             </td>
                             <td>
-                                {{ m.jina_la_mzazi|default:"—" }}
-                                {% if m.uhusiano_wa_mlezi %}
-                                <div class="mawasiliano-meta">{{ m.get_uhusiano_wa_mlezi_display }}</div>
-                                {% endif %}
+                                {% for z in m.mzazi_slots %}
+                                    {% if z.jina or z.namba %}
+                                    <div class="mawasiliano-meta"{% if not forloop.first %} style="margin-top:4px;"{% endif %}>
+                                        {{ z.jina|default:"—" }}{% if z.uhusiano_display %} · {{ z.uhusiano_display }}{% endif %}
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if not m.jina_la_mzazi and not m.jina_la_mzazi_pili and not m.namba_ya_simu_mzazi and not m.namba_ya_simu_mzazi_pili %}—{% endif %}
                             </td>
                             <td>
-                                {% if m.namba_ya_simu_mzazi %}
-                                    <a href="tel:{{ m.namba_ya_simu_mzazi }}">{{ m.namba_ya_simu_mzazi }}</a>
+                                {% if m.namba_ya_simu_mzazi or m.namba_ya_simu_mzazi_pili %}
+                                    {% for z in m.mzazi_slots %}
+                                        {% if z.namba %}
+                                        <div{% if not forloop.first %} style="margin-top:4px;"{% endif %}>
+                                            <a href="tel:{{ z.namba }}">{{ z.namba }}</a>
+                                            {% if z.uhusiano_display %}<span class="mawasiliano-meta"> ({{ z.uhusiano_display }})</span>{% endif %}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 {% else %}
                                     <span class="mawasiliano-missing">Hakuna namba</span>
                                 {% endif %}

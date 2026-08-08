@@ -2,10 +2,10 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_aina_malipo.css' %}?v=20260809crud">
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/orodha_aina_malipo.css' %}?v=20260809period">
 {% endblock %}
 
-{% block page_eyebrow %}Ada{% endblock %}
+{% block page_eyebrow %}Mapato · Ada{% endblock %}
 {% block title %}Aina za ada · Madrasatul Rasulillah{% endblock %}
 
 {% block maudhui %}
@@ -13,19 +13,36 @@
     <header class="aina-hero">
         <div>
             <h1 class="aina-title">Aina za ada</h1>
-            <p class="aina-lead">Simamia aina za malipo zinazotumika kwenye ukurasa wa Malipo.</p>
+            <p class="aina-lead">Kila ada inahusishwa na mwaka (na mwezi hiari) — Aprili ya miaka tofauti haitachanganyika.</p>
         </div>
         <a href="{% url 'ongeza_aina_malipo' %}" class="app-btn app-btn-primary">Ongeza aina</a>
     </header>
+
+    <form method="get" class="app-card app-toolbar" style="margin-bottom:16px; gap:12px; flex-wrap:wrap;">
+        <label for="mwakaFilter">Mwaka</label>
+        <select name="mwaka" id="mwakaFilter" class="app-select" style="max-width:240px;" onchange="this.form.submit()">
+            {% if mwaka_hai %}
+            <option value="{{ mwaka_hai.id }}" {% if mwaka_filter == mwaka_hai.id|stringformat:"s" %}selected{% endif %}>{{ mwaka_hai.jina }} (hai)</option>
+            {% endif %}
+            {% for y in miaka %}
+                {% if not mwaka_hai or y.id != mwaka_hai.id %}
+                <option value="{{ y.id }}" {% if mwaka_filter == y.id|stringformat:"s" %}selected{% endif %}>{{ y.jina }}</option>
+                {% endif %}
+            {% endfor %}
+            <option value="bila" {% if mwaka_filter == 'bila' %}selected{% endif %}>Bila mwaka (zamani)</option>
+            <option value="yote" {% if mwaka_filter == 'yote' %}selected{% endif %}>Miaka yote</option>
+        </select>
+    </form>
 
     <div class="app-card">
         <div class="app-table-wrap">
             <table class="app-table">
                 <thead>
                     <tr>
-                        <th>Jina</th>
+                        <th>Aina</th>
+                        <th>Mwaka</th>
+                        <th>Mwezi</th>
                         <th>Kiasi</th>
-                        <th>Tarehe</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -33,11 +50,12 @@
                     {% for aina in aina_za_malipo %}
                     <tr>
                         <td>
-                            <strong>{{ aina.jina }}</strong>
+                            <strong>{{ aina.lebo_kamili }}</strong>
                             {% if aina.maelezo %}<div class="aina-meta">{{ aina.maelezo|truncatechars:80 }}</div>{% endif %}
                         </td>
+                        <td>{% if aina.mwaka %}{{ aina.mwaka.jina }}{% else %}<span class="aina-meta">—</span>{% endif %}</td>
+                        <td>{% if aina.mwezi %}{{ aina.get_mwezi_display }}{% else %}—{% endif %}</td>
                         <td>{{ aina.kiasi_kinachotakiwa }}/=</td>
-                        <td>{{ aina.tarehe_ya_kuanzishwa|date:"d M Y" }}</td>
                         <td class="aina-actions">
                             <a href="{% url 'hariri_aina_malipo' aina.id %}" class="app-btn app-btn-outline app-btn-sm">Hariri</a>
                             <form method="post" action="{% url 'futa_aina_malipo' aina.id %}" onsubmit="return confirm('Futa aina hii ya ada?');">
@@ -48,10 +66,10 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4">
+                        <td colspan="5">
                             <div class="app-empty-state">
                                 <p class="app-empty-state-title">Hakuna aina za ada</p>
-                                <p class="app-empty-state-copy">Anza kwa kuongeza aina ya kwanza.</p>
+                                <p class="app-empty-state-copy">Ongeza aina na uchague mwaka wa masomo.</p>
                             </div>
                         </td>
                     </tr>

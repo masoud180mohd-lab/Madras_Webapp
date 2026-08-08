@@ -89,6 +89,26 @@ class DashboardHomeTests(TestCase):
         ctx = build_dashboard_context(self.mkuu)
         labels = [m["label"] for m in ctx["vipimo"]]
         self.assertIn("Malipo leo", labels)
+        self.assertIn("Wanaodaiwa", labels)
+        self.assertIsNotNone(ctx["ufuatiliaji_deni"])
+        self.assertEqual(ctx["ufuatiliaji_deni"]["idadi"], 1)
+        self.assertEqual(ctx["ufuatiliaji_deni"]["jumla"], Decimal("4000"))
+
+    def test_attendance_followup_lists_absent_today(self):
+        Hudhurio.objects.create(
+            mwanafunzi=self.student,
+            tarehe=date(2026, 8, 8),
+            aina_ya_rekodi="Kawaida",
+            yupo=False,
+        )
+        ctx = build_dashboard_context(self.kawaida, leo=date(2026, 8, 8))
+        follow = ctx["ufuatiliaji_mahudhurio"]
+        self.assertIsNotNone(follow)
+        self.assertEqual(follow["hayupo_leo"], 1)
+        self.assertEqual(len(follow["orodha"]), 1)
+        self.assertEqual(follow["orodha"][0]["mwanafunzi"].id, self.student.id)
+        labels = [m["label"] for m in ctx["vipimo"]]
+        self.assertIn("Watoro wiki", labels)
 
     def test_manage_students_action_only_for_mkuu(self):
         mkuu_ctx = build_dashboard_context(self.mkuu)

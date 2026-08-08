@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from usimamizi.models import AinaMalipo, Darasa, Malipo, Mwalimu, Mwanafunzi
+from usimamizi.models import AinaMalipo, Darasa, Malipo, Mwalimu, MwakaWaMasomo, Mwanafunzi
 from usimamizi.tests.helpers import HOSTS, create_user_with_cheo
 
 User = get_user_model()
@@ -16,8 +16,16 @@ class ManageCrudTests(TestCase):
         self.mkuu = create_user_with_cheo("mkuu_crud", "Mwalimu Mkuu")
         self.kawaida = create_user_with_cheo("kawaida_crud", "Mwalimu wa Kawaida")
         self.darasa = Darasa.objects.create(jina="Darasa CRUD")
+        self.mwaka = MwakaWaMasomo.objects.create(
+            jina="2025/2026",
+            mwaka_kuanzia=2025,
+            mwaka_kuisha=2026,
+            ni_hai=True,
+        )
         self.aina = AinaMalipo.objects.create(
             jina="Ada ya Mwezi",
+            mwaka=self.mwaka,
+            mwezi=4,
             kiasi_kinachotakiwa=Decimal("10000.00"),
         )
 
@@ -118,6 +126,8 @@ class ManageCrudTests(TestCase):
         response = self.client.post(
             reverse("ongeza_aina_malipo"),
             {
+                "mwaka": self.mwaka.id,
+                "mwezi": "",
                 "jina": "Mchango Mtihani",
                 "kiasi_kinachotakiwa": "5000.00",
                 "maelezo": "",
@@ -125,6 +135,7 @@ class ManageCrudTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         aina = AinaMalipo.objects.get(jina="Mchango Mtihani")
+        self.assertEqual(aina.mwaka_id, self.mwaka.id)
 
         mwanafunzi = Mwanafunzi.objects.create(
             jina_kamili="Mlipaji",
@@ -144,10 +155,43 @@ class ManageCrudTests(TestCase):
         self.assertTrue(AinaMalipo.objects.filter(id=aina.id).exists())
 
         unused = AinaMalipo.objects.create(
-            jina="Isiyotumika", kiasi_kinachotakiwa=Decimal("1000")
+            jina="Isiyotumika",
+            mwaka=self.mwaka,
+            kiasi_kinachotakiwa=Decimal("1000"),
         )
         response = self.client.post(
             reverse("futa_aina_malipo", kwargs={"aina_id": unused.id})
         )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(AinaMalipo.objects.filter(id=unused.id).exists())
+
+    def test_april_fee_types_distinct_by_year(self):
+        other = MwakaWaMasomo.objects.create(
+            jina="2026/2027",
+            mwaka_kuanzia=2026,
+            mwaka_kuisha=2027,
+            ni_hai=False,
+        )
+        a2 = AinaMalipo.objects.create(
+            jina="Ada · Aprili",
+            mwaka=other,
+            mwezi=4,
+            kiasi_kinachotakiwa=Decimal("12000"),
+        )
+        self.assertIn("2025/2026", self.aina.lebo_kamili)
+        self.assertIn("2026/2027", a2.lebo_kamili)
+        self.assertNotEqual(self.aina.lebo_kamili, a2.lebo_kamili)
+
+        self.client.login(username="mkuu_crud", password="pass12345")
+        dup = self.client.post(
+            reverse("ongeza_aina_malipo"),
+            {
+                "mwaka": self.mwaka.id,
+                "mwezi": "4",
+                "jina": "",
+                "kiasi_kinachotakiwa": "10000",
+                "maelezo": "",
+            },
+        )
+        self.assertEqual(dup.status_code, 200)
+        self.assertContains(dup, "tayari ipo")

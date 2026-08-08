@@ -43,7 +43,9 @@ class MwanafunziForm(forms.ModelForm):
         fields = [
             'jina_kamili', 'tarehe_ya_kuzaliwa', 'jinsia', 'darasa',
             'programu_ya_usiku', 'juzuu_aliyohifadhi', 'mahala_anapoishi',
-            'jina_la_mzazi', 'uhusiano_wa_mlezi', 'namba_ya_simu_mzazi', 'picha',
+            'jina_la_mzazi', 'uhusiano_wa_mlezi', 'namba_ya_simu_mzazi',
+            'jina_la_mzazi_pili', 'uhusiano_wa_mlezi_pili', 'namba_ya_simu_mzazi_pili',
+            'picha',
         ]
         labels = {
             'jina_kamili': 'Jina Kamili',
@@ -53,9 +55,12 @@ class MwanafunziForm(forms.ModelForm):
             'programu_ya_usiku': 'Programu ya Usiku',
             'juzuu_aliyohifadhi': 'Juzuu Aliyohifadhi',
             'mahala_anapoishi': 'Mahala Anapoishi',
-            'jina_la_mzazi': 'Jina la Mzazi / Mlezi',
-            'uhusiano_wa_mlezi': 'Uhusiano',
-            'namba_ya_simu_mzazi': 'Namba ya Simu ya Mzazi',
+            'jina_la_mzazi': 'Jina (mzazi wa kwanza)',
+            'uhusiano_wa_mlezi': 'Uhusiano (mf. Baba)',
+            'namba_ya_simu_mzazi': 'Namba (mzazi wa kwanza)',
+            'jina_la_mzazi_pili': 'Jina (mzazi wa pili)',
+            'uhusiano_wa_mlezi_pili': 'Uhusiano (mf. Mama)',
+            'namba_ya_simu_mzazi_pili': 'Namba (mzazi wa pili)',
             'picha': 'Picha ya Mwanafunzi',
         }
         help_texts = {
@@ -234,20 +239,35 @@ class MtihaniForm(forms.ModelForm):
 
 
 class MawasilianoContactForm(forms.ModelForm):
-    """Hariri haraka mawasiliano ya mzazi (ofisi)."""
+    """Hariri haraka mawasiliano ya wazazi (ofisi) — kwanza + pili."""
 
     class Meta:
         model = Mwanafunzi
-        fields = ["jina_la_mzazi", "uhusiano_wa_mlezi", "namba_ya_simu_mzazi"]
+        fields = [
+            "jina_la_mzazi",
+            "uhusiano_wa_mlezi",
+            "namba_ya_simu_mzazi",
+            "jina_la_mzazi_pili",
+            "uhusiano_wa_mlezi_pili",
+            "namba_ya_simu_mzazi_pili",
+        ]
         labels = {
-            "jina_la_mzazi": "Jina la mzazi / mlezi",
-            "uhusiano_wa_mlezi": "Uhusiano",
-            "namba_ya_simu_mzazi": "Namba ya simu",
+            "jina_la_mzazi": "Jina (mzazi wa kwanza)",
+            "uhusiano_wa_mlezi": "Uhusiano (mf. Baba)",
+            "namba_ya_simu_mzazi": "Namba (mzazi wa kwanza)",
+            "jina_la_mzazi_pili": "Jina (mzazi wa pili)",
+            "uhusiano_wa_mlezi_pili": "Uhusiano (mf. Mama)",
+            "namba_ya_simu_mzazi_pili": "Namba (mzazi wa pili)",
         }
         widgets = {
             "jina_la_mzazi": forms.TextInput(attrs={"class": "app-input"}),
             "uhusiano_wa_mlezi": forms.Select(attrs={"class": "app-input"}),
             "namba_ya_simu_mzazi": forms.TextInput(
+                attrs={"class": "app-input", "inputmode": "tel"}
+            ),
+            "jina_la_mzazi_pili": forms.TextInput(attrs={"class": "app-input"}),
+            "uhusiano_wa_mlezi_pili": forms.Select(attrs={"class": "app-input"}),
+            "namba_ya_simu_mzazi_pili": forms.TextInput(
                 attrs={"class": "app-input", "inputmode": "tel"}
             ),
         }
@@ -289,7 +309,7 @@ class RekodiSimuMzaziForm(forms.ModelForm):
         if not self.is_bound:
             if mwanafunzi:
                 self.fields["namba_iliyopigwa"].initial = (
-                    mwanafunzi.namba_ya_simu_mzazi or ""
+                    mwanafunzi.namba_ya_mzazi_ya_kwanza_inayopatikana()
                 )
             if not getattr(self.instance, "pk", None):
                 self.fields["tarehe_ya_simu"].initial = dj_tz.localtime(
@@ -310,14 +330,86 @@ class DarasaForm(forms.ModelForm):
 class AinaMalipoForm(forms.ModelForm):
     class Meta:
         model = AinaMalipo
-        fields = ["jina", "kiasi_kinachotakiwa", "maelezo"]
+        fields = ["mwaka", "mwezi", "jina", "kiasi_kinachotakiwa", "maelezo"]
+        labels = {
+            "mwaka": "Mwaka wa masomo",
+            "mwezi": "Mwezi (hiari — ada ya mwezi)",
+            "jina": "Jina la aina",
+            "kiasi_kinachotakiwa": "Kiasi kinachotakiwa",
+            "maelezo": "Maelezo",
+        }
+        help_texts = {
+            "mwaka": "Lazima kwa ada mpya — hutenganisha Aprili ya miaka tofauti.",
+            "mwezi": "Chagua mwezi kwa ada ya mwezi; jina linaweza kujazwa otomatiki.",
+            "jina": "Mfano: Ada ya mwezi, Mchango wa mtihani",
+        }
         widgets = {
+            "mwaka": forms.Select(attrs={"class": "app-input"}),
+            "mwezi": forms.Select(attrs={"class": "app-input"}),
             "jina": forms.TextInput(attrs={"class": "app-input"}),
             "kiasi_kinachotakiwa": forms.NumberInput(
                 attrs={"class": "app-input", "step": "0.01", "min": "0"}
             ),
             "maelezo": forms.Textarea(attrs={"class": "app-input", "rows": 3}),
         }
+
+    def __init__(self, *args, **kwargs):
+        from .academic import get_active_mwaka
+
+        super().__init__(*args, **kwargs)
+        self.fields["mwaka"].queryset = MwakaWaMasomo.objects.all().order_by(
+            "-mwaka_kuanzia", "-id"
+        )
+        self.fields["mwaka"].empty_label = "-- Chagua mwaka --"
+        self.fields["mwezi"].required = False
+        self.fields["jina"].required = False
+        if not self.is_bound and not getattr(self.instance, "pk", None):
+            active = get_active_mwaka()
+            if active:
+                self.initial.setdefault("mwaka", active.pk)
+
+    def clean(self):
+        cleaned = super().clean()
+        mwaka = cleaned.get("mwaka")
+        mwezi = cleaned.get("mwezi")
+        jina = (cleaned.get("jina") or "").strip()
+
+        if mwezi and not mwaka:
+            self.add_error(
+                "mwaka",
+                "Chagua mwaka wa masomo unapoweka ada ya mwezi.",
+            )
+
+        if not jina and mwezi:
+            jina = f"Ada · {dict(AinaMalipo.MWEZI_CHOICES).get(mwezi, mwezi)}"
+            cleaned["jina"] = jina
+        elif not jina:
+            self.add_error("jina", "Weka jina la aina ya ada.")
+        else:
+            cleaned["jina"] = jina
+
+        if mwaka and mwezi:
+            qs = AinaMalipo.objects.filter(mwaka=mwaka, mwezi=mwezi)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                self.add_error(
+                    "mwezi",
+                    f"Ada ya {dict(AinaMalipo.MWEZI_CHOICES).get(mwezi)} "
+                    f"kwa {mwaka.jina} tayari ipo.",
+                )
+
+        if mwaka and cleaned.get("jina"):
+            qs = AinaMalipo.objects.filter(mwaka=mwaka, jina=cleaned["jina"])
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                self.add_error(
+                    "jina",
+                    f'Aina "{cleaned["jina"]}" tayari ipo kwa {mwaka.jina}.',
+                )
+
+        return cleaned
 
 
 class MwalimuCreateForm(forms.Form):

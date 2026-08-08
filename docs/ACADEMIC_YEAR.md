@@ -18,3 +18,14 @@ Mfumo sasa una kipindi cha kitaaluma kinachounganisha ripoti za mitihani.
 ## Seed
 
 Migration `0012_academic_year_term` inaunda mwaka wa kalenda ya sasa + Muhula 1 (hai) na Muhula 2 ikiwa hakuna data bado.
+
+## Promotion (hamisha darasa) — M-012
+
+Mwisho wa mwaka: **Hamisha darasa** (`/madrasa/hamisha-darasa/`, Mkuu tu) — menyu: **Mwaka wa masomo → Hamisha darasa**.
+
+1. Chagua darasa la **kutoka**
+2. Chagua darasa la **kwenda** + wanafunzi hai
+3. **Endelea kuthibitisha** → **Thibitisha uhamisho**
+4. `Mwanafunzi.darasa` inasasishwa kwa transaction; ukaguzi `hamisha_darasa` unaandikwa
+
+Wanafunzi waliotunzwa (archive) hawaonyeshwi. Hakuna historia tofauti ya darasa bado — ukaguzi ni audit trail.

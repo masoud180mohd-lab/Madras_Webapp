@@ -35,7 +35,7 @@ from .exams import (
     pakua_pdf_matokeo_jumla,
     pakua_csv_matokeo_jumla,
 )
-from .academic import ukurasa_mwaka_masomo
+from .academic import ukurasa_mwaka_masomo, hamisha_darasa
 from .audit_views import orodha_ukaguzi
 from .manage import (
     ongeza_darasa,
@@ -94,6 +94,7 @@ __all__ = [
     "pakua_pdf_matokeo_jumla",
     "pakua_csv_matokeo_jumla",
     "ukurasa_mwaka_masomo",
+    "hamisha_darasa",
     "orodha_ukaguzi",
     "ongeza_darasa",
     "hariri_darasa",
