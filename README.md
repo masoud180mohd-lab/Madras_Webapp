@@ -89,7 +89,9 @@ Mkuu: `/madrasa/hamisha-darasa/` — uhamisho wa wanafunzi darasa → darasa (mw
 
 ## Token API / DRF
 
-Hakuna domain REST API. `/api-token-auth/` **imezimwa kwa default** — weka `DJANGO_ENABLE_TOKEN_AUTH=True` lab pekee. Sera: [docs/API.md](docs/API.md). Dead-code: [docs/DEAD_CODE.md](docs/DEAD_CODE.md).
+Staff mobile API: `/api/v1/` (JWT). Sera na endpoints: [docs/API.md](docs/API.md).
+
+`/api-token-auth/` **imezimwa kwa default** (legacy) — weka `DJANGO_ENABLE_TOKEN_AUTH=True` lab pekee. Dead-code: [docs/DEAD_CODE.md](docs/DEAD_CODE.md).
 
 ## Majukumu ya kawaida
 
@@ -99,7 +101,7 @@ py manage.py check
 py manage.py test usimamizi
 ```
 
-Critical-path tests (`usimamizi/tests/`): auth, attendance, marks, fees, AuthZ, middleware, integrity, forms, dashboard, academic year/term, API token gate.
+Critical-path tests (`usimamizi/tests/`): auth, attendance, marks, fees, AuthZ, middleware, integrity, forms, dashboard, academic year/term, API token gate, `/api/v1/` JWT.
 
 ## Muundo
 

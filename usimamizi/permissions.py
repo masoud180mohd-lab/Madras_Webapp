@@ -36,6 +36,20 @@ CAP_VIEW_DIRECTORY = "view_directory"  # madarasa / masomo / walimu lists
 CAP_PARENT_CONTACT = "parent_contact"  # mawasiliano + call log (ofisi)
 CAP_PROMOTE_CLASS = "promote_class"  # mwisho wa mwaka: hamisha darasa (Mkuu tu)
 
+ALL_CAPABILITIES = (
+    CAP_VIEW_STUDENTS,
+    CAP_MANAGE_STUDENTS,
+    CAP_ATTENDANCE,
+    CAP_SABAQ,
+    CAP_EXAMS,
+    CAP_FEES,
+    CAP_MATERIALS,
+    CAP_MSETO,
+    CAP_VIEW_DIRECTORY,
+    CAP_PARENT_CONTACT,
+    CAP_PROMOTE_CLASS,
+)
+
 # Explicit Django model perms that grant a capability (office staff path).
 # Note: CAP_PROMOTE_CLASS has no office perm mapping — Mkuu / superuser only.
 PERM_CAPABILITIES = {
@@ -178,6 +192,11 @@ def user_has_capability(user, *capabilities):
     if CAP_PARENT_CONTACT in needed and _has_fees_via_perm(user, cheo):
         return True
     return False
+
+
+def list_user_capabilities(user):
+    """Sorted CAP_* names the user currently holds (for /api/v1/me/)."""
+    return [cap for cap in ALL_CAPABILITIES if user_has_capability(user, cap)]
 
 
 def _has_fees_via_perm(user, cheo):

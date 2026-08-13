@@ -1,29 +1,37 @@
-# API / DRF policy (M-010)
+# API / DRF policy
 
-## Current product surface
-
-Al-Madrasatul Rasulillah MIS is **Django SSR** (HTML templates). There is **no domain REST API** for wanafunzi, mahudhurio, malipo, n.k.
+## Surfaces
 
 | Endpoint | Status |
 |----------|--------|
-| `/` | Health ping (`Muunganisho umefanikiwa!`) — always on |
-| `/madrasa/…` | App (session auth) |
+| `/` | Health ping (`Muunganisho umefanikiwa!`) |
+| `/madrasa/…` | SSR app (session + CSRF) |
 | `/admin/` | Django admin |
-| `/api-token-auth/` | **Opt-in** DRF `obtain_auth_token` only |
+| `/api/v1/` | **Staff mobile API** (JWT) |
+| `/api-token-auth/` | **Opt-in** legacy DRF Authtoken — not a domain API |
 
-## Token auth gate
+## `/api/v1/` (P0)
 
-- Setting: `ENABLE_TOKEN_AUTH` ← env `DJANGO_ENABLE_TOKEN_AUTH` (default **False**)
-- When False: URL is **not registered** (404)
-- When True: POST username/password → token (DRF Authtoken). Anon throttle `30/hour`.
+Auth: `Authorization: Bearer <access>`. Access ~15 min, refresh ~7 days (rotated + blacklisted).
 
-```bash
-# .env (lab only)
-DJANGO_ENABLE_TOKEN_AUTH=True
-```
+| Method | Path | CAP |
+|--------|------|-----|
+| `POST` | `/api/v1/auth/token/` | public (username + password) |
+| `POST` | `/api/v1/auth/refresh/` | refresh token |
+| `GET` | `/api/v1/me/` | authenticated — `cheo` + `capabilities` |
+| `GET` | `/api/v1/madarasa/` | `view_directory` |
+| `GET` | `/api/v1/madarasa/<id>/wanafunzi/` | `view_students` — hai tu; no parent phones |
+| `GET` | `/api/v1/mahudhurio/?darasa=&tarehe=&aina_ya_rekodi=` | `attendance` |
+| `POST` | `/api/v1/mahudhurio/` | `attendance` — batch, full active roster |
 
-**Production:** keep False unless you ship a real mobile/API product with HTTPS, scoped permissions, and rate limits reviewed.
+`POST` mahudhurio must include **every** active student in the class. Duplicate roll for the same `(darasa, tarehe, aina)` → **409** (`already_recorded`). Clients should treat 409 as successful sync, not a retry-with-new-rows error.
 
-## Future API
+Permissions reuse `user_has_capability` / `CAP_*` — same matrix as the web app.
 
-If a mobile app is needed later, add versioned endpoints under `/api/v1/` with explicit serializers/permissions — do not treat token-auth alone as an API.
+Throttle (production): anon `30/hour`, authenticated `300/hour`.
+
+## Legacy token gate
+
+- Setting: `ENABLE_TOKEN_AUTH` ← `DJANGO_ENABLE_TOKEN_AUTH` (default **False**)
+- When False: `/api-token-auth/` is **not registered** (404)
+- Do not use Authtoken as the mobile API. Use `/api/v1/auth/token/`.

@@ -12,6 +12,7 @@ def salamu_ya_api(request):
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/v1/", include("usimamizi.api.v1.urls")),
     path("madrasa/", include("usimamizi.urls")),
     # Media behind login (dev + prod). Do not expose MEDIA_ROOT as public static.
     re_path(r"^media/(?P<path>.*)$", protected_media, name="protected_media"),

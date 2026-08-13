@@ -5,6 +5,7 @@ Shared Django settings for madrasa_sys (dev + production).
 from __future__ import annotations
 
 import os
+from datetime import timedelta
 from pathlib import Path
 from typing import List, Optional
 
@@ -35,6 +36,8 @@ INSTALLED_APPS = [
     "usimamizi",
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 MIDDLEWARE = [
@@ -102,6 +105,7 @@ ENABLE_TOKEN_AUTH = env_bool("DJANGO_ENABLE_TOKEN_AUTH", False)
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
@@ -110,10 +114,20 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "30/hour",
+        "user": "300/hour",
     },
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 SESSION_COOKIE_HTTPONLY = True
