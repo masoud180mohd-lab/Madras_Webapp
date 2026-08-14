@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../core/copy.dart';
-import '../../core/theme.dart';
+import '../../../core/copy.dart';
+import '../../../core/theme.dart';
 import '../view_models/auth_view_model.dart';
 
 class LoginView extends StatefulWidget {

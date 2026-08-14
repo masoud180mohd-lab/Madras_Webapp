@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/copy.dart';
-import '../../core/theme.dart';
-import '../view_models/auth_view_model.dart';
-import '../../classes/view_models/classes_view_model.dart';
+import '../../../core/copy.dart';
+import '../../../core/theme.dart';
+import '../../auth/view_models/auth_view_model.dart';
+import '../view_models/classes_view_model.dart';
 
 class ClassesView extends StatefulWidget {
   const ClassesView({

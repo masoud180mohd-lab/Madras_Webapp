@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../data/models/models.dart';
-import '../../../data/repositories/attendance_repository.dart';
-import '../../../data/services/api_exception.dart';
+import '../../../../data/models/models.dart';
+import '../../../../data/repositories/attendance_repository.dart';
+import '../../../../data/services/api_exception.dart';
 
 class ClassesViewModel extends ChangeNotifier {
   ClassesViewModel({required AttendanceRepository repository})

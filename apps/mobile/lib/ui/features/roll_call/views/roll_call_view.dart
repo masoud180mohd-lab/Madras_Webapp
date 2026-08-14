@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../data/models/models.dart';
-import '../../../data/services/api_client.dart';
-import '../../core/copy.dart';
-import '../../core/theme.dart';
-import '../../core/widgets/authenticated_photo.dart';
+import '../../../../data/models/models.dart';
+import '../../../../data/services/api_client.dart';
+import '../../../core/copy.dart';
+import '../../../core/theme.dart';
+import '../../../core/widgets/authenticated_photo.dart';
 import '../view_models/roll_call_view_model.dart';
 
 class RollCallView extends StatefulWidget {
@@ -145,43 +145,7 @@ class _Banner extends StatelessWidget {
   }
 }
 
-class _ReasonField extends StatefulWidget {
-  const _ReasonField({
-    super.key,
-    required this.initial,
-    required this.enabled,
-    required this.onChanged,
-  });
-
-  final String initial;
-  final bool enabled;
-  final ValueChanged<String> onChanged;
-
-  @override
-  State<_ReasonField> createState() => _ReasonFieldState();
-}
-
-class _ReasonFieldState extends State<_ReasonField> {
-  late final TextEditingController _controller = TextEditingController(
-    text: widget.initial,
-  );
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: _controller,
-      enabled: widget.enabled,
-      decoration: const InputDecoration(labelText: MadrasaCopy.reason),
-      onChanged: widget.onChanged,
-    );
-  }
-}
+class _RollTile extends StatelessWidget {
   const _RollTile({
     required this.api,
     required this.row,
