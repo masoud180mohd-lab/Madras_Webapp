@@ -91,6 +91,8 @@ Mkuu: `/madrasa/hamisha-darasa/` — uhamisho wa wanafunzi darasa → darasa (mw
 
 Staff mobile API: `/api/v1/` (JWT). Sera na endpoints: [docs/API.md](docs/API.md).
 
+App ya simu (P1): [apps/mobile/README.md](apps/mobile/README.md) — Flutter, Android kwanza (ingia, madarasa, mahudhurio).
+
 `/api-token-auth/` **imezimwa kwa default** (legacy) — weka `DJANGO_ENABLE_TOKEN_AUTH=True` lab pekee. Dead-code: [docs/DEAD_CODE.md](docs/DEAD_CODE.md).
 
 ## Majukumu ya kawaida
@@ -106,5 +108,6 @@ Critical-path tests (`usimamizi/tests/`): auth, attendance, marks, fees, AuthZ, 
 ## Muundo
 
 - `madrasa_sys/` — project (settings package, urls, wsgi)
-- `usimamizi/` — app ya biashara (models, views/, templates, static, tests/)
+- `usimamizi/` — app ya biashara (models, views/, templates, static, tests/, api/)
+- `apps/mobile/` — Flutter staff app (P1: login, madarasa, mahudhurio)
 - `docs/` — ROLES.md, ACADEMIC_YEAR.md, API.md, DEAD_CODE.md

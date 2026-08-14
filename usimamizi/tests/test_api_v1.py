@@ -5,7 +5,17 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 
-from usimamizi.models import Darasa, Hudhurio, Malipo, Mwanafunzi
+from usimamizi.models import (
+    Darasa,
+    Hudhurio,
+    Matokeo,
+    Mtihani,
+    Malipo,
+    Mwanafunzi,
+    RekodiHifdhu,
+    RekodiMaendeleoMchana,
+    Somo,
+)
 from usimamizi.permissions import (
     CAP_ATTENDANCE,
     CAP_EXAMS,
@@ -210,3 +220,137 @@ class ApiV1Tests(TestCase):
         self.assertIn(CAP_VIEW_DIRECTORY, response.data["capabilities"])
         self.assertIn(CAP_FEES, response.data["capabilities"])
         self.assertEqual(self.client.get("/api/v1/madarasa/").status_code, 200)
+
+
+@HOSTS
+@NO_THROTTLE
+class ApiV1SabaqExamsTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.darasa = Darasa.objects.create(jina="Darasa API P3")
+        self.student = Mwanafunzi.objects.create(
+            jina_kamili="API P3 Student",
+            darasa=self.darasa,
+        )
+        self.hifdhu = Somo.objects.create(
+            jina="Hifdhu API",
+            ni_la_hifdhu=True,
+            darasa=self.darasa,
+        )
+        self.student.programu_ya_usiku = self.hifdhu
+        self.student.save(update_fields=["programu_ya_usiku"])
+        self.fiqhi = Somo.objects.create(
+            jina="Fiqhi API",
+            ni_la_hifdhu=False,
+            darasa=self.darasa,
+        )
+        self.exam = Mtihani.objects.create(
+            somo=self.fiqhi,
+            jina_la_mtihani="Mtihani wa kwanza",
+            tarehe=date.today(),
+        )
+        self.kawaida = create_user_with_cheo("p3_kawaida", "Mwalimu wa Kawaida")
+        self.jaji = create_user_with_cheo("p3_jaji", "Jaji")
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
+        self.office = User.objects.create_user("p3_ofisi", password="pass12345")
+        ct = ContentType.objects.get_for_model(Malipo)
+        perm = Permission.objects.get(content_type=ct, codename="add_malipo")
+        self.office.user_permissions.add(perm)
+
+    def _auth(self, username):
+        response = self.client.post(
+            "/api/v1/auth/token/",
+            {"username": username, "password": "pass12345"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200, response.content)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {response.data['access']}")
+
+    def test_kawaida_records_sabaq_and_maendeleo(self):
+        self._auth("p3_kawaida")
+        sabaq = self.client.post(
+            "/api/v1/sabaq/",
+            {
+                "mwanafunzi": self.student.id,
+                "aina_ya_rekodi": "Usiku",
+                "sabaq_sura": "Al-Fatiha",
+                "sabaq_aya_kuanzia": 1,
+                "sabaq_aya_kuishia": 7,
+                "sabaq_hali": "Kajua",
+            },
+            format="json",
+        )
+        self.assertEqual(sabaq.status_code, 201, sabaq.content)
+        self.assertEqual(RekodiHifdhu.objects.count(), 1)
+        progress = self.client.post(
+            "/api/v1/maendeleo/",
+            {
+                "mwanafunzi": self.student.id,
+                "somo": self.fiqhi.id,
+                "mada_iliyosomwa": "Udhu",
+                "hali": "Ameelewa",
+            },
+            format="json",
+        )
+        self.assertEqual(progress.status_code, 201, progress.content)
+        self.assertEqual(RekodiMaendeleoMchana.objects.count(), 1)
+
+    def test_jaji_denied_sabaq_allowed_maksi(self):
+        self._auth("p3_jaji")
+        self.assertEqual(
+            self.client.post(
+                "/api/v1/sabaq/",
+                {"mwanafunzi": self.student.id, "aina_ya_rekodi": "Darasa"},
+                format="json",
+            ).status_code,
+            403,
+        )
+        listed = self.client.get(f"/api/v1/mitihani/?somo={self.fiqhi.id}")
+        self.assertEqual(listed.status_code, 200)
+        self.assertEqual(len(listed.data), 1)
+        saved = self.client.put(
+            f"/api/v1/mitihani/{self.exam.id}/matokeo/",
+            {"rekodi": [{"mwanafunzi": self.student.id, "maksi": 81}]},
+            format="json",
+        )
+        self.assertEqual(saved.status_code, 200, saved.content)
+        row = Matokeo.objects.get(mtihani=self.exam, mwanafunzi=self.student)
+        self.assertEqual(row.maksi, 81)
+
+    def test_office_denied_sabaq(self):
+        self._auth("p3_ofisi")
+        self.assertEqual(
+            self.client.post(
+                "/api/v1/sabaq/",
+                {"mwanafunzi": self.student.id, "aina_ya_rekodi": "Darasa"},
+                format="json",
+            ).status_code,
+            403,
+        )
+
+    def test_maksi_out_of_range_rejected(self):
+        self._auth("p3_jaji")
+        response = self.client.put(
+            f"/api/v1/mitihani/{self.exam.id}/matokeo/",
+            {"rekodi": [{"mwanafunzi": self.student.id, "maksi": 101}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Matokeo.objects.count(), 0)
+
+    def test_hifdhu_somo_rejected_for_maendeleo(self):
+        self._auth("p3_kawaida")
+        response = self.client.post(
+            "/api/v1/maendeleo/",
+            {
+                "mwanafunzi": self.student.id,
+                "somo": self.hifdhu.id,
+                "mada_iliyosomwa": "Juzuu",
+                "hali": "Ameelewa",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(RekodiMaendeleoMchana.objects.count(), 0)

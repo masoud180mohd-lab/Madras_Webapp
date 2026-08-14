@@ -43,6 +43,28 @@ class ProtectedMediaTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn(reverse("ingia"), response.url)
 
+    def test_jwt_bearer_can_view(self):
+        token = self.client.post(
+            "/api/v1/auth/token/",
+            {"username": "media_user", "password": "pass12345"},
+            content_type="application/json",
+        )
+        self.assertEqual(token.status_code, 200)
+        access = token.json()["access"]
+        response = self.client.get(
+            self.media_url,
+            HTTP_AUTHORIZATION=f"Bearer {access}",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(b"".join(response.streaming_content)[:8], b"\x89PNG\r\n\x1a\n")
+
+    def test_invalid_jwt_is_401(self):
+        response = self.client.get(
+            self.media_url,
+            HTTP_AUTHORIZATION="Bearer not-a-token",
+        )
+        self.assertEqual(response.status_code, 401)
+
     def test_logged_in_can_view(self):
         self.client.login(username="media_user", password="pass12345")
         response = self.client.get(self.media_url)

@@ -39,3 +39,13 @@ Thumbs.db
 .vscode/
 *.swp
 *~
+
+# Flutter
+apps/mobile/.dart_tool/
+apps/mobile/.flutter-plugins
+apps/mobile/.flutter-plugins-dependencies
+apps/mobile/.packages
+apps/mobile/build/
+apps/mobile/.idea/
+apps/mobile/**/Generated.xcconfig
+apps/mobile/**/flutter_export_environment.sh
