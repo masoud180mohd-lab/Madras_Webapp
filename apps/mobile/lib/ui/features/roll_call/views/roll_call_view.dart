@@ -5,6 +5,7 @@ import '../../../../data/models/models.dart';
 import '../../../../data/services/api_client.dart';
 import '../../../core/copy.dart';
 import '../../../core/theme.dart';
+import '../../../core/widgets/accent_card.dart';
 import '../../../core/widgets/authenticated_photo.dart';
 import '../view_models/roll_call_view_model.dart';
 
@@ -49,18 +50,21 @@ class _RollCallViewState extends State<RollCallView> {
               _Banner(viewModel: vm),
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                   itemCount: vm.rows.length,
                   itemBuilder: (context, index) {
                     final row = vm.rows[index];
-                    return _RollTile(
-                      api: api,
-                      row: row,
-                      editable: vm.canEdit,
-                      onChanged: (yupo) =>
-                          vm.setYupo(row.mwanafunzi.id, yupo),
-                      onReason: (value) =>
-                          vm.setSababu(row.mwanafunzi.id, value),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _RollTile(
+                        api: api,
+                        row: row,
+                        editable: vm.canEdit,
+                        onChanged: (yupo) =>
+                            vm.setYupo(row.mwanafunzi.id, yupo),
+                        onReason: (value) =>
+                            vm.setSababu(row.mwanafunzi.id, value),
+                      ),
                     );
                   },
                 ),
@@ -101,45 +105,44 @@ class _Banner extends StatelessWidget {
   Widget build(BuildContext context) {
     final vm = viewModel;
     String text;
-    Color color;
+    Color accent;
     if (!vm.canTakeAttendance) {
       text = MadrasaCopy.viewOnly;
-      color = MadrasaTheme.muted;
+      accent = MadrasaTheme.muted;
     } else if (vm.alreadyRecorded) {
       text = vm.notice ?? MadrasaCopy.already;
-      color = MadrasaTheme.primary;
+      accent = MadrasaTheme.primary;
     } else {
       text =
           '${MadrasaCopy.rollCall} · ${vm.presentCount}/${vm.rows.length} ${MadrasaCopy.present}';
-      color = MadrasaTheme.forest;
+      accent = MadrasaTheme.gold;
     }
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: const Border(
-          left: BorderSide(color: MadrasaTheme.gold, width: 4),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            text,
-            style: TextStyle(color: color, fontWeight: FontWeight.w600),
-          ),
-          if (vm.error != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Text(
-                vm.error!,
-                style: const TextStyle(color: MadrasaTheme.danger),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      child: AccentCard(
+        accent: accent,
+        accentWidth: 4,
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              text,
+              style: TextStyle(
+                color: accent == MadrasaTheme.gold ? MadrasaTheme.title : accent,
+                fontWeight: FontWeight.w700,
               ),
             ),
-        ],
+            if (vm.error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  vm.error!,
+                  style: const TextStyle(color: MadrasaTheme.danger),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -163,54 +166,103 @@ class _RollTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final student = row.mwanafunzi;
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
-        child: Column(
-          children: [
-            ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-              leading: AuthenticatedPhoto(
+    final accent = row.yupo ? MadrasaTheme.primary : MadrasaTheme.danger;
+    return AccentCard(
+      accent: accent,
+      padding: const EdgeInsets.fromLTRB(14, 12, 12, 14),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              AuthenticatedPhoto(
                 api: api,
                 url: student.pichaUrl,
                 fallbackLabel: student.jinaKamili,
               ),
-              title: Text(
-                student.jinaKamili,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      student.jinaKamili,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: MadrasaTheme.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      student.nambaYaUsajili,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: MadrasaTheme.muted,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _StatusBadge(yupo: row.yupo),
+                  ],
+                ),
               ),
-              subtitle: Text(student.nambaYaUsajili),
-              trailing: Switch.adaptive(
+              Switch.adaptive(
                 value: row.yupo,
+                activeThumbColor: MadrasaTheme.primary,
                 onChanged: editable ? onChanged : null,
               ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: Text(
-                  row.yupo ? MadrasaCopy.present : MadrasaCopy.absent,
-                  style: TextStyle(
-                    color: row.yupo ? MadrasaTheme.primary : MadrasaTheme.danger,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+            ],
+          ),
+          if (!row.yupo)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: _ReasonField(
+                key: ValueKey('reason-${student.id}'),
+                initial: row.sababu,
+                enabled: editable,
+                onChanged: onReason,
               ),
             ),
-            if (!row.yupo)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: _ReasonField(
-                  key: ValueKey('reason-${student.id}'),
-                  initial: row.sababu,
-                  enabled: editable,
-                  onChanged: onReason,
-                ),
-              ),
-          ],
-        ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.yupo});
+
+  final bool yupo;
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = yupo ? MadrasaTheme.successBg : MadrasaTheme.dangerBg;
+    final border = yupo ? MadrasaTheme.successBorder : MadrasaTheme.dangerBorder;
+    final fg = yupo ? MadrasaTheme.successText : MadrasaTheme.dangerText;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            yupo ? Icons.check_circle : Icons.cancel,
+            size: 15,
+            color: fg,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            yupo ? MadrasaCopy.present : MadrasaCopy.absent,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: fg,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -248,7 +300,10 @@ class _ReasonFieldState extends State<_ReasonField> {
     return TextField(
       controller: _controller,
       enabled: widget.enabled,
-      decoration: const InputDecoration(labelText: MadrasaCopy.reason),
+      decoration: const InputDecoration(
+        labelText: MadrasaCopy.reason,
+        isDense: true,
+      ),
       onChanged: widget.onChanged,
     );
   }

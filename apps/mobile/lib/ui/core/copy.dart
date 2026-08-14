@@ -3,9 +3,11 @@ class MadrasaCopy {
   static const welcome = 'Karibu Ndani';
   static const subtitle =
       'Weka taarifa zako za kiutawala kuingia kwenye mfumo.';
-  static const username = 'Jina la mtumiaji';
-  static const password = 'Nenosiri';
-  static const login = 'Ingia';
+  static const username = 'Jina la Kuingilia (Username)';
+  static const password = 'Neno la Siri (Password)';
+  static const login = 'Ingia Kwenye Mfumo';
+  static const footer =
+      'Al-Madrasatul Rasulillah. Haki Zote Zimehifadhiwa.';
   static const logout = 'Toka';
   static const classes = 'Madarasa';
   static const rollCall = 'Mahudhurio';

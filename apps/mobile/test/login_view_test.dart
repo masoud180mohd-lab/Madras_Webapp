@@ -28,6 +28,8 @@ void main() {
     );
     expect(find.text(MadrasaCopy.welcome), findsOneWidget);
     expect(find.text(MadrasaCopy.brand), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const Key('login_submit')));
+    await tester.pump();
     await tester.tap(find.byKey(const Key('login_submit')));
     await tester.pump();
     expect(find.text(MadrasaCopy.needUsername), findsOneWidget);
