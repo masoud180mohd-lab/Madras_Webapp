@@ -394,6 +394,28 @@ class ApiV1SabaqExamsTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Matokeo.objects.count(), 0)
 
+    def test_somo_detail_includes_nyenzo_and_mitihani(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        from usimamizi.models import Nyenzo
+
+        self._auth("p3_kawaida")
+        Nyenzo.objects.create(
+            somo=self.fiqhi,
+            jina_la_faili="kitabu.pdf",
+            faili=SimpleUploadedFile(
+                "kitabu.pdf", b"%PDF-1.4 test", content_type="application/pdf"
+            ),
+        )
+        response = self.client.get(f"/api/v1/masomo/{self.fiqhi.id}/")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.data["jina"], self.fiqhi.jina)
+        self.assertEqual(len(response.data["nyenzo"]), 1)
+        self.assertEqual(response.data["nyenzo"][0]["jina_la_faili"], "kitabu.pdf")
+        self.assertTrue(response.data["nyenzo"][0]["faili"])
+        self.assertEqual(len(response.data["mitihani"]), 1)
+        self.assertEqual(response.data["mitihani"][0]["id"], self.exam.id)
+
     def test_hifdhu_somo_rejected_for_maendeleo(self):
         self._auth("p3_kawaida")
         response = self.client.post(

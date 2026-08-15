@@ -14,7 +14,9 @@ import 'features/auth/views/login_view.dart';
 import 'features/catalog/view_models/catalog_view_model.dart';
 import 'features/catalog/views/catalog_list_view.dart';
 import 'features/catalog/views/entity_detail_view.dart';
+import 'features/catalog/views/exam_results_view.dart';
 import 'features/catalog/views/student_detail_view.dart';
+import 'features/catalog/views/subject_detail_view.dart';
 import 'features/classes/view_models/classes_view_model.dart';
 import 'features/classes/views/class_hub_view.dart';
 import 'features/classes/views/classes_view.dart';
@@ -136,15 +138,31 @@ GoRouter createRouter({
               GoRoute(
                 path: ':id',
                 builder: (context, state) {
-                  final id = int.tryParse(state.pathParameters['id'] ?? '');
-                  return EntityDetailView(
-                    heading: MadrasaCopy.subjects,
-                    loader: () async {
-                      final rows = await catalog.masomo();
-                      return rows.firstWhere((row) => row.id == id);
-                    },
+                  final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+                  return SubjectDetailView(
+                    somoId: id,
+                    repository: catalog,
                   );
                 },
+                routes: [
+                  GoRoute(
+                    path: 'mitihani/:mtihaniId',
+                    builder: (context, state) {
+                      final mtihaniId =
+                          int.tryParse(
+                            state.pathParameters['mtihaniId'] ?? '',
+                          ) ??
+                          0;
+                      final extra = state.extra;
+                      final editable = extra is Map && extra['edit'] == true;
+                      return ExamResultsView(
+                        mtihaniId: mtihaniId,
+                        repository: catalog,
+                        editable: editable,
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),

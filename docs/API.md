@@ -34,11 +34,12 @@ Auth: `Authorization: Bearer <access>`. Access ~15 min, refresh ~7 days (rotated
 | `GET` | `/api/v1/madarasa/<id>/wanafunzi/` | `view_students` — hai tu; no parent phones |
 | `GET` | `/api/v1/mahudhurio/?darasa=&tarehe=&aina_ya_rekodi=` | `attendance` |
 | `POST` | `/api/v1/mahudhurio/` | `attendance` — batch, full active roster |
-| `GET` | `/api/v1/masomo/?darasa=` | `view_directory` |
+| `GET` | `/api/v1/masomo/?darasa=` | `view_directory` / `exams` / `materials` |
+| `GET` | `/api/v1/masomo/<id>/` | same — somo + `nyenzo` + `mitihani` |
 | `POST` | `/api/v1/sabaq/` | `sabaq` — requires linked Mwalimu |
 | `POST` | `/api/v1/maendeleo/` | `sabaq` — maendeleo ya mchana (not hifdhu) |
 | `GET` | `/api/v1/mitihani/?somo=` | `exams` |
-| `GET`/`PUT` | `/api/v1/mitihani/<id>/matokeo/` | `exams` — upsert maksi 0–100 |
+| `GET`/`PUT` | `/api/v1/mitihani/<id>/matokeo/` | `exams` — upsert maksi 0–100; GET includes `daraja` |
 
 `POST` mahudhurio must include **every** active student in the class. Duplicate roll for the same `(darasa, tarehe, aina)` → **409** (`already_recorded`). Clients should treat 409 as successful sync, not a retry-with-new-rows error.
 

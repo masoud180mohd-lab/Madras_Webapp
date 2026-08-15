@@ -180,6 +180,12 @@ String titleForPath(String path) {
       if (path.startsWith('/wanafunzi/')) {
         return MadrasaCopy.studentDetail;
       }
+      if (path.contains('/mitihani/')) {
+        return MadrasaCopy.subjectExams;
+      }
+      if (path.startsWith('/masomo/')) {
+        return MadrasaCopy.subjects;
+      }
       return MadrasaCopy.brand;
   }
 }

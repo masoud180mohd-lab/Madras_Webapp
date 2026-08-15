@@ -12,6 +12,7 @@ from usimamizi.models import (
     MwakaWaMasomo,
     Mwalimu,
     Mwanafunzi,
+    Nyenzo,
     RekodiMaendeleoMchana,
     RekodiUkaguzi,
     Somo,
@@ -122,6 +123,23 @@ class SomoSerializer(serializers.ModelSerializer):
             return None
         user = obj.mwalimu.user
         return user.get_full_name() or user.username
+
+
+class NyenzoSerializer(serializers.ModelSerializer):
+    faili = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Nyenzo
+        fields = ("id", "jina_la_faili", "faili", "tarehe_iliyowekwa")
+
+    def get_faili(self, obj):
+        if not obj.faili:
+            return None
+        url = obj.faili.url
+        request = self.context.get("request")
+        if request is not None:
+            return request.build_absolute_uri(url)
+        return url
 
 
 class SabaqCreateSerializer(serializers.Serializer):

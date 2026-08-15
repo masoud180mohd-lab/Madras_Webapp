@@ -56,6 +56,16 @@ class ApiClient {
     }, retryOn401: auth);
   }
 
+  Future<dynamic> put(String path, {Object? body}) {
+    return _send(() async {
+      return _http.put(
+        _uri(path),
+        headers: await _headers(jsonBody: true),
+        body: body == null ? null : jsonEncode(body),
+      );
+    });
+  }
+
   Future<http.Response> getBytes(String url) async {
     final headers = await _headers();
     final response = await _http.get(Uri.parse(url), headers: headers);

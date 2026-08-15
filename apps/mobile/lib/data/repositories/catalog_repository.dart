@@ -71,6 +71,23 @@ class CatalogRepository {
     return StudentDetail.fromJson(raw as Map<String, dynamic>);
   }
 
+  Future<SubjectDetail> somoDetail(int id) async {
+    final raw = await _api.get('/api/v1/masomo/$id/');
+    return SubjectDetail.fromJson(raw as Map<String, dynamic>);
+  }
+
+  Future<ExamResults> matokeo(int mtihaniId) async {
+    final raw = await _api.get('/api/v1/mitihani/$mtihaniId/matokeo/');
+    return ExamResults.fromJson(raw as Map<String, dynamic>);
+  }
+
+  Future<void> hifadhiMaksi(int mtihaniId, List<Map<String, dynamic>> rekodi) {
+    return _api.put(
+      '/api/v1/mitihani/$mtihaniId/matokeo/',
+      body: {'rekodi': rekodi},
+    );
+  }
+
   Future<List<CatalogRow>> masomo() async {
     final list = await _api.get('/api/v1/masomo/') as List<dynamic>;
     return list.whereType<Map<String, dynamic>>().map((row) {

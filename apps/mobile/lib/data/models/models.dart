@@ -256,6 +256,156 @@ class StudentDetail {
   }
 }
 
+class SubjectMaterial {
+  const SubjectMaterial({
+    required this.id,
+    required this.jinaLaFaili,
+    this.failiUrl,
+    this.tarehe,
+  });
+
+  final int id;
+  final String jinaLaFaili;
+  final String? failiUrl;
+  final String? tarehe;
+
+  factory SubjectMaterial.fromJson(Map<String, dynamic> json) {
+    return SubjectMaterial(
+      id: json['id'] as int,
+      jinaLaFaili: json['jina_la_faili'] as String? ?? '',
+      failiUrl: json['faili'] as String?,
+      tarehe: json['tarehe_iliyowekwa'] as String?,
+    );
+  }
+}
+
+class SubjectExam {
+  const SubjectExam({
+    required this.id,
+    required this.jina,
+    required this.tarehe,
+    required this.somoId,
+  });
+
+  final int id;
+  final String jina;
+  final String tarehe;
+  final int somoId;
+
+  factory SubjectExam.fromJson(Map<String, dynamic> json) {
+    return SubjectExam(
+      id: json['id'] as int,
+      jina: json['jina_la_mtihani'] as String? ?? '',
+      tarehe: json['tarehe'] as String? ?? '',
+      somoId: json['somo'] as int? ?? 0,
+    );
+  }
+}
+
+class SubjectDetail {
+  const SubjectDetail({
+    required this.id,
+    required this.jina,
+    required this.niLaHifdhu,
+    this.darasaJina,
+    this.mwalimu,
+    this.nyenzo = const [],
+    this.mitihani = const [],
+  });
+
+  final int id;
+  final String jina;
+  final bool niLaHifdhu;
+  final String? darasaJina;
+  final String? mwalimu;
+  final List<SubjectMaterial> nyenzo;
+  final List<SubjectExam> mitihani;
+
+  factory SubjectDetail.fromJson(Map<String, dynamic> json) {
+    final nyenzo = json['nyenzo'];
+    final mitihani = json['mitihani'];
+    return SubjectDetail(
+      id: json['id'] as int,
+      jina: json['jina'] as String? ?? '',
+      niLaHifdhu: json['ni_la_hifdhu'] == true,
+      darasaJina: json['darasa_jina'] as String?,
+      mwalimu: json['mwalimu'] as String?,
+      nyenzo: nyenzo is List
+          ? nyenzo
+                .whereType<Map<String, dynamic>>()
+                .map(SubjectMaterial.fromJson)
+                .toList(growable: false)
+          : const [],
+      mitihani: mitihani is List
+          ? mitihani
+                .whereType<Map<String, dynamic>>()
+                .map(SubjectExam.fromJson)
+                .toList(growable: false)
+          : const [],
+    );
+  }
+}
+
+class ExamMarkRow {
+  const ExamMarkRow({
+    required this.mwanafunziId,
+    required this.jinaKamili,
+    this.nambaYaUsajili,
+    this.maksi,
+    this.daraja,
+    this.maelezo,
+  });
+
+  final int mwanafunziId;
+  final String jinaKamili;
+  final String? nambaYaUsajili;
+  final double? maksi;
+  final String? daraja;
+  final String? maelezo;
+
+  factory ExamMarkRow.fromJson(Map<String, dynamic> json) {
+    final raw = json['maksi'];
+    return ExamMarkRow(
+      mwanafunziId: json['mwanafunzi'] as int,
+      jinaKamili: json['jina_kamili'] as String? ?? '',
+      nambaYaUsajili: json['namba_ya_usajili'] as String?,
+      maksi: raw == null ? null : (raw as num).toDouble(),
+      daraja: json['daraja'] as String?,
+      maelezo: json['maelezo'] as String?,
+    );
+  }
+}
+
+class ExamResults {
+  const ExamResults({
+    required this.mtihaniId,
+    required this.jina,
+    required this.tarehe,
+    required this.rekodi,
+  });
+
+  final int mtihaniId;
+  final String jina;
+  final String tarehe;
+  final List<ExamMarkRow> rekodi;
+
+  factory ExamResults.fromJson(Map<String, dynamic> json) {
+    final mtihani = json['mtihani'] as Map<String, dynamic>? ?? const {};
+    final rekodi = json['rekodi'];
+    return ExamResults(
+      mtihaniId: mtihani['id'] as int? ?? 0,
+      jina: mtihani['jina_la_mtihani'] as String? ?? '',
+      tarehe: mtihani['tarehe'] as String? ?? '',
+      rekodi: rekodi is List
+          ? rekodi
+                .whereType<Map<String, dynamic>>()
+                .map(ExamMarkRow.fromJson)
+                .toList(growable: false)
+          : const [],
+    );
+  }
+}
+
 class Mwanafunzi {
   const Mwanafunzi({
     required this.id,

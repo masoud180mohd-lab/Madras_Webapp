@@ -20,6 +20,14 @@ class MadrasaCopy {
   static const students = 'Orodha ya Wanafunzi';
   static const studentDetail = 'Taarifa ya mwanafunzi';
   static const subjects = 'Masomo';
+  static const subjectMaterials = 'Nyenzo za Kusomea';
+  static const subjectExams = 'Mitihani & Matokeo';
+  static const openMaterial = 'Fungua';
+  static const viewResults = 'Tazama Ripoti';
+  static const enterMarks = 'Jaza Maksi';
+  static const saveMarks = 'Hifadhi maksi';
+  static const noMaterials = 'Hakuna nyenzo zilizowekwa bado.';
+  static const noExams = 'Hakuna mitihani iliyosajiliwa bado.';
   static const classes = 'Madarasa';
   static const absentees = 'Watoro wa Wiki';
   static const revenue = 'Mapato';

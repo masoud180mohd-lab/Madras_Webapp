@@ -23,6 +23,7 @@ from usimamizi.api.v1.views import (
     MtihaniListView,
     MtihaniMatokeoView,
     SabaqCreateView,
+    SomoDetailView,
     SomoListView,
 )
 
@@ -53,6 +54,11 @@ urlpatterns = [
     ),
     path("mahudhurio/", MahudhurioView.as_view(), name="api_v1_mahudhurio"),
     path("masomo/", SomoListView.as_view(), name="api_v1_masomo"),
+    path(
+        "masomo/<int:somo_id>/",
+        SomoDetailView.as_view(),
+        name="api_v1_somo_detail",
+    ),
     path("sabaq/", SabaqCreateView.as_view(), name="api_v1_sabaq"),
     path("maendeleo/", MaendeleoCreateView.as_view(), name="api_v1_maendeleo"),
     path("mitihani/", MtihaniListView.as_view(), name="api_v1_mitihani"),

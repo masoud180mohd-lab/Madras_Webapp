@@ -18,6 +18,7 @@ from usimamizi.api.v1.serializers import (
     MeSerializer,
     MtihaniSerializer,
     MwanafunziRosterSerializer,
+    NyenzoSerializer,
     SabaqCreateSerializer,
     SomoSerializer,
 )
@@ -27,6 +28,7 @@ from usimamizi.models import (
     Matokeo,
     Mtihani,
     Mwanafunzi,
+    Nyenzo,
     RekodiHifdhu,
     RekodiMaendeleoMchana,
     Somo,
@@ -34,6 +36,7 @@ from usimamizi.models import (
 from usimamizi.permissions import (
     CAP_ATTENDANCE,
     CAP_EXAMS,
+    CAP_MATERIALS,
     CAP_SABAQ,
     CAP_VIEW_DIRECTORY,
     CAP_VIEW_STUDENTS,
@@ -41,6 +44,7 @@ from usimamizi.permissions import (
     get_user_cheo,
     list_user_capabilities,
 )
+from usimamizi.utils import hesabu_daraja
 
 
 def _display_name(user):
@@ -137,7 +141,7 @@ class MahudhurioView(APIView):
 
 class SomoListView(APIView):
     permission_classes = [IsAuthenticated, HasCapability]
-    required_capability = CAP_VIEW_DIRECTORY
+    required_capabilities = (CAP_VIEW_DIRECTORY, CAP_EXAMS, CAP_MATERIALS)
 
     def get(self, request):
         qs = Somo.objects.select_related("darasa", "mwalimu", "mwalimu__user").order_by(
@@ -147,6 +151,33 @@ class SomoListView(APIView):
         if darasa_id:
             qs = qs.filter(darasa_id=darasa_id)
         return Response(SomoSerializer(qs, many=True).data)
+
+
+class SomoDetailView(APIView):
+    """Subject hub like web: header + nyenzo + mitihani."""
+
+    permission_classes = [IsAuthenticated, HasCapability]
+    required_capabilities = (CAP_VIEW_DIRECTORY, CAP_EXAMS, CAP_MATERIALS)
+
+    def get(self, request, somo_id):
+        somo = (
+            Somo.objects.select_related("darasa", "mwalimu", "mwalimu__user")
+            .filter(pk=somo_id)
+            .first()
+        )
+        if somo is None:
+            return Response({"detail": "Somo halipatikani."}, status=404)
+        data = SomoSerializer(somo).data
+        data["nyenzo"] = NyenzoSerializer(
+            Nyenzo.objects.filter(somo=somo).order_by("-tarehe_iliyowekwa"),
+            many=True,
+            context={"request": request},
+        ).data
+        data["mitihani"] = MtihaniSerializer(
+            Mtihani.objects.filter(somo=somo).order_by("-tarehe", "-id"),
+            many=True,
+        ).data
+        return Response(data)
 
 
 class SabaqCreateView(APIView):
@@ -288,18 +319,33 @@ class MtihaniMatokeoView(APIView):
             row.mwanafunzi_id: row.maksi
             for row in Matokeo.objects.filter(mtihani=mtihani, mwanafunzi__in=wanafunzi)
         }
+        rekodi = []
+        for student in wanafunzi:
+            maksi = existing.get(student.id)
+            row = {
+                "mwanafunzi": student.id,
+                "jina_kamili": student.jina_kamili,
+                "namba_ya_usajili": student.namba_ya_usajili,
+                "maksi": maksi,
+                "daraja": None,
+                "maelezo": None,
+            }
+            if maksi is not None:
+                daraja, maelezo, _ = hesabu_daraja(maksi)
+                row["daraja"] = daraja
+                row["maelezo"] = maelezo
+            rekodi.append(row)
+        rekodi.sort(
+            key=lambda r: (
+                r["maksi"] is None,
+                -(r["maksi"] or 0),
+                r["jina_kamili"],
+            )
+        )
         return Response(
             {
                 "mtihani": MtihaniSerializer(mtihani).data,
-                "rekodi": [
-                    {
-                        "mwanafunzi": student.id,
-                        "jina_kamili": student.jina_kamili,
-                        "namba_ya_usajili": student.namba_ya_usajili,
-                        "maksi": existing.get(student.id),
-                    }
-                    for student in wanafunzi
-                ],
+                "rekodi": rekodi,
             }
         )
 
