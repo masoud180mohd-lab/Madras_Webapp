@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'config.dart';
 import 'data/repositories/attendance_repository.dart';
 import 'data/repositories/auth_repository.dart';
+import 'data/repositories/catalog_repository.dart';
 import 'data/services/api_client.dart';
 import 'data/services/secure_token_store.dart';
 import 'ui/app.dart';
@@ -17,9 +18,14 @@ Future<void> main() async {
   final api = ApiClient(baseUrl: config.apiBaseUrl, tokens: tokens);
   final authRepository = AuthRepository(api: api, tokens: tokens);
   final attendanceRepository = AttendanceRepository(api: api);
+  final catalogRepository = CatalogRepository(api: api);
   final auth = AuthViewModel(repository: authRepository);
   final classes = ClassesViewModel(repository: attendanceRepository);
-  final router = createRouter(auth: auth, attendance: attendanceRepository);
+  final router = createRouter(
+    auth: auth,
+    attendance: attendanceRepository,
+    catalog: catalogRepository,
+  );
 
   await auth.restore();
 

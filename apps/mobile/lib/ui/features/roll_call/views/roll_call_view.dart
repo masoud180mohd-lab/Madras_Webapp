@@ -28,11 +28,7 @@ class _RollCallViewState extends State<RollCallView> {
   @override
   Widget build(BuildContext context) {
     final api = context.read<ApiClient>();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.viewModel.darasa.jina),
-      ),
-      body: ListenableBuilder(
+    return ListenableBuilder(
         listenable: widget.viewModel,
         builder: (context, _) {
           final vm = widget.viewModel;
@@ -91,7 +87,6 @@ class _RollCallViewState extends State<RollCallView> {
             ],
           );
         },
-      ),
     );
   }
 }

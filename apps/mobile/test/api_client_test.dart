@@ -19,6 +19,8 @@ void main() {
       expect(profile.canTakeAttendance, isTrue);
       expect(profile.canViewStudents, isTrue);
       expect(profile.canViewDirectory, isFalse);
+      expect(profile.canSeeTaaluma, isTrue);
+      expect(profile.canSeeFees, isFalse);
     });
 
     test('RollDraft omits reason when present', () {
