@@ -10,11 +10,13 @@ class AuthenticatedPhoto extends StatefulWidget {
     required this.api,
     required this.url,
     required this.fallbackLabel,
+    this.radius = 22,
   });
 
   final ApiClient api;
   final String? url;
   final String fallbackLabel;
+  final double radius;
 
   @override
   State<AuthenticatedPhoto> createState() => _AuthenticatedPhotoState();
@@ -43,17 +45,21 @@ class _AuthenticatedPhotoState extends State<AuthenticatedPhoto> {
       builder: (context, snapshot) {
         final image = snapshot.data;
         if (image != null) {
-          return CircleAvatar(backgroundImage: image, radius: 22);
+          return CircleAvatar(backgroundImage: image, radius: widget.radius);
         }
         final letter = widget.fallbackLabel.isEmpty
             ? '?'
             : widget.fallbackLabel[0].toUpperCase();
         return CircleAvatar(
-          radius: 22,
+          radius: widget.radius,
           backgroundColor: MadrasaTheme.forest,
           child: Text(
             letter,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: widget.radius * 0.7,
+            ),
           ),
         );
       },

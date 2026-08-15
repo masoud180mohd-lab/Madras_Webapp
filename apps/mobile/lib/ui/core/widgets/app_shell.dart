@@ -99,21 +99,6 @@ class AppDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            const Divider(color: Color(0x33FFFFFF), height: 1),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Color(0xFFFFC9C9)),
-              title: const Text(
-                MadrasaCopy.logout,
-                style: TextStyle(
-                  color: Color(0xFFFFC9C9),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              onTap: () {
-                Navigator.of(context).pop();
-                auth.logout();
-              },
-            ),
           ],
         ),
       ),
@@ -251,6 +236,8 @@ IconData _itemIcon(String name) {
       return Icons.phone_outlined;
     case 'audit':
       return Icons.fact_check_outlined;
+    case 'settings':
+      return Icons.settings_outlined;
     default:
       return Icons.circle_outlined;
   }

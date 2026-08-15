@@ -14,11 +14,17 @@ class CatalogRepository {
   Future<List<CatalogRow>> walimu() async {
     final list = await _api.get('/api/v1/walimu/') as List<dynamic>;
     return list.whereType<Map<String, dynamic>>().map((row) {
-      final cheo = row['cheo'] as String?;
+      final id = row['id'] as int?;
       return CatalogRow(
+        id: id,
         title: row['jina'] as String? ?? row['username'] as String? ?? '',
-        subtitle: cheo,
-        trailing: row['namba_ya_simu'] as String?,
+        subtitle: [
+          if (row['cheo'] != null) row['cheo'] as String,
+          if ((row['namba_ya_simu'] as String?)?.isNotEmpty == true)
+            row['namba_ya_simu'] as String,
+        ].join(' · '),
+        photoUrl: row['picha'] as String?,
+        detailPath: id == null ? null : '/walimu/$id',
       );
     }).toList(growable: false);
   }
@@ -38,25 +44,49 @@ class CatalogRepository {
             )
             as List<dynamic>;
     return list.whereType<Map<String, dynamic>>().map((row) {
-      final darasa = row['darasa'] as String?;
-      final namba = row['namba_ya_usajili'] as String?;
+      final id = row['id'] as int?;
+      final jinsia = row['jinsia'] as String?;
       return CatalogRow(
+        id: id,
         title: row['jina_kamili'] as String? ?? '',
         subtitle: [
-          if (namba != null && namba.isNotEmpty) namba,
-          if (darasa != null && darasa.isNotEmpty) darasa,
+          if ((row['namba_ya_usajili'] as String?)?.isNotEmpty == true)
+            row['namba_ya_usajili'] as String,
+          if ((row['darasa'] as String?)?.isNotEmpty == true)
+            row['darasa'] as String,
         ].join(' · '),
+        photoUrl: row['picha'] as String?,
+        badge: jinsia == 'KE'
+            ? 'KE'
+            : jinsia == 'ME'
+            ? 'ME'
+            : null,
+        detailPath: id == null ? null : '/wanafunzi/$id',
       );
     }).toList(growable: false);
+  }
+
+  Future<StudentDetail> mwanafunziDetail(int id) async {
+    final raw = await _api.get('/api/v1/wanafunzi/$id/');
+    return StudentDetail.fromJson(raw as Map<String, dynamic>);
   }
 
   Future<List<CatalogRow>> masomo() async {
     final list = await _api.get('/api/v1/masomo/') as List<dynamic>;
     return list.whereType<Map<String, dynamic>>().map((row) {
       final hifdhu = row['ni_la_hifdhu'] == true;
+      final darasa = row['darasa_jina'] as String?;
+      final mwalimu = row['mwalimu'] as String?;
       return CatalogRow(
+        id: row['id'] as int?,
         title: row['jina'] as String? ?? '',
-        subtitle: hifdhu ? 'Somo la hifdhu' : 'Somo la darasa',
+        subtitle: [
+          if (hifdhu) 'Hifdhu (usiku)' else 'Somo la darasa',
+          if (darasa != null && darasa.isNotEmpty) darasa,
+          if (mwalimu != null && mwalimu.isNotEmpty) mwalimu,
+        ].join(' · '),
+        badge: hifdhu ? 'Usiku' : 'Mchana',
+        detailPath: row['id'] == null ? null : '/masomo/${row['id']}',
       );
     }).toList(growable: false);
   }
@@ -64,27 +94,49 @@ class CatalogRepository {
   Future<List<CatalogRow>> watoro() async {
     final raw = await _api.get('/api/v1/watoro/') as Map<String, dynamic>;
     final rows = <CatalogRow>[];
-    void addGroup(String label, dynamic items) {
-      if (items is! List) {
+
+    void addSection(String title, String maelezo, dynamic items) {
+      rows.add(
+        CatalogRow(title: title, subtitle: maelezo, isHeader: true),
+      );
+      if (items is! List || items.isEmpty) {
+        rows.add(
+          const CatalogRow(
+            title: 'Hakuna watoro katika sehemu hii.',
+            subtitle: null,
+          ),
+        );
         return;
       }
       for (final item in items.whereType<Map<String, dynamic>>()) {
         final count = item['idadi_ya_utoro'];
+        final id = item['id'] as int?;
         rows.add(
           CatalogRow(
+            id: id,
             title: item['jina_kamili'] as String? ?? '',
             subtitle: [
-              label,
+              item['aina_jina'] as String? ?? title,
               if (item['darasa'] != null) item['darasa'] as String,
             ].join(' · '),
-            trailing: count == null ? null : '$count',
+            trailing: count == null ? null : '$count siku',
+            badge: item['aina'] == 'usiku' ? 'Usiku' : 'Mchana',
+            detailPath: id == null ? null : '/wanafunzi/$id',
           ),
         );
       }
     }
 
-    addGroup('Chuoni', raw['chuoni']);
-    addGroup('Darsa', raw['darsa']);
+    addSection(
+      'Kawaida (mchana)',
+      'Utoro wa madrasa ya kawaida',
+      raw['chuoni'],
+    );
+    addSection(
+      'Usiku (hifdhu)',
+      'Utoro wa darsa ya usiku',
+      raw['darsa'],
+    );
     return rows;
   }
 
@@ -96,8 +148,9 @@ class CatalogRepository {
         subtitle: [
           row['aina'] as String? ?? '',
           row['tarehe_ya_malipo'] as String? ?? '',
+          if (row['njia_ya_malipo'] != null) row['njia_ya_malipo'] as String,
         ].join(' · '),
-        trailing: '${row['kiasi_kilicholipwa']}',
+        trailing: 'Tsh ${row['kiasi_kilicholipwa']}',
       );
     }).toList(growable: false);
   }
@@ -107,8 +160,11 @@ class CatalogRepository {
     return list.whereType<Map<String, dynamic>>().map((row) {
       return CatalogRow(
         title: row['lebo_kamili'] as String? ?? row['jina'] as String? ?? '',
-        subtitle: row['mwaka'] as String?,
-        trailing: '${row['kiasi_kinachotakiwa']}',
+        subtitle: [
+          if (row['mwaka'] != null) row['mwaka'] as String,
+          if (row['mwezi'] != null) 'Mwezi ${row['mwezi']}',
+        ].join(' · '),
+        trailing: 'Tsh ${row['kiasi_kinachotakiwa']}',
       );
     }).toList(growable: false);
   }
@@ -131,6 +187,7 @@ class CatalogRepository {
       return CatalogRow(
         title: row['jina'] as String? ?? '',
         subtitle: subtitle,
+        badge: hai ? 'Hai' : null,
         trailing: hai ? 'Hai' : null,
       );
     }).toList(growable: false);
@@ -154,15 +211,20 @@ class CatalogRepository {
             )
             as List<dynamic>;
     return list.whereType<Map<String, dynamic>>().map((row) {
+      final id = row['id'] as int?;
       final simu = row['namba_ya_simu_mzazi'] as String?;
       final mzazi = row['jina_la_mzazi'] as String?;
       return CatalogRow(
+        id: id,
         title: row['jina_kamili'] as String? ?? '',
         subtitle: [
           if (row['darasa'] != null) row['darasa'] as String,
           if (mzazi != null && mzazi.isNotEmpty) mzazi,
+          if ((row['uhusiano_wa_mlezi'] as String?)?.isNotEmpty == true)
+            row['uhusiano_wa_mlezi'] as String,
         ].join(' · '),
         trailing: simu,
+        detailPath: id == null ? null : '/wanafunzi/$id',
       );
     }).toList(growable: false);
   }
@@ -172,7 +234,11 @@ class CatalogRepository {
     return list.whereType<Map<String, dynamic>>().map((row) {
       return CatalogRow(
         title: row['kitendo_jina'] as String? ?? row['kitendo'] as String? ?? '',
-        subtitle: row['maelezo'] as String?,
+        subtitle: [
+          if (row['maelezo'] != null) row['maelezo'] as String,
+          if (row['tarehe_ya_kitendo'] != null)
+            (row['tarehe_ya_kitendo'] as String).split('T').first,
+        ].join(' · '),
         trailing: row['mtumiaji'] as String?,
       );
     }).toList(growable: false);

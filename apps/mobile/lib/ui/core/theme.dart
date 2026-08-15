@@ -45,9 +45,11 @@ class MadrasaTheme {
       seedColor: primary,
       primary: primary,
       surface: paper,
+      brightness: Brightness.light,
     );
     return ThemeData(
       useMaterial3: true,
+      brightness: Brightness.light,
       fontFamily: uiFont,
       colorScheme: base.copyWith(
         primary: primary,
@@ -58,8 +60,8 @@ class MadrasaTheme {
         onSurface: ink,
       ),
       scaffoldBackgroundColor: paper,
+      drawerTheme: const DrawerThemeData(backgroundColor: forest),
       appBarTheme: const AppBarTheme(
-        // Web .header hutumia --nav-bg (#1F6B45)
         backgroundColor: primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -103,6 +105,95 @@ class MadrasaTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: primary,
+          foregroundColor: Colors.white,
+          minimumSize: const Size.fromHeight(50),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Dark palette kutoka base.css [data-theme=dark]
+  static const Color darkPrimary = Color(0xFF4CAF75);
+  static const Color darkPrimaryHover = Color(0xFF6FC890);
+  static const Color darkPaper = Color(0xFF101412);
+  static const Color darkCard = Color(0xFF1A211D);
+  static const Color darkSurfaceMuted = Color(0xFF232B26);
+  static const Color darkInk = Color(0xFFEEF3EF);
+  static const Color darkMuted = Color(0xFFA7B5AC);
+  static const Color darkTitle = Color(0xFFA8D5B5);
+  static const Color darkBorder = Color(0xFF334038);
+  static const Color darkForest = Color(0xFF0D1411);
+  static const Color darkNav = Color(0xFF121916);
+
+  static ThemeData dark() {
+    final base = ColorScheme.fromSeed(
+      seedColor: darkPrimary,
+      primary: darkPrimary,
+      surface: darkPaper,
+      brightness: Brightness.dark,
+    );
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      fontFamily: uiFont,
+      colorScheme: base.copyWith(
+        primary: darkPrimary,
+        onPrimary: Colors.white,
+        secondary: goldEdge,
+        surface: darkPaper,
+        error: const Color(0xFFEF5350),
+        onSurface: darkInk,
+      ),
+      scaffoldBackgroundColor: darkPaper,
+      drawerTheme: const DrawerThemeData(backgroundColor: darkForest),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: darkNav,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontFamily: brandFont,
+          fontSize: 21,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      dividerColor: darkBorder,
+      cardTheme: CardThemeData(
+        color: darkCard,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: darkBorder),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: darkSurfaceMuted,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 14),
+        hintStyle: const TextStyle(color: darkMuted),
+        labelStyle: const TextStyle(color: darkMuted),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: darkBorder),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: darkBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: darkPrimary, width: 2),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: darkPrimary,
           foregroundColor: Colors.white,
           minimumSize: const Size.fromHeight(50),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),

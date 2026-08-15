@@ -140,7 +140,9 @@ class SomoListView(APIView):
     required_capability = CAP_VIEW_DIRECTORY
 
     def get(self, request):
-        qs = Somo.objects.select_related("darasa").order_by("jina")
+        qs = Somo.objects.select_related("darasa", "mwalimu", "mwalimu__user").order_by(
+            "jina"
+        )
         darasa_id = request.query_params.get("darasa")
         if darasa_id:
             qs = qs.filter(darasa_id=darasa_id)

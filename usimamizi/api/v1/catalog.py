@@ -13,6 +13,7 @@ from usimamizi.api.v1.serializers import (
     MalipoSerializer,
     MawasilianoSerializer,
     MwakaSerializer,
+    MwanafunziDetailSerializer,
     MwanafunziDirectorySerializer,
     MwalimuSerializer,
     TangazoSerializer,
@@ -50,10 +51,17 @@ def _dashboard_payload(user):
         }
         for item in raw.get("vipimo", [])
     ]
+    active = Mwanafunzi.objects.active()
+    idadi = {
+        "jumla": active.count(),
+        "wavulana": active.filter(jinsia="ME").count(),
+        "wasichana": active.filter(jinsia="KE").count(),
+    }
     return {
         "jina": raw["jina_la_mtumiaji"],
         "cheo": raw["cheo"],
         "leo": raw["leo"].isoformat(),
+        "idadi_wanafunzi": idadi,
         "vipimo": vipimo,
         "matangazo": TangazoSerializer(raw.get("matangazo") or [], many=True).data,
     }
@@ -72,7 +80,9 @@ class WalimuListView(APIView):
 
     def get(self, request):
         qs = Mwalimu.objects.select_related("user").order_by("cheo", "id")
-        return Response(MwalimuSerializer(qs, many=True).data)
+        return Response(
+            MwalimuSerializer(qs, many=True, context={"request": request}).data
+        )
 
 
 class WanafunziListView(APIView):
@@ -97,6 +107,23 @@ class WanafunziListView(APIView):
             qs, many=True, context={"request": request}
         )
         return Response(serializer.data)
+
+
+class MwanafunziDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasCapability]
+    required_capability = CAP_VIEW_STUDENTS
+
+    def get(self, request, mwanafunzi_id):
+        row = (
+            Mwanafunzi.objects.select_related("darasa", "programu_ya_usiku")
+            .filter(pk=mwanafunzi_id)
+            .first()
+        )
+        if row is None:
+            return Response({"detail": "Mwanafunzi hapatikani."}, status=404)
+        return Response(
+            MwanafunziDetailSerializer(row, context={"request": request}).data
+        )
 
 
 class WatoroView(APIView):
@@ -137,6 +164,12 @@ class WatoroView(APIView):
                     "jina_kamili": row.jina_kamili,
                     "darasa": row.darasa.jina if row.darasa_id else None,
                     "idadi_ya_utoro": row.idadi_ya_utoro,
+                    "aina": "kawaida" if aina == "Kawaida" else "usiku",
+                    "aina_jina": (
+                        "Kawaida (mchana)"
+                        if aina == "Kawaida"
+                        else "Usiku (hifdhu)"
+                    ),
                 }
                 for row in rows
             ]
@@ -146,6 +179,18 @@ class WatoroView(APIView):
                 "kuanzia": kuanzia.isoformat(),
                 "chuoni": _group("Kawaida"),
                 "darsa": _group("Hifdhu"),
+                "sehemu": [
+                    {
+                        "funguo": "chuoni",
+                        "jina": "Kawaida (mchana)",
+                        "maelezo": "Utoro wa madrasa ya kawaida",
+                    },
+                    {
+                        "funguo": "darsa",
+                        "jina": "Usiku (hifdhu)",
+                        "maelezo": "Utoro wa darsa ya usiku / hifdhu",
+                    },
+                ],
             }
         )
 

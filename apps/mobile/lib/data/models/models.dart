@@ -104,11 +104,35 @@ class DashboardMetric {
   }
 }
 
+class StudentCounts {
+  const StudentCounts({
+    required this.jumla,
+    required this.wavulana,
+    required this.wasichana,
+  });
+
+  final int jumla;
+  final int wavulana;
+  final int wasichana;
+
+  factory StudentCounts.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return const StudentCounts(jumla: 0, wavulana: 0, wasichana: 0);
+    }
+    return StudentCounts(
+      jumla: json['jumla'] as int? ?? 0,
+      wavulana: json['wavulana'] as int? ?? 0,
+      wasichana: json['wasichana'] as int? ?? 0,
+    );
+  }
+}
+
 class DashboardSnapshot {
   const DashboardSnapshot({
     required this.jina,
     this.cheo,
     required this.leo,
+    required this.idadi,
     required this.vipimo,
     required this.matangazo,
   });
@@ -116,6 +140,7 @@ class DashboardSnapshot {
   final String jina;
   final String? cheo;
   final String leo;
+  final StudentCounts idadi;
   final List<DashboardMetric> vipimo;
   final List<CatalogRow> matangazo;
 
@@ -126,6 +151,9 @@ class DashboardSnapshot {
       jina: json['jina'] as String,
       cheo: json['cheo'] as String?,
       leo: json['leo'] as String? ?? '',
+      idadi: StudentCounts.fromJson(
+        json['idadi_wanafunzi'] as Map<String, dynamic>?,
+      ),
       vipimo: vipimo is List
           ? vipimo
                 .whereType<Map<String, dynamic>>()
@@ -145,11 +173,87 @@ class DashboardSnapshot {
 }
 
 class CatalogRow {
-  const CatalogRow({required this.title, this.subtitle, this.trailing});
+  const CatalogRow({
+    required this.title,
+    this.id,
+    this.subtitle,
+    this.trailing,
+    this.photoUrl,
+    this.badge,
+    this.detailPath,
+    this.isHeader = false,
+  });
 
+  final int? id;
   final String title;
   final String? subtitle;
   final String? trailing;
+  final String? photoUrl;
+  final String? badge;
+  final String? detailPath;
+  final bool isHeader;
+}
+
+class StudentDetail {
+  const StudentDetail({
+    required this.id,
+    required this.jinaKamili,
+    required this.nambaYaUsajili,
+    required this.jinsia,
+    this.darasa,
+    this.pichaUrl,
+    this.tareheKuzaliwa,
+    this.mahala,
+    this.programuUsiku,
+    this.juzuu,
+    this.tareheKujiunga,
+    this.jinaMzazi,
+    this.simuMzazi,
+    this.uhusiano,
+    this.jinaMzaziPili,
+    this.simuMzaziPili,
+    this.uhusianoPili,
+  });
+
+  final int id;
+  final String jinaKamili;
+  final String nambaYaUsajili;
+  final String jinsia;
+  final String? darasa;
+  final String? pichaUrl;
+  final String? tareheKuzaliwa;
+  final String? mahala;
+  final String? programuUsiku;
+  final int? juzuu;
+  final String? tareheKujiunga;
+  final String? jinaMzazi;
+  final String? simuMzazi;
+  final String? uhusiano;
+  final String? jinaMzaziPili;
+  final String? simuMzaziPili;
+  final String? uhusianoPili;
+
+  factory StudentDetail.fromJson(Map<String, dynamic> json) {
+    return StudentDetail(
+      id: json['id'] as int,
+      jinaKamili: json['jina_kamili'] as String? ?? '',
+      nambaYaUsajili: json['namba_ya_usajili'] as String? ?? '',
+      jinsia: json['jinsia'] as String? ?? 'ME',
+      darasa: json['darasa'] as String?,
+      pichaUrl: json['picha'] as String?,
+      tareheKuzaliwa: json['tarehe_ya_kuzaliwa'] as String?,
+      mahala: json['mahala_anapoishi'] as String?,
+      programuUsiku: json['programu_usiku'] as String?,
+      juzuu: json['juzuu_aliyohifadhi'] as int?,
+      tareheKujiunga: json['tarehe_ya_kujiunga'] as String?,
+      jinaMzazi: json['jina_la_mzazi'] as String?,
+      simuMzazi: json['namba_ya_simu_mzazi'] as String?,
+      uhusiano: json['uhusiano_wa_mlezi'] as String?,
+      jinaMzaziPili: json['jina_la_mzazi_pili'] as String?,
+      simuMzaziPili: json['namba_ya_simu_mzazi_pili'] as String?,
+      uhusianoPili: json['uhusiano_wa_mlezi_pili'] as String?,
+    );
+  }
 }
 
 class Mwanafunzi {

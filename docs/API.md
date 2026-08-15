@@ -22,6 +22,7 @@ Auth: `Authorization: Bearer <access>`. Access ~15 min, refresh ~7 days (rotated
 | `GET` | `/api/v1/mwanzo/` | authenticated — dashboard metrics |
 | `GET` | `/api/v1/walimu/` | `view_directory` |
 | `GET` | `/api/v1/wanafunzi/?q=&darasa=` | `view_students` — hai tu; no parent phones |
+| `GET` | `/api/v1/wanafunzi/<id>/` | `view_students` — profile; parent phones only with `parent_contact` |
 | `GET` | `/api/v1/watoro/` | `attendance` or `view_students` |
 | `GET` | `/api/v1/malipo/` | `fees` |
 | `GET` | `/api/v1/aina-malipo/` | `manage_students` |

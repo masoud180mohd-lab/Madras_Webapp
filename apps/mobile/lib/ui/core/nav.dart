@@ -132,6 +132,13 @@ List<NavItem> navItemsFor(StaffProfile? profile) {
       const NavItem(path: '/ukaguzi', label: MadrasaCopy.audit, icon: 'audit'),
     );
   }
+  items.add(
+    const NavItem(
+      path: '/mipangilio',
+      label: MadrasaCopy.settings,
+      icon: 'settings',
+    ),
+  );
   return items;
 }
 
@@ -167,7 +174,12 @@ String titleForPath(String path) {
       return MadrasaCopy.contacts;
     case '/ukaguzi':
       return MadrasaCopy.audit;
+    case '/mipangilio':
+      return MadrasaCopy.settings;
     default:
+      if (path.startsWith('/wanafunzi/')) {
+        return MadrasaCopy.studentDetail;
+      }
       return MadrasaCopy.brand;
   }
 }

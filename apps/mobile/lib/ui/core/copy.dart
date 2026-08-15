@@ -9,11 +9,16 @@ class MadrasaCopy {
   static const footer =
       'Al-Madrasatul Rasulillah. Haki Zote Zimehifadhiwa.';
   static const logout = 'Toka Nje';
+  static const settings = 'Mipangilio';
+  static const appearance = 'Muonekano';
+  static const lightMode = 'Mwanga (Light)';
+  static const darkMode = 'Giza (Dark)';
   static const home = 'Mwanzo';
   static const location = 'Mwera · Zanzibar';
   static const taaluma = 'Idara ya Taaluma';
   static const teachers = 'Orodha ya Walimu';
   static const students = 'Orodha ya Wanafunzi';
+  static const studentDetail = 'Taarifa ya mwanafunzi';
   static const subjects = 'Masomo';
   static const classes = 'Madarasa';
   static const absentees = 'Watoro wa Wiki';
@@ -29,6 +34,9 @@ class MadrasaCopy {
   static const classStudents = 'Wanafunzi wa darasa';
   static const emptyList = 'Hakuna rekodi iliyopatikana.';
   static const search = 'Tafuta...';
+  static const boys = 'Wavulana';
+  static const girls = 'Wasichana';
+  static const totalStudents = 'Jumla';
   static const promoteHint =
       'Hamisho la mwisho wa mwaka linathibitishwa kwenye wavuti. Hapa unaona idadi ya wanafunzi kwa kila darasa.';
   static const present = 'Yupo';

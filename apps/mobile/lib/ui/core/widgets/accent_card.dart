@@ -37,14 +37,23 @@ class AccentCard extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: MadrasaTheme.card,
+        color: Theme.of(context).cardTheme.color ??
+            (Theme.of(context).brightness == Brightness.dark
+                ? MadrasaTheme.darkCard
+                : MadrasaTheme.card),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: MadrasaTheme.border),
-        boxShadow: const [
+        border: Border.all(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? MadrasaTheme.darkBorder
+              : MadrasaTheme.border,
+        ),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x14143D2A),
+            color: Theme.of(context).brightness == Brightness.dark
+                ? const Color(0x66000000)
+                : const Color(0x14143D2A),
             blurRadius: 10,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -80,11 +89,14 @@ class TopAccentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: MadrasaTheme.card,
+        color: dark ? MadrasaTheme.darkCard : MadrasaTheme.card,
         borderRadius: BorderRadius.circular(radius),
-        border: Border.all(color: MadrasaTheme.border),
+        border: Border.all(
+          color: dark ? MadrasaTheme.darkBorder : MadrasaTheme.border,
+        ),
         boxShadow: const [
           BoxShadow(
             color: Color(0x14000000),

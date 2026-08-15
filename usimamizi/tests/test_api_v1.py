@@ -252,6 +252,29 @@ class ApiV1Tests(TestCase):
         self.assertEqual(self.client.get("/api/v1/ukaguzi/").status_code, 200)
         self.assertEqual(self.client.get("/api/v1/aina-malipo/").status_code, 200)
 
+        self._auth("api_kawaida")
+        detail = self.client.get(f"/api/v1/wanafunzi/{self.s1.id}/")
+        self.assertEqual(detail.status_code, 200)
+        self.assertEqual(detail.data["jina_kamili"], "API Student A")
+        self.assertNotIn("namba_ya_simu_mzazi", detail.data)
+
+        self._auth("api_mkuu")
+        mkuu_detail = self.client.get(f"/api/v1/wanafunzi/{self.s1.id}/")
+        self.assertEqual(mkuu_detail.status_code, 200)
+        self.assertEqual(mkuu_detail.data.get("namba_ya_simu_mzazi"), "0771111111")
+
+        self._auth("api_kawaida")
+        home = self.client.get("/api/v1/mwanzo/")
+        self.assertEqual(home.status_code, 200)
+        self.assertIn("idadi_wanafunzi", home.data)
+        self.assertEqual(home.data["idadi_wanafunzi"]["jumla"], 2)
+        self.assertIn("wavulana", home.data["idadi_wanafunzi"])
+        self.assertIn("wasichana", home.data["idadi_wanafunzi"])
+
+        watoro = self.client.get("/api/v1/watoro/")
+        self.assertEqual(watoro.status_code, 200)
+        self.assertIn("sehemu", watoro.data)
+
 
 @HOSTS
 @NO_THROTTLE

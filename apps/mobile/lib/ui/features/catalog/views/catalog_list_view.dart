@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../../../../data/services/api_client.dart';
 import '../../../core/copy.dart';
 import '../../../core/theme.dart';
 import '../../../core/widgets/accent_card.dart';
+import '../../../core/widgets/authenticated_photo.dart';
 import '../view_models/catalog_view_model.dart';
 
 class CatalogListView extends StatefulWidget {
@@ -40,6 +44,7 @@ class _CatalogListViewState extends State<CatalogListView> {
 
   @override
   Widget build(BuildContext context) {
+    final api = context.read<ApiClient>();
     return ListenableBuilder(
       listenable: widget.viewModel,
       builder: (context, _) {
@@ -99,13 +104,52 @@ class _CatalogListViewState extends State<CatalogListView> {
                 ),
               )
             else
-              ...vm.rows.map(
-                (row) => Padding(
+              ...vm.rows.map((row) {
+                if (row.isHeader) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 12, 0, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          row.title,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: MadrasaTheme.primary,
+                          ),
+                        ),
+                        if (row.subtitle != null)
+                          Text(
+                            row.subtitle!,
+                            style: const TextStyle(
+                              color: MadrasaTheme.muted,
+                              fontSize: 13,
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                }
+                return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: AccentCard(
-                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                    onTap: row.detailPath == null
+                        ? null
+                        : () => context.push(row.detailPath!),
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                     child: Row(
                       children: [
+                        if (row.photoUrl != null || row.detailPath != null)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: AuthenticatedPhoto(
+                              api: api,
+                              url: row.photoUrl,
+                              fallbackLabel: row.title,
+                              radius: 24,
+                            ),
+                          ),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,6 +173,30 @@ class _CatalogListViewState extends State<CatalogListView> {
                                   ),
                                 ),
                               ],
+                              if (row.badge != null) ...[
+                                const SizedBox(height: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: MadrasaTheme.successBg,
+                                    borderRadius: BorderRadius.circular(999),
+                                    border: Border.all(
+                                      color: MadrasaTheme.successBorder,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    row.badge!,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: MadrasaTheme.successText,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -140,11 +208,16 @@ class _CatalogListViewState extends State<CatalogListView> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
+                        if (row.detailPath != null)
+                          const Icon(
+                            Icons.chevron_right,
+                            color: MadrasaTheme.muted,
+                          ),
                       ],
                     ),
                   ),
-                ),
-              ),
+                );
+              }),
           ],
         );
       },

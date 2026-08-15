@@ -35,6 +35,7 @@ void main() {
     expect(labels, contains(MadrasaCopy.payments));
     expect(labels, contains(MadrasaCopy.contacts));
     expect(labels, contains(MadrasaCopy.audit));
+    expect(labels, contains(MadrasaCopy.settings));
     expect(labels, isNot(contains(MadrasaCopy.teachers)));
     expect(labels, isNot(contains(MadrasaCopy.classes)));
   });

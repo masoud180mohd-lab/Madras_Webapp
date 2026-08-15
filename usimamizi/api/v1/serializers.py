@@ -103,10 +103,25 @@ class HudhurioSerializer(serializers.ModelSerializer):
 
 class SomoSerializer(serializers.ModelSerializer):
     darasa = serializers.IntegerField(source="darasa_id", allow_null=True)
+    darasa_jina = serializers.CharField(source="darasa.jina", allow_null=True)
+    mwalimu = serializers.SerializerMethodField()
 
     class Meta:
         model = Somo
-        fields = ("id", "jina", "ni_la_hifdhu", "darasa")
+        fields = (
+            "id",
+            "jina",
+            "ni_la_hifdhu",
+            "darasa",
+            "darasa_jina",
+            "mwalimu",
+        )
+
+    def get_mwalimu(self, obj):
+        if obj.mwalimu_id is None:
+            return None
+        user = obj.mwalimu.user
+        return user.get_full_name() or user.username
 
 
 class SabaqCreateSerializer(serializers.Serializer):
@@ -170,17 +185,28 @@ class MaksiBatchSerializer(serializers.Serializer):
 class MwalimuSerializer(serializers.ModelSerializer):
     jina = serializers.SerializerMethodField()
     username = serializers.CharField(source="user.username", read_only=True)
+    picha = serializers.SerializerMethodField()
 
     class Meta:
         model = Mwalimu
-        fields = ("id", "jina", "username", "cheo", "namba_ya_simu")
+        fields = ("id", "jina", "username", "cheo", "namba_ya_simu", "picha")
 
     def get_jina(self, obj):
         return obj.user.get_full_name() or obj.user.username
 
+    def get_picha(self, obj):
+        if not obj.picha:
+            return None
+        request = self.context.get("request")
+        url = obj.picha.url
+        if request:
+            return request.build_absolute_uri(url)
+        return url
+
 
 class MwanafunziDirectorySerializer(serializers.ModelSerializer):
     darasa = serializers.CharField(source="darasa.jina", allow_null=True)
+    darasa_id = serializers.IntegerField(allow_null=True, required=False)
     picha = serializers.SerializerMethodField()
 
     class Meta:
@@ -191,6 +217,7 @@ class MwanafunziDirectorySerializer(serializers.ModelSerializer):
             "namba_ya_usajili",
             "jinsia",
             "darasa",
+            "darasa_id",
             "picha",
         )
 
@@ -204,11 +231,73 @@ class MwanafunziDirectorySerializer(serializers.ModelSerializer):
         return url
 
 
+class MwanafunziDetailSerializer(serializers.ModelSerializer):
+    darasa = serializers.CharField(source="darasa.jina", allow_null=True)
+    darasa_id = serializers.IntegerField(allow_null=True, required=False)
+    programu_usiku = serializers.CharField(
+        source="programu_ya_usiku.jina", allow_null=True
+    )
+    picha = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Mwanafunzi
+        fields = (
+            "id",
+            "jina_kamili",
+            "namba_ya_usajili",
+            "jinsia",
+            "tarehe_ya_kuzaliwa",
+            "mahala_anapoishi",
+            "darasa",
+            "darasa_id",
+            "programu_usiku",
+            "juzuu_aliyohifadhi",
+            "tarehe_ya_kujiunga",
+            "picha",
+            "jina_la_mzazi",
+            "namba_ya_simu_mzazi",
+            "uhusiano_wa_mlezi",
+            "jina_la_mzazi_pili",
+            "namba_ya_simu_mzazi_pili",
+            "uhusiano_wa_mlezi_pili",
+        )
+
+    def get_picha(self, obj):
+        if not obj.picha:
+            return None
+        request = self.context.get("request")
+        url = obj.picha.url
+        if request:
+            return request.build_absolute_uri(url)
+        return url
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        if request is None:
+            return data
+        from usimamizi.permissions import CAP_PARENT_CONTACT, user_has_capability
+
+        if not user_has_capability(request.user, CAP_PARENT_CONTACT):
+            for key in (
+                "jina_la_mzazi",
+                "namba_ya_simu_mzazi",
+                "uhusiano_wa_mlezi",
+                "jina_la_mzazi_pili",
+                "namba_ya_simu_mzazi_pili",
+                "uhusiano_wa_mlezi_pili",
+            ):
+                data.pop(key, None)
+        return data
+
+
 class WatoroRowSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     jina_kamili = serializers.CharField()
     darasa = serializers.CharField(allow_null=True)
     idadi_ya_utoro = serializers.IntegerField()
+    aina = serializers.CharField()
+    aina_jina = serializers.CharField()
 
 
 class MalipoSerializer(serializers.ModelSerializer):
