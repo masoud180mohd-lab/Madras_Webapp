@@ -19,6 +19,16 @@ Auth: `Authorization: Bearer <access>`. Access ~15 min, refresh ~7 days (rotated
 | `POST` | `/api/v1/auth/token/` | public (username + password) |
 | `POST` | `/api/v1/auth/refresh/` | refresh token |
 | `GET` | `/api/v1/me/` | authenticated — `cheo` + `capabilities` |
+| `GET` | `/api/v1/mwanzo/` | authenticated — dashboard metrics |
+| `GET` | `/api/v1/walimu/` | `view_directory` |
+| `GET` | `/api/v1/wanafunzi/?q=&darasa=` | `view_students` — hai tu; no parent phones |
+| `GET` | `/api/v1/watoro/` | `attendance` or `view_students` |
+| `GET` | `/api/v1/malipo/` | `fees` |
+| `GET` | `/api/v1/aina-malipo/` | `manage_students` |
+| `GET` | `/api/v1/mwaka/` | `mseto` |
+| `GET` | `/api/v1/hamisha/` | `promote_class` — class counts |
+| `GET` | `/api/v1/mawasiliano/` | `parent_contact` — parent phones |
+| `GET` | `/api/v1/ukaguzi/` | `manage_students` or `fees` |
 | `GET` | `/api/v1/madarasa/` | `view_directory` |
 | `GET` | `/api/v1/madarasa/<id>/wanafunzi/` | `view_students` — hai tu; no parent phones |
 | `GET` | `/api/v1/mahudhurio/?darasa=&tarehe=&aina_ya_rekodi=` | `attendance` |

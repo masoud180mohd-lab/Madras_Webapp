@@ -221,6 +221,37 @@ class ApiV1Tests(TestCase):
         self.assertIn(CAP_FEES, response.data["capabilities"])
         self.assertEqual(self.client.get("/api/v1/madarasa/").status_code, 200)
 
+    def test_catalog_sidebar_lists_respect_capabilities(self):
+        self._auth("api_kawaida")
+        self.assertEqual(self.client.get("/api/v1/mwanzo/").status_code, 200)
+        walimu = self.client.get("/api/v1/walimu/")
+        self.assertEqual(walimu.status_code, 200)
+        names = {row["username"] for row in walimu.data}
+        self.assertIn("api_kawaida", names)
+        students = self.client.get("/api/v1/wanafunzi/")
+        self.assertEqual(students.status_code, 200)
+        ids = {row["id"] for row in students.data}
+        self.assertEqual(ids, {self.s1.id, self.s2.id})
+        for row in students.data:
+            self.assertNotIn("namba_ya_simu_mzazi", row)
+        self.assertEqual(self.client.get("/api/v1/watoro/").status_code, 200)
+        self.assertEqual(self.client.get("/api/v1/malipo/").status_code, 403)
+        self.assertEqual(self.client.get("/api/v1/mawasiliano/").status_code, 403)
+
+        self._auth("api_ofisi")
+        self.assertEqual(self.client.get("/api/v1/walimu/").status_code, 403)
+        self.assertEqual(self.client.get("/api/v1/malipo/").status_code, 200)
+        contacts = self.client.get("/api/v1/mawasiliano/")
+        self.assertEqual(contacts.status_code, 200)
+        phones = {row["id"]: row["namba_ya_simu_mzazi"] for row in contacts.data}
+        self.assertEqual(phones[self.s1.id], "0771111111")
+
+        self._auth("api_mkuu")
+        self.assertEqual(self.client.get("/api/v1/mwaka/").status_code, 200)
+        self.assertEqual(self.client.get("/api/v1/hamisha/").status_code, 200)
+        self.assertEqual(self.client.get("/api/v1/ukaguzi/").status_code, 200)
+        self.assertEqual(self.client.get("/api/v1/aina-malipo/").status_code, 200)
+
 
 @HOSTS
 @NO_THROTTLE

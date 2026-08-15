@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 
+from django.db.models import Count, Q
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -66,7 +67,12 @@ class DarasaListView(APIView):
     required_capability = CAP_VIEW_DIRECTORY
 
     def get(self, request):
-        qs = Darasa.objects.all().order_by("jina")
+        qs = Darasa.objects.annotate(
+            idadi_wanafunzi=Count(
+                "mwanafunzi",
+                filter=Q(mwanafunzi__amehifadhiwa=False),
+            )
+        ).order_by("jina")
         return Response(DarasaSerializer(qs, many=True).data)
 
 

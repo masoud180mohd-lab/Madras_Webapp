@@ -3,12 +3,19 @@ from __future__ import annotations
 from rest_framework import serializers
 
 from usimamizi.models import (
+    AinaMalipo,
     Darasa,
     Hudhurio,
+    Malipo,
     Mtihani,
+    Muhula,
+    MwakaWaMasomo,
+    Mwalimu,
     Mwanafunzi,
     RekodiMaendeleoMchana,
+    RekodiUkaguzi,
     Somo,
+    Tangazo,
 )
 
 
@@ -21,9 +28,11 @@ class MeSerializer(serializers.Serializer):
 
 
 class DarasaSerializer(serializers.ModelSerializer):
+    idadi_wanafunzi = serializers.IntegerField(read_only=True, required=False)
+
     class Meta:
         model = Darasa
-        fields = ("id", "jina", "maelezo")
+        fields = ("id", "jina", "maelezo", "idadi_wanafunzi")
 
 
 class MwanafunziRosterSerializer(serializers.ModelSerializer):
@@ -156,3 +165,145 @@ class MaksiBatchSerializer(serializers.Serializer):
         if len(ids) != len(set(ids)):
             raise serializers.ValidationError("Mwanafunzi amerudiwa kwenye rekodi.")
         return value
+
+
+class MwalimuSerializer(serializers.ModelSerializer):
+    jina = serializers.SerializerMethodField()
+    username = serializers.CharField(source="user.username", read_only=True)
+
+    class Meta:
+        model = Mwalimu
+        fields = ("id", "jina", "username", "cheo", "namba_ya_simu")
+
+    def get_jina(self, obj):
+        return obj.user.get_full_name() or obj.user.username
+
+
+class MwanafunziDirectorySerializer(serializers.ModelSerializer):
+    darasa = serializers.CharField(source="darasa.jina", allow_null=True)
+    picha = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Mwanafunzi
+        fields = (
+            "id",
+            "jina_kamili",
+            "namba_ya_usajili",
+            "jinsia",
+            "darasa",
+            "picha",
+        )
+
+    def get_picha(self, obj):
+        if not obj.picha:
+            return None
+        request = self.context.get("request")
+        url = obj.picha.url
+        if request:
+            return request.build_absolute_uri(url)
+        return url
+
+
+class WatoroRowSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    jina_kamili = serializers.CharField()
+    darasa = serializers.CharField(allow_null=True)
+    idadi_ya_utoro = serializers.IntegerField()
+
+
+class MalipoSerializer(serializers.ModelSerializer):
+    mwanafunzi = serializers.CharField(source="mwanafunzi.jina_kamili")
+    aina = serializers.CharField(source="aina_ya_malipo.lebo_kamili")
+
+    class Meta:
+        model = Malipo
+        fields = (
+            "id",
+            "mwanafunzi",
+            "aina",
+            "kiasi_kilicholipwa",
+            "tarehe_ya_malipo",
+            "njia_ya_malipo",
+        )
+
+
+class AinaMalipoSerializer(serializers.ModelSerializer):
+    lebo_kamili = serializers.CharField(read_only=True)
+    mwaka = serializers.CharField(source="mwaka.jina", allow_null=True)
+
+    class Meta:
+        model = AinaMalipo
+        fields = (
+            "id",
+            "jina",
+            "lebo_kamili",
+            "kiasi_kinachotakiwa",
+            "mwaka",
+            "mwezi",
+        )
+
+
+class MuhulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Muhula
+        fields = ("id", "namba", "jina", "ni_hai")
+
+
+class MwakaSerializer(serializers.ModelSerializer):
+    muhula = MuhulaSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = MwakaWaMasomo
+        fields = (
+            "id",
+            "jina",
+            "mwaka_kuanzia",
+            "mwaka_kuisha",
+            "ni_hai",
+            "muhula",
+        )
+
+
+class MawasilianoSerializer(serializers.ModelSerializer):
+    darasa = serializers.CharField(source="darasa.jina", allow_null=True)
+
+    class Meta:
+        model = Mwanafunzi
+        fields = (
+            "id",
+            "jina_kamili",
+            "namba_ya_usajili",
+            "darasa",
+            "jina_la_mzazi",
+            "namba_ya_simu_mzazi",
+            "uhusiano_wa_mlezi",
+            "jina_la_mzazi_pili",
+            "namba_ya_simu_mzazi_pili",
+        )
+
+
+class UkaguziSerializer(serializers.ModelSerializer):
+    mtumiaji = serializers.SerializerMethodField()
+    kitendo_jina = serializers.CharField(source="get_kitendo_display")
+
+    class Meta:
+        model = RekodiUkaguzi
+        fields = (
+            "id",
+            "kitendo",
+            "kitendo_jina",
+            "maelezo",
+            "mtumiaji",
+            "tarehe_ya_kitendo",
+        )
+
+    def get_mtumiaji(self, obj):
+        if obj.mtumiaji is None:
+            return None
+        return obj.mtumiaji.get_full_name() or obj.mtumiaji.username
+
+
+class TangazoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tangazo
+        fields = ("id", "kichwa_cha_habari", "maelezo", "tarehe_iliyotolewa")
