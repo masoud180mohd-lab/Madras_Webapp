@@ -177,10 +177,17 @@ class MaendeleoCreateSerializer(serializers.Serializer):
 
 class MtihaniSerializer(serializers.ModelSerializer):
     somo = serializers.IntegerField(source="somo_id")
+    mseto = serializers.IntegerField(source="mseto_id", allow_null=True, required=False)
 
     class Meta:
         model = Mtihani
-        fields = ("id", "jina_la_mtihani", "tarehe", "somo")
+        fields = ("id", "jina_la_mtihani", "tarehe", "somo", "mseto")
+
+
+class MtihaniCreateSerializer(serializers.Serializer):
+    jina_la_mtihani = serializers.CharField(max_length=100)
+    tarehe = serializers.DateField()
+    mseto = serializers.IntegerField(required=False, allow_null=True)
 
 
 class MaksiRowSerializer(serializers.Serializer):

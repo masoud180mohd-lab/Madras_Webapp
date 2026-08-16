@@ -88,6 +88,37 @@ class CatalogRepository {
     );
   }
 
+  Future<SubjectMaterial> pakiaNyenzo({
+    required int somoId,
+    required String jinaLaFaili,
+    required List<int> bytes,
+    required String filename,
+  }) async {
+    final raw = await _api.postMultipart(
+      '/api/v1/masomo/$somoId/nyenzo/',
+      fields: {'jina_la_faili': jinaLaFaili},
+      fileField: 'faili',
+      bytes: bytes,
+      filename: filename,
+    );
+    return SubjectMaterial.fromJson(raw as Map<String, dynamic>);
+  }
+
+  Future<SubjectExam> undaMtihani({
+    required int somoId,
+    required String jina,
+    required String tarehe,
+  }) async {
+    final raw = await _api.post(
+      '/api/v1/masomo/$somoId/mitihani/',
+      body: {
+        'jina_la_mtihani': jina,
+        'tarehe': tarehe,
+      },
+    );
+    return SubjectExam.fromJson(raw as Map<String, dynamic>);
+  }
+
   Future<List<CatalogRow>> masomo() async {
     final list = await _api.get('/api/v1/masomo/') as List<dynamic>;
     return list.whereType<Map<String, dynamic>>().map((row) {

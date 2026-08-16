@@ -35,6 +35,7 @@ class StaffProfile {
   bool get canManageStudents => capabilities.contains('manage_students');
   bool get canSeeFees => capabilities.contains('fees');
   bool get canSeeExams => capabilities.contains('exams');
+  bool get canSeeMaterials => capabilities.contains('materials');
   bool get canSeeMseto => capabilities.contains('mseto');
   bool get canPromoteClass => capabilities.contains('promote_class');
   bool get canSeeParents => capabilities.contains('parent_contact');

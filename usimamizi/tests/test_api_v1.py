@@ -416,6 +416,36 @@ class ApiV1SabaqExamsTests(TestCase):
         self.assertEqual(len(response.data["mitihani"]), 1)
         self.assertEqual(response.data["mitihani"][0]["id"], self.exam.id)
 
+    def test_upload_nyenzo_and_create_mtihani(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        self._auth("p3_kawaida")
+        uploaded = self.client.post(
+            f"/api/v1/masomo/{self.fiqhi.id}/nyenzo/",
+            {
+                "jina_la_faili": "Maelezo ya Fiqhi",
+                "faili": SimpleUploadedFile(
+                    "fiqhi.pdf", b"%PDF-1.4 content", content_type="application/pdf"
+                ),
+            },
+            format="multipart",
+        )
+        self.assertEqual(uploaded.status_code, 201, uploaded.content)
+        self.assertEqual(uploaded.data["jina_la_faili"], "Maelezo ya Fiqhi")
+        self.assertTrue(uploaded.data["faili"])
+
+        created = self.client.post(
+            f"/api/v1/masomo/{self.fiqhi.id}/mitihani/",
+            {
+                "jina_la_mtihani": "Mtihani wa pili",
+                "tarehe": date.today().isoformat(),
+            },
+            format="json",
+        )
+        self.assertEqual(created.status_code, 201, created.content)
+        self.assertEqual(created.data["jina_la_mtihani"], "Mtihani wa pili")
+        self.assertEqual(Mtihani.objects.filter(somo=self.fiqhi).count(), 2)
+
     def test_hifdhu_somo_rejected_for_maendeleo(self):
         self._auth("p3_kawaida")
         response = self.client.post(

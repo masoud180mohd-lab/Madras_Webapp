@@ -23,6 +23,12 @@ class MadrasaCopy {
   static const subjectMaterials = 'Nyenzo za Kusomea';
   static const subjectExams = 'Mitihani & Matokeo';
   static const openMaterial = 'Fungua';
+  static const uploadMaterial = 'Pakia Nyenzo';
+  static const newExam = 'Mtihani Mpya';
+  static const examName = 'Jina la mtihani';
+  static const examDate = 'Tarehe';
+  static const materialName = 'Jina la faili';
+  static const pickFile = 'Chagua faili';
   static const viewResults = 'Tazama Ripoti';
   static const enterMarks = 'Jaza Maksi';
   static const saveMarks = 'Hifadhi maksi';

@@ -25,6 +25,8 @@ from usimamizi.api.v1.views import (
     SabaqCreateView,
     SomoDetailView,
     SomoListView,
+    SomoMtihaniCreateView,
+    SomoNyenzoCreateView,
 )
 
 urlpatterns = [
@@ -58,6 +60,16 @@ urlpatterns = [
         "masomo/<int:somo_id>/",
         SomoDetailView.as_view(),
         name="api_v1_somo_detail",
+    ),
+    path(
+        "masomo/<int:somo_id>/nyenzo/",
+        SomoNyenzoCreateView.as_view(),
+        name="api_v1_somo_nyenzo",
+    ),
+    path(
+        "masomo/<int:somo_id>/mitihani/",
+        SomoMtihaniCreateView.as_view(),
+        name="api_v1_somo_mitihani",
     ),
     path("sabaq/", SabaqCreateView.as_view(), name="api_v1_sabaq"),
     path("maendeleo/", MaendeleoCreateView.as_view(), name="api_v1_maendeleo"),

@@ -36,6 +36,8 @@ Auth: `Authorization: Bearer <access>`. Access ~15 min, refresh ~7 days (rotated
 | `POST` | `/api/v1/mahudhurio/` | `attendance` — batch, full active roster |
 | `GET` | `/api/v1/masomo/?darasa=` | `view_directory` / `exams` / `materials` |
 | `GET` | `/api/v1/masomo/<id>/` | same — somo + `nyenzo` + `mitihani` |
+| `POST` | `/api/v1/masomo/<id>/nyenzo/` | `materials` — multipart `jina_la_faili` + `faili` |
+| `POST` | `/api/v1/masomo/<id>/mitihani/` | `exams` — `jina_la_mtihani`, `tarehe`, optional `mseto` |
 | `POST` | `/api/v1/sabaq/` | `sabaq` — requires linked Mwalimu |
 | `POST` | `/api/v1/maendeleo/` | `sabaq` — maendeleo ya mchana (not hifdhu) |
 | `GET` | `/api/v1/mitihani/?somo=` | `exams` |

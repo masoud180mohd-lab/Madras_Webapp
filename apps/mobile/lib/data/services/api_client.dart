@@ -66,11 +66,31 @@ class ApiClient {
     });
   }
 
+  Future<dynamic> postMultipart(
+    String path, {
+    required Map<String, String> fields,
+    required String fileField,
+    required List<int> bytes,
+    required String filename,
+  }) {
+    return _send(() async {
+      final request = http.MultipartRequest('POST', _uri(path));
+      final headers = await _headers();
+      request.headers.addAll(headers);
+      request.fields.addAll(fields);
+      request.files.add(
+        http.MultipartFile.fromBytes(fileField, bytes, filename: filename),
+      );
+      final streamed = await _http.send(request);
+      return await http.Response.fromStream(streamed);
+    });
+  }
+
   Future<http.Response> getBytes(String url) async {
     final headers = await _headers();
     final response = await _http.get(Uri.parse(url), headers: headers);
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw ApiException(response.statusCode, 'Imeshindikana kupakua picha.');
+      throw ApiException(response.statusCode, 'Imeshindikana kupakua faili.');
     }
     return response;
   }

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date
 
+from django.core.exceptions import ValidationError
 from django.db.models import Count, Q
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -16,6 +17,7 @@ from usimamizi.api.v1.serializers import (
     MahudhurioBatchSerializer,
     MaksiBatchSerializer,
     MeSerializer,
+    MtihaniCreateSerializer,
     MtihaniSerializer,
     MwanafunziRosterSerializer,
     NyenzoSerializer,
@@ -26,12 +28,14 @@ from usimamizi.models import (
     Darasa,
     Hudhurio,
     Matokeo,
+    MsetoMtihani,
     Mtihani,
     Mwanafunzi,
     Nyenzo,
     RekodiHifdhu,
     RekodiMaendeleoMchana,
     Somo,
+    validate_nyenzo,
 )
 from usimamizi.permissions import (
     CAP_ATTENDANCE,
@@ -178,6 +182,77 @@ class SomoDetailView(APIView):
             many=True,
         ).data
         return Response(data)
+
+
+class SomoNyenzoCreateView(APIView):
+    """Upload learning material for a subject (web: Pakia Nyenzo)."""
+
+    permission_classes = [IsAuthenticated, HasCapability]
+    required_capability = CAP_MATERIALS
+
+    def post(self, request, somo_id):
+        somo = Somo.objects.filter(pk=somo_id).first()
+        if somo is None:
+            return Response({"detail": "Somo halipatikani."}, status=404)
+        if somo.ni_la_hifdhu:
+            return Response(
+                {"detail": "Nyenzo zinapakwa kwenye somo la darasa tu."},
+                status=400,
+            )
+        jina = (request.data.get("jina_la_faili") or "").strip()
+        faili = request.FILES.get("faili")
+        if not jina:
+            return Response({"detail": "Jina la faili linahitajika."}, status=400)
+        if faili is None:
+            return Response({"detail": "Faili linahitajika."}, status=400)
+        try:
+            validate_nyenzo(faili)
+        except ValidationError as exc:
+            message = exc.messages[0] if getattr(exc, "messages", None) else str(exc)
+            return Response({"detail": message}, status=400)
+        row = Nyenzo.objects.create(somo=somo, jina_la_faili=jina[:200], faili=faili)
+        return Response(
+            NyenzoSerializer(row, context={"request": request}).data,
+            status=201,
+        )
+
+
+class SomoMtihaniCreateView(APIView):
+    """Create exam under a subject (web: Mtihani Mpya)."""
+
+    permission_classes = [IsAuthenticated, HasCapability]
+    required_capability = CAP_EXAMS
+
+    def post(self, request, somo_id):
+        somo = Somo.objects.filter(pk=somo_id).first()
+        if somo is None:
+            return Response({"detail": "Somo halipatikani."}, status=404)
+        if somo.ni_la_hifdhu:
+            return Response(
+                {"detail": "Mitihani inaongezwa kwenye somo la darasa tu."},
+                status=400,
+            )
+        serializer = MtihaniCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        mseto = None
+        mseto_id = data.get("mseto")
+        if mseto_id is not None:
+            mseto = MsetoMtihani.objects.filter(pk=mseto_id).first()
+            if mseto is None:
+                return Response({"detail": "Mseto haupatikani."}, status=400)
+            if somo.darasa_id and mseto.darasa_id != somo.darasa_id:
+                return Response(
+                    {"detail": "Mseto si wa darasa la somo hili."},
+                    status=400,
+                )
+        exam = Mtihani.objects.create(
+            somo=somo,
+            jina_la_mtihani=data["jina_la_mtihani"],
+            tarehe=data["tarehe"],
+            mseto=mseto,
+        )
+        return Response(MtihaniSerializer(exam).data, status=201)
 
 
 class SabaqCreateView(APIView):
