@@ -15,6 +15,20 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+
+// AGP 9 locks compileSdk after evaluation, so afterEvaluate is too late.
+// finalizeDsl runs after each library's android {} block and before lock.
+// Register this BEFORE evaluationDependsOn(":app").
+subprojects {
+    pluginManager.withPlugin("com.android.library") {
+        extensions
+            .findByType(com.android.build.api.variant.LibraryAndroidComponentsExtension::class.java)
+            ?.finalizeDsl { extension ->
+                extension.compileSdk = 36
+            }
+    }
+}
+
 subprojects {
     project.evaluationDependsOn(":app")
 }
