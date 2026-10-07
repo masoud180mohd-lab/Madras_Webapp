@@ -143,7 +143,12 @@ class ApiClient {
     final code = response.statusCode;
     dynamic decoded;
     if (response.body.isNotEmpty) {
-      decoded = jsonDecode(response.body);
+      try {
+        decoded = jsonDecode(response.body);
+      } catch (e) {
+        // Invalid JSON response
+        return null;
+      }
     }
     if (code >= 200 && code < 300) {
       return decoded;
@@ -162,6 +167,9 @@ class ApiClient {
         return rekodi.first.toString();
       }
     }
+    if (code == 0 || code == -1) {
+      return 'Hakuna muunganisho wa mtandao. Tafadhali kuangalia Wi-Fi au mobile data.';
+    }
     if (code == 401) {
       return 'Jina la mtumiaji au nenosiri si sahihi.';
     }
@@ -171,6 +179,9 @@ class ApiClient {
     if (code == 409) {
       return 'Mahudhurio ya siku hii tayari yameshajulikana.';
     }
-    return 'Hitilafu ya mtandao ($code).';
+    if (code >= 500) {
+      return 'Hitilafu ya seva ($code). Tafadhali jaribu baadaye.';
+    }
+    return 'Hitilafu ya mtandao ($code). Tafadhali kuangalia muunganisho wako.';
   }
 }
