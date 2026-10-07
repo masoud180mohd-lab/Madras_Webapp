@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:http/http.dart' as http;
 
@@ -38,18 +39,22 @@ class ApiClient {
 
   Future<dynamic> get(String path, {Map<String, String>? query}) {
     return _send(() async {
-      return _http.get(_uri(path, query), headers: await _headers());
+      final uri = _uri(path, query);
+      developer.log('GET $uri', name: 'ApiClient.get');
+      return _http.get(uri, headers: await _headers());
     });
   }
 
   Future<dynamic> post(String path, {Object? body, bool auth = true}) {
     return _send(() async {
+      final uri = _uri(path);
       final headers = await _headers(jsonBody: true);
       if (!auth) {
         headers.remove('Authorization');
       }
+      developer.log('POST $uri | Auth: $auth | Body: ${jsonEncode(body)}', name: 'ApiClient.post');
       return _http.post(
-        _uri(path),
+        uri,
         headers: headers,
         body: body == null ? null : jsonEncode(body),
       );
@@ -99,44 +104,64 @@ class ApiClient {
     Future<http.Response> Function() request, {
     bool retryOn401 = true,
   }) async {
-    var response = await request();
-    if (response.statusCode == 401 && retryOn401) {
-      final refreshed = await _refresh();
-      if (refreshed) {
-        response = await request();
+    try {
+      var response = await request();
+      developer.log('Response: ${response.statusCode} | Body length: ${response.body.length}', name: 'ApiClient._send');
+      if (response.statusCode == 401 && retryOn401) {
+        developer.log('Got 401, attempting token refresh...', name: 'ApiClient._send');
+        final refreshed = await _refresh();
+        if (refreshed) {
+          developer.log('Token refreshed successfully, retrying request', name: 'ApiClient._send');
+          response = await request();
+        }
       }
+      return _decode(response);
+    } catch (e, stack) {
+      developer.log('Request error: $e\nStack: $stack', name: 'ApiClient._send', level: 1000);
+      rethrow;
     }
-    return _decode(response);
   }
 
   Future<bool> _refresh() async {
+    developer.log('Attempting to refresh token...', name: 'ApiClient._refresh');
     final refresh = await _tokens.readRefresh();
     if (refresh == null || refresh.isEmpty) {
+      developer.log('No refresh token available', name: 'ApiClient._refresh', level: 1000);
       return false;
     }
-    final response = await _http.post(
-      _uri('/api/v1/auth/refresh/'),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({'refresh': refresh}),
-    );
-    if (response.statusCode != 200) {
-      await _tokens.clear();
+    try {
+      final response = await _http.post(
+        _uri('/api/v1/auth/refresh/'),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({'refresh': refresh}),
+      );
+      developer.log('Token refresh response: ${response.statusCode}', name: 'ApiClient._refresh');
+      if (response.statusCode != 200) {
+        developer.log('Token refresh failed: ${response.body}', name: 'ApiClient._refresh', level: 1000);
+        await _tokens.clear();
+        return false;
+      }
+      final data = jsonDecode(response.body);
+      if (data is! Map<String, dynamic>) {
+        developer.log('Invalid token response format', name: 'ApiClient._refresh', level: 1000);
+        return false;
+      }
+      final access = data['access'] as String?;
+      final newRefresh = data['refresh'] as String? ?? refresh;
+      if (access == null) {
+        developer.log('No access token in refresh response', name: 'ApiClient._refresh', level: 1000);
+        return false;
+      }
+      await _tokens.writeTokens(access: access, refresh: newRefresh);
+      developer.log('Token refreshed successfully', name: 'ApiClient._refresh');
+      return true;
+    } catch (e, stack) {
+      developer.log('Token refresh error: $e\nStack: $stack', name: 'ApiClient._refresh', level: 1000);
       return false;
     }
-    final data = jsonDecode(response.body);
-    if (data is! Map<String, dynamic>) {
-      return false;
-    }
-    final access = data['access'] as String?;
-    final newRefresh = data['refresh'] as String? ?? refresh;
-    if (access == null) {
-      return false;
-    }
-    await _tokens.writeTokens(access: access, refresh: newRefresh);
-    return true;
   }
 
   dynamic _decode(http.Response response) {
@@ -145,15 +170,18 @@ class ApiClient {
     if (response.body.isNotEmpty) {
       try {
         decoded = jsonDecode(response.body);
+        developer.log('Decoded response successfully', name: 'ApiClient._decode');
       } catch (e) {
-        // Invalid JSON response
+        developer.log('JSON decode error: $e | Body: ${response.body.substring(0, 200)}', name: 'ApiClient._decode', level: 1000);
         return null;
       }
     }
     if (code >= 200 && code < 300) {
       return decoded;
     }
-    throw ApiException(code, _messageFrom(decoded, code));
+    final errorMsg = _messageFrom(decoded, code);
+    developer.log('Error response: $code | Message: $errorMsg', name: 'ApiClient._decode', level: 1000);
+    throw ApiException(code, errorMsg);
   }
 
   String _messageFrom(dynamic decoded, int code) {
