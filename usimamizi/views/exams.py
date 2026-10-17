@@ -49,7 +49,7 @@ from ..permissions import (
     user_has_capability,
 )
 
-from .helpers import link_callback
+from .helpers import link_callback, pdf_media_tempdir
 
 @login_required(login_url='ingia')
 @ruhusa_inahitajika('usimamizi.add_matokeo', 'usimamizi.change_matokeo')
@@ -175,7 +175,8 @@ def pakua_pdf_matokeo(request, mtihani_id):
     jina_la_faili = f"Matokeo_{somo.jina}_{mtihani.jina_la_mtihani}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+    with pdf_media_tempdir():
+        pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Kumetokea hitilafu katika kutengeneza PDF ya matokeo', status=500)
     return response
@@ -255,7 +256,8 @@ def pakua_pdf_matokeo_jumla(request, darasa_id, mseto_id):
     jina_la_faili = f"Matokeo_Jumla_{darasa.jina}_{jina_salama}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+    with pdf_media_tempdir():
+        pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Kumetokea hitilafu katika kutengeneza PDF ya matokeo ya jumla', status=500)
     return response

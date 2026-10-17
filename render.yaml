@@ -1,0 +1,45 @@
+databases:
+  - name: madrasa-db
+    databaseName: madrasa_db
+    user: madrasa_user
+    plan: free
+
+services:
+  - type: web
+    name: madrasa-webapp
+    branch: main
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn madrasa_sys.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --max-requests 1000 --max-requests-jitter 50"
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: madrasa-db
+          property: connectionString
+      - key: DJANGO_ENV
+        value: production
+      - key: DJANGO_SETTINGS_MODULE
+        value: madrasa_sys.settings
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: madrasa-webapp
+          property: host
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: "https://madrasa-webapp.onrender.com"
+      - key: DJANGO_SECURE_SSL_REDIRECT
+        value: "False"
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

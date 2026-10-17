@@ -22,3 +22,7 @@ pypdf==6.14.2
 svglib==2.0.2
 cssselect2==0.8.0
 lxml==6.1.1
+
+dj-database-url>=2.1
+cloudinary>=1.36
+django-cloudinary-storage>=0.3.0

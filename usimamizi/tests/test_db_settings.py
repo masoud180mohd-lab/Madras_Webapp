@@ -3,7 +3,7 @@ from pathlib import Path
 from django.test import SimpleTestCase
 
 from madrasa_sys.settings.base import env_bool
-from madrasa_sys.settings.db import build_databases, parse_database_url
+from madrasa_sys.settings.db import build_databases
 
 
 class DatabaseSettingsBuilderTests(SimpleTestCase):
@@ -51,16 +51,12 @@ class DatabaseSettingsBuilderTests(SimpleTestCase):
         self.assertEqual(cfg["USER"], "u")
         self.assertEqual(cfg["PASSWORD"], "p@ss")
         self.assertEqual(cfg["HOST"], "db.example")
-        self.assertEqual(cfg["PORT"], "5433")
+        # dj-database-url returns PORT as an int for postgres URLs.
+        self.assertEqual(int(cfg["PORT"]), 5433)
+        # ssl_require=True injects sslmode into OPTIONS.
+        self.assertEqual(cfg["OPTIONS"].get("sslmode"), "require")
 
-    def test_mysql_url_and_discrete(self):
-        cfg = parse_database_url(
-            "mysql://pa_user:secret@pa_user.mysql.pythonanywhere-services.com:3306/pa_user$madrasa"
-        )
-        self.assertEqual(cfg["ENGINE"], "django.db.backends.mysql")
-        self.assertEqual(cfg["NAME"], "pa_user$madrasa")
-        self.assertEqual(cfg["HOST"], "pa_user.mysql.pythonanywhere-services.com")
-
+    def test_discrete_mysql(self):
         db = build_databases(
             self.base,
             environ={
@@ -75,9 +71,47 @@ class DatabaseSettingsBuilderTests(SimpleTestCase):
         self.assertEqual(db["default"]["ENGINE"], "django.db.backends.mysql")
         self.assertEqual(db["default"]["OPTIONS"].get("charset"), "utf8mb4")
 
-    def test_parse_rejects_unknown(self):
+    def test_mysql_url_parsed(self):
+        db = build_databases(
+            self.base,
+            environ={
+                "DATABASE_URL": (
+                    "mysql://pa_user:secret@"
+                    "pa_user.mysql.pythonanywhere-services.com:3306/pa_user$madrasa"
+                ),
+            },
+        )
+        cfg = db["default"]
+        self.assertEqual(cfg["ENGINE"], "django.db.backends.mysql")
+        self.assertEqual(cfg["NAME"], "pa_user$madrasa")
+        self.assertEqual(cfg["HOST"], "pa_user.mysql.pythonanywhere-services.com")
+        self.assertEqual(int(cfg["PORT"]), 3306)
+
+    def test_ssl_require_adds_options(self):
+        db = build_databases(
+            self.base,
+            environ={"DATABASE_URL": "postgres://u:p@db.example:5432/mydb"},
+        )
+        cfg = db["default"]
+        self.assertEqual(cfg["OPTIONS"].get("sslmode"), "require")
+
+    def test_unknown_scheme_raises(self):
+        # oracle:// is now a supported scheme, so use a genuinely unknown one.
         with self.assertRaises(ValueError):
-            parse_database_url("oracle://u:p@localhost/db")
+            build_databases(
+                self.base,
+                environ={"DATABASE_URL": "nosuchdb://u:p@localhost/db"},
+            )
+
+    def test_conn_max_age_passthrough(self):
+        db = build_databases(
+            self.base,
+            environ={
+                "DATABASE_URL": "postgres://u:p@db.example:5432/mydb",
+                "DB_CONN_MAX_AGE": "120",
+            },
+        )
+        self.assertEqual(db["default"]["CONN_MAX_AGE"], 120)
 
     def test_allow_sqlite_env_flag(self):
         import os

@@ -1,5 +1,12 @@
 import csv
+import mimetypes
 import os
+import shutil
+import tempfile
+import threading
+import uuid
+import urllib.request
+from contextlib import contextmanager
 from urllib.parse import urlparse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
@@ -49,9 +56,112 @@ from ..permissions import (
     user_has_capability,
 )
 
+from .media_protected import signed_media_url_for_path
+
+# --- Cloudinary-backed media for PDF generation -----------------------------
+#
+# xhtml2pdf resolves <img>/link URIs through link_callback, which historically
+# returns LOCAL filesystem paths. When media lives on Cloudinary (e.g. Render),
+# the local MEDIA_ROOT is empty/ephemeral, so we obtain a short-lived signed URL
+# via signed_media_url_for_path() and download it to a temporary file whose path
+# is handed back to pisa. We download rather than return the remote URL because
+# the existing callback contract is "return a local path" — deterministic across
+# xhtml2pdf versions and independent of pisa's optional remote-fetch support.
+
+_pdf_local = threading.local()
+
+
+@contextmanager
+def pdf_media_tempdir():
+    """
+    Per-PDF-generation temporary directory for downloaded Cloudinary media.
+
+    Wrap each pisa.CreatePDF(...) call in this context manager so the files that
+    link_callback downloads are removed as soon as the PDF bytes are produced.
+    Nesting is safe; the innermost active directory is the one used.
+    """
+    tmp_dir = tempfile.mkdtemp(prefix="madrasa_pdf_")
+    previous = getattr(_pdf_local, "temp_dir", None)
+    _pdf_local.temp_dir = tmp_dir
+    try:
+        yield tmp_dir
+    finally:
+        _pdf_local.temp_dir = previous
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+def _media_relative_path(path):
+    """
+    Return the MEDIA_ROOT-relative portion of a URI, or None if it is not a
+    media URI. Accepts the MEDIA_URL form, an absolute "/media/..." form, and a
+    relative "media/..." form.
+    """
+    prefixes = []
+    for candidate in (settings.MEDIA_URL, "/media/", "media/"):
+        if candidate and candidate not in prefixes:
+            prefixes.append(candidate)
+    # Longest prefix first so "/media/x" is never matched by the "media/" form.
+    for prefix in sorted(prefixes, key=len, reverse=True):
+        if path.startswith(prefix):
+            return path[len(prefix):]
+    return None
+
+
+def _download_to_temp(signed_url, media_rel):
+    """
+    Download a signed Cloudinary URL to a temporary file and return its local
+    path, or None on failure.
+
+    Uses the active per-generation temp dir (see pdf_media_tempdir) when one is
+    set. LIMITATION: when link_callback runs outside pdf_media_tempdir() (e.g. a
+    PDF view that does not wrap CreatePDF), files are written to the system temp
+    dir and are NOT removed by this code — they rely on the OS temp cleanup
+    policy. Wrap CreatePDF calls in pdf_media_tempdir() for guaranteed cleanup.
+    """
+    try:
+        with urllib.request.urlopen(signed_url, timeout=30) as resp:
+            data = resp.read()
+            content_type = (resp.headers.get("Content-Type") or "").split(";")[0].strip()
+    except Exception:
+        return None
+
+    suffix = os.path.splitext(media_rel)[1]
+    if not suffix and content_type:
+        suffix = mimetypes.guess_extension(content_type) or ""
+    if not suffix:
+        suffix = ".img"
+
+    tmp_dir = getattr(_pdf_local, "temp_dir", None)
+    try:
+        if tmp_dir is not None:
+            dest = os.path.join(tmp_dir, uuid.uuid4().hex + suffix)
+            with open(dest, "wb") as fh:
+                fh.write(data)
+            return dest
+        fd, dest = tempfile.mkstemp(suffix=suffix, prefix="madrasa_pdf_")
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(data)
+        return dest
+    except Exception:
+        return None
+
+
 def link_callback(uri, rel):
     parsed_uri = urlparse(uri)
     path = parsed_uri.path or uri
+
+    # Cloudinary-backed media: when enabled, embed the file from a signed URL
+    # (downloaded to a temp path) instead of the ephemeral local MEDIA_ROOT.
+    # signed_media_url_for_path() returns None when Cloudinary is disabled, the
+    # path is empty/unsafe (traversal), or signing fails — in every such case we
+    # fall through to the unchanged local behaviour below.
+    media_rel = _media_relative_path(path)
+    if media_rel is not None:
+        signed_url = signed_media_url_for_path(media_rel)
+        if signed_url:
+            local_path = _download_to_temp(signed_url, media_rel)
+            if local_path:
+                return local_path
 
     if path.startswith(settings.MEDIA_URL):
         media_path = os.path.join(settings.MEDIA_ROOT, path.replace(settings.MEDIA_URL, "", 1))

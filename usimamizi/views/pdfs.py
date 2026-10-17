@@ -49,7 +49,7 @@ from ..permissions import (
     user_has_capability,
 )
 
-from .helpers import link_callback
+from .helpers import link_callback, pdf_media_tempdir
 
 @login_required(login_url='ingia')
 @ruhusa_capability(CAP_VIEW_STUDENTS, CAP_ATTENDANCE)
@@ -79,7 +79,8 @@ def pakua_pdf_mahudhurio(request, mwanafunzi_id, aina, muda):
     jina_la_faili = f"Mahudhurio_{mwanafunzi.namba_ya_usajili}_{muda_wa_sasa.strftime('%H%M%S')}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+    with pdf_media_tempdir():
+        pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Samahani, kumetokea hitilafu katika kutengeneza PDF', status=500)
     return response
@@ -115,7 +116,8 @@ def pakua_pdf_sabaq(request, mwanafunzi_id, aina, muda):
     jina_la_faili = f"Sabaq_{mwanafunzi.namba_ya_usajili}_{muda_wa_sasa.strftime('%H%M%S')}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+    with pdf_media_tempdir():
+        pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Hitilafu ilitokea', status=500)
     return response

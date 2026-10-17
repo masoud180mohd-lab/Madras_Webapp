@@ -51,7 +51,7 @@ from ..permissions import (
     user_has_capability,
 )
 
-from .helpers import link_callback, paginate_items
+from .helpers import link_callback, paginate_items, pdf_media_tempdir
 
 @login_required(login_url='ingia')
 @ruhusa_capability(CAP_FEES)
@@ -249,7 +249,8 @@ def pakua_risiti(request, malipo_id):
     jina_la_faili = f"Risiti_{mwanafunzi.namba_ya_usajili}_{malipo.id}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{jina_la_faili}"'
 
-    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+    with pdf_media_tempdir():
+        pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     if pisa_status.err:
         return HttpResponse('Kumetokea hitilafu katika kutengeneza Risiti', status=500)
     return response

@@ -55,9 +55,27 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     *MIDDLEWARE[1:],
 ]
+# Cloudinary is opt-in. When credentials are present, new uploads go to Cloudinary
+# through the protected /media/ backend (usimamizi.storage.ProtectedCloudinaryStorage),
+# which keeps field.url pointing at the authenticated endpoint instead of the public
+# CDN. When they are absent, production stays on local FileSystemStorage. Detected
+# from the environment directly so settings never import the usimamizi app at load
+# time; the backend is referenced by dotted string path so Django imports it lazily.
+# Mirrors usimamizi.cloudinary_utils.is_cloudinary_enabled (CLOUDINARY_URL, or the
+# discrete CLOUDINARY_CLOUD_NAME + API_KEY + API_SECRET trio that Render provides).
+_cloudinary_keys = ("CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET")
+cloudinary_ready = bool(
+    os.environ.get("CLOUDINARY_URL")
+    or all(os.environ.get(key) for key in _cloudinary_keys)
+)
+
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": (
+            "usimamizi.storage.ProtectedCloudinaryStorage"
+            if cloudinary_ready
+            else "django.core.files.storage.FileSystemStorage"
+        ),
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",

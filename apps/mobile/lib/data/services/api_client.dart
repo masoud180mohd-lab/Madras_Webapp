@@ -87,8 +87,54 @@ class ApiClient {
   }
 
   Future<http.Response> getBytes(String url) async {
+    final uri = Uri.parse(url);
+    final isMediaRequest = uri.path.startsWith('/media/');
     final headers = await _headers();
-    final response = await _http.get(Uri.parse(url), headers: headers);
+
+    if (isMediaRequest) {
+      // Ask the API for the media. In Cloudinary mode it replies with JSON
+      // holding a signed URL; in development/fallback mode it replies with the
+      // raw file bytes.
+      final apiResponse = await _http.get(uri, headers: headers);
+      if (apiResponse.statusCode < 200 || apiResponse.statusCode >= 300) {
+        throw ApiException(
+          apiResponse.statusCode,
+          'Imeshindikana kupakua faili.',
+        );
+      }
+
+      // Interpret the body as a signed-URL payload when possible.
+      String? signedUrl;
+      try {
+        final data = jsonDecode(apiResponse.body);
+        if (data is Map<String, dynamic> && data['url'] is String) {
+          signedUrl = data['url'] as String;
+        }
+      } catch (_) {
+        // Not JSON -> the API already served the raw bytes (fallback mode).
+        signedUrl = null;
+      }
+
+      if (signedUrl == null) {
+        // Development/fallback mode: the response already contains the bytes.
+        return apiResponse;
+      }
+
+      // Cloudinary mode: fetch the actual bytes from the signed URL.
+      final imageResponse = await http.get(Uri.parse(signedUrl));
+      if (imageResponse.statusCode < 200 || imageResponse.statusCode >= 300) {
+        // Do NOT fall back to the /media/ endpoint here: in Cloudinary mode it
+        // returns JSON, which would be handed to the caller as image bytes.
+        throw ApiException(
+          imageResponse.statusCode,
+          'Imeshindikana kupakua faili.',
+        );
+      }
+      return imageResponse;
+    }
+
+    // Non-media request: direct download.
+    final response = await _http.get(uri, headers: headers);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw ApiException(response.statusCode, 'Imeshindikana kupakua faili.');
     }

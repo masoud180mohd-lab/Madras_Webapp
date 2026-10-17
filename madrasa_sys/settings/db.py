@@ -5,7 +5,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 from typing import Any, Dict, Optional
-from urllib.parse import unquote, urlparse
+
+import dj_database_url
 
 
 def _sqlite_default(base_dir: Path) -> Dict[str, Any]:
@@ -13,45 +14,6 @@ def _sqlite_default(base_dir: Path) -> Dict[str, Any]:
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.environ.get("DB_NAME", str(base_dir / "db.sqlite3")),
     }
-
-
-def parse_database_url(url: str) -> Dict[str, Any]:
-    """
-    Parse DATABASE_URL into a Django DATABASES entry.
-    Supports postgres(ql)://, mysql://, mariadb://, sqlite://.
-    """
-    parsed = urlparse(url.strip())
-    scheme = (parsed.scheme or "").lower()
-    if scheme in {"postgres", "postgresql"}:
-        engine = "django.db.backends.postgresql"
-    elif scheme in {"mysql", "mariadb"}:
-        engine = "django.db.backends.mysql"
-    elif scheme == "sqlite":
-        # sqlite:///absolute/or/relative/path
-        name = unquote(parsed.path or "")
-        if name.startswith("/") and len(name) > 1 and os.name == "nt":
-            # urlparse may yield /C:/... on Windows file URLs
-            pass
-        return {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": name or ":memory:",
-        }
-    else:
-        raise ValueError(
-            f"Unsupported DATABASE_URL scheme {scheme!r}; "
-            "use postgres://, postgresql://, mysql://, or mariadb://"
-        )
-
-    name = unquote((parsed.path or "").lstrip("/"))
-    config: Dict[str, Any] = {
-        "ENGINE": engine,
-        "NAME": name,
-        "USER": unquote(parsed.username or ""),
-        "PASSWORD": unquote(parsed.password or ""),
-        "HOST": parsed.hostname or "",
-        "PORT": str(parsed.port or ""),
-    }
-    return config
 
 
 def build_databases(
@@ -62,16 +24,17 @@ def build_databases(
     Return DATABASES mapping.
 
     Priority:
-      1. DATABASE_URL
+      1. DATABASE_URL (parsed by dj-database-url, handles sslmode/query params)
       2. DB_ENGINE (+ DB_NAME/USER/PASSWORD/HOST/PORT)
       3. SQLite under base_dir/db.sqlite3
     """
     env = environ if environ is not None else os.environ
-    conn_max_age = int(env.get("DB_CONN_MAX_AGE", "60") or "60")
+    conn_max_age = int(env.get("DB_CONN_MAX_AGE", "600") or "600")
 
     url = (env.get("DATABASE_URL") or "").strip()
     if url:
-        config = parse_database_url(url)
+        # dj-database-url handles postgres://, mysql://, sqlite://, and query params
+        config = dj_database_url.parse(url, conn_max_age=conn_max_age, ssl_require=True)
     else:
         engine = (env.get("DB_ENGINE") or "").strip()
         if not engine or engine.endswith("sqlite3"):
@@ -91,7 +54,7 @@ def build_databases(
             }
 
     if config["ENGINE"] != "django.db.backends.sqlite3":
-        config["CONN_MAX_AGE"] = conn_max_age
+        config.setdefault("CONN_MAX_AGE", conn_max_age)
         config.setdefault("OPTIONS", {})
         if config["ENGINE"] == "django.db.backends.mysql":
             # Avoid strict surprises with older dumps; PA MySQL is utf8mb4 by default.

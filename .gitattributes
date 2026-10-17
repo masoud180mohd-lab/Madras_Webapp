@@ -1,0 +1,8 @@
+# Ensure files consumed by Render's Linux build keep LF endings on every
+# platform: a CRLF shebang breaks `./build.sh`, and a trailing CR in
+# runtime.txt breaks Python version detection. Scoped narrowly so the rest of
+# the repo keeps its existing endings.
+*.sh text eol=lf
+runtime.txt text eol=lf
+render.yaml text eol=lf
+.gitattributes text eol=lf
