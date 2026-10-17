@@ -14,7 +14,7 @@ from django.utils.timezone import localtime
 from xhtml2pdf import pisa
 
 from usimamizi.models import Hudhurio, Malipo, RekodiHifdhu
-from usimamizi.views.helpers import link_callback
+from usimamizi.views.helpers import link_callback, pdf_media_tempdir
 
 
 def build_risiti_pdf_response(malipo: Malipo) -> HttpResponse:
@@ -41,8 +41,9 @@ def build_risiti_pdf_response(malipo: Malipo) -> HttpResponse:
     response = HttpResponse(content_type="application/pdf")
     jina = f"Risiti_{mwanafunzi.namba_ya_usajili}_{malipo.id}.pdf"
     response["Content-Disposition"] = f'attachment; filename="{jina}"'
-    if pisa.CreatePDF(html, dest=response, link_callback=link_callback).err:
-        return HttpResponse("Kumetokea hitilafu katika kutengeneza Risiti", status=500)
+    with pdf_media_tempdir():
+        if pisa.CreatePDF(html, dest=response, link_callback=link_callback).err:
+            return HttpResponse("Kumetokea hitilafu katika kutengeneza Risiti", status=500)
     return response
 
 
@@ -74,10 +75,11 @@ def build_mahudhurio_pdf_response(mwanafunzi, aina: str, muda: str) -> HttpRespo
     response = HttpResponse(content_type="application/pdf")
     jina = f"Mahudhurio_{mwanafunzi.namba_ya_usajili}_{muda_wa_sasa.strftime('%H%M%S')}.pdf"
     response["Content-Disposition"] = f'attachment; filename="{jina}"'
-    if pisa.CreatePDF(html, dest=response, link_callback=link_callback).err:
-        return HttpResponse(
-            "Samahani, kumetokea hitilafu katika kutengeneza PDF", status=500
-        )
+    with pdf_media_tempdir():
+        if pisa.CreatePDF(html, dest=response, link_callback=link_callback).err:
+            return HttpResponse(
+                "Samahani, kumetokea hitilafu katika kutengeneza PDF", status=500
+            )
     return response
 
 
@@ -108,6 +110,7 @@ def build_sabaq_pdf_response(mwanafunzi, aina: str, muda: str) -> HttpResponse:
     response = HttpResponse(content_type="application/pdf")
     jina = f"Sabaq_{mwanafunzi.namba_ya_usajili}_{muda_wa_sasa.strftime('%H%M%S')}.pdf"
     response["Content-Disposition"] = f'attachment; filename="{jina}"'
-    if pisa.CreatePDF(html, dest=response, link_callback=link_callback).err:
-        return HttpResponse("Hitilafu ilitokea", status=500)
+    with pdf_media_tempdir():
+        if pisa.CreatePDF(html, dest=response, link_callback=link_callback).err:
+            return HttpResponse("Hitilafu ilitokea", status=500)
     return response

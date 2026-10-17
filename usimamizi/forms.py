@@ -25,6 +25,7 @@ from .models import (
     RekodiHifdhu,
     RekodiMaendeleoMchana,
     RekodiSimuMzazi,
+    Somo,
     validate_picha,
 )
 
@@ -41,7 +42,7 @@ class MwanafunziForm(forms.ModelForm):
     class Meta:
         model = Mwanafunzi
         fields = [
-            'jina_kamili', 'tarehe_ya_kuzaliwa', 'jinsia', 'darasa',
+            'jina_kamili', 'tarehe_ya_kuzaliwa', 'tarehe_ya_kujiunga', 'jinsia', 'darasa',
             'programu_ya_usiku', 'juzuu_aliyohifadhi', 'mahala_anapoishi',
             'jina_la_mzazi', 'uhusiano_wa_mlezi', 'namba_ya_simu_mzazi',
             'jina_la_mzazi_pili', 'uhusiano_wa_mlezi_pili', 'namba_ya_simu_mzazi_pili',
@@ -50,6 +51,7 @@ class MwanafunziForm(forms.ModelForm):
         labels = {
             'jina_kamili': 'Jina Kamili',
             'tarehe_ya_kuzaliwa': 'Tarehe ya Kuzaliwa',
+            'tarehe_ya_kujiunga': 'Tarehe ya Kujiunga',
             'jinsia': 'Jinsia',
             'darasa': 'Darasa / Ngazi',
             'programu_ya_usiku': 'Programu ya Usiku',
@@ -68,6 +70,7 @@ class MwanafunziForm(forms.ModelForm):
         }
         widgets = {
             'tarehe_ya_kuzaliwa': forms.DateInput(attrs={'type': 'date'}),
+            'tarehe_ya_kujiunga': forms.DateInput(attrs={'type': 'date'}),
             'picha': forms.ClearableFileInput(attrs={'accept': '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp'}),
         }
 
@@ -315,6 +318,33 @@ class RekodiSimuMzaziForm(forms.ModelForm):
                 self.fields["tarehe_ya_simu"].initial = dj_tz.localtime(
                     dj_tz.now()
                 ).strftime("%Y-%m-%dT%H:%M")
+
+
+class SomoForm(forms.ModelForm):
+    class Meta:
+        model = Somo
+        fields = ["jina", "ni_la_hifdhu", "mwalimu", "darasa"]
+        labels = {
+            "jina": "Jina la somo",
+            "ni_la_hifdhu": "Somo la Hifdhu",
+            "mwalimu": "Mwalimu",
+            "darasa": "Darasa",
+        }
+        help_texts = {
+            "ni_la_hifdhu": (
+                "Weka TIKI kama somo hili linahitaji mahudhurio na sabaq zake."
+            ),
+        }
+        widgets = {
+            "jina": forms.TextInput(attrs={"class": "app-input"}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["mwalimu"].required = False
+        self.fields["mwalimu"].empty_label = "-- Hakuna mwalimu --"
+        self.fields["darasa"].required = False
+        self.fields["darasa"].empty_label = "-- Haina darasa maalum --"
 
 
 class DarasaForm(forms.ModelForm):

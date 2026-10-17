@@ -243,7 +243,10 @@ class ApiV1Tests(TestCase):
         self.assertEqual(self.client.get("/api/v1/malipo/").status_code, 200)
         contacts = self.client.get("/api/v1/mawasiliano/")
         self.assertEqual(contacts.status_code, 200)
-        phones = {row["id"]: row["namba_ya_simu_mzazi"] for row in contacts.data}
+        phones = {
+            row["id"]: row["namba_ya_simu_mzazi"]
+            for row in contacts.data["results"]
+        }
         self.assertEqual(phones[self.s1.id], "0771111111")
 
         self._auth("api_mkuu")

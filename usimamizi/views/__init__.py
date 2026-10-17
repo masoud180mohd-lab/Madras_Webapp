@@ -57,6 +57,7 @@ from .contacts import (
 )
 from .payments import ukurasa_malipo, weka_malipo, pakua_risiti
 from .pdfs import pakua_pdf_mahudhurio, pakua_pdf_sabaq
+from .registration import ukurasa_usajili, ongeza_somo
 
 __all__ = [
     "link_callback",
@@ -115,4 +116,6 @@ __all__ = [
     "pakua_risiti",
     "pakua_pdf_mahudhurio",
     "pakua_pdf_sabaq",
+    "ukurasa_usajili",
+    "ongeza_somo",
 ]

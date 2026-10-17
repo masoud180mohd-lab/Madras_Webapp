@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from decimal import Decimal
+
 from rest_framework import serializers
 
 from usimamizi.models import (
@@ -14,6 +16,7 @@ from usimamizi.models import (
     Mwanafunzi,
     Nyenzo,
     RekodiMaendeleoMchana,
+    RekodiSimuMzazi,
     RekodiUkaguzi,
     Somo,
     Tangazo,
@@ -341,6 +344,19 @@ class MalipoSerializer(serializers.ModelSerializer):
         )
 
 
+class MalipoCreateSerializer(serializers.Serializer):
+    aina_ya_malipo = serializers.IntegerField()
+    kiasi = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        min_value=Decimal("0.01"),
+    )
+    njia = serializers.ChoiceField(
+        choices=Malipo._meta.get_field("njia_ya_malipo").choices
+    )
+    maelezo = serializers.CharField(required=False, allow_blank=True, default="")
+
+
 class AinaMalipoSerializer(serializers.ModelSerializer):
     lebo_kamili = serializers.CharField(read_only=True)
     mwaka = serializers.CharField(source="mwaka.jina", allow_null=True)
@@ -357,10 +373,43 @@ class AinaMalipoSerializer(serializers.ModelSerializer):
         )
 
 
+class AinaMalipoWriteSerializer(serializers.Serializer):
+    mwaka = serializers.IntegerField(required=False, allow_null=True)
+    mwezi = serializers.ChoiceField(
+        choices=AinaMalipo.MWEZI_CHOICES,
+        required=False,
+        allow_null=True,
+    )
+    jina = serializers.CharField(required=False, allow_blank=True, default="")
+    kiasi_kinachotakiwa = serializers.DecimalField(
+        max_digits=10, decimal_places=2
+    )
+    maelezo = serializers.CharField(required=False, allow_blank=True, default="")
+
+
 class MuhulaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Muhula
         fields = ("id", "namba", "jina", "ni_hai")
+
+
+class MuhulaWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Muhula
+        fields = (
+            "mwaka",
+            "namba",
+            "jina",
+            "tarehe_kuanzia",
+            "tarehe_kuisha",
+            "ni_hai",
+        )
+        extra_kwargs = {
+            "jina": {"required": False},
+            "tarehe_kuanzia": {"required": False},
+            "tarehe_kuisha": {"required": False},
+            "ni_hai": {"required": False, "default": False},
+        }
 
 
 class MwakaSerializer(serializers.ModelSerializer):
@@ -376,6 +425,24 @@ class MwakaSerializer(serializers.ModelSerializer):
             "ni_hai",
             "muhula",
         )
+
+
+class MwakaWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MwakaWaMasomo
+        fields = (
+            "jina",
+            "mwaka_kuanzia",
+            "mwaka_kuisha",
+            "tarehe_kuanzia",
+            "tarehe_kuisha",
+            "ni_hai",
+        )
+        extra_kwargs = {
+            "tarehe_kuanzia": {"required": False},
+            "tarehe_kuisha": {"required": False},
+            "ni_hai": {"required": False, "default": False},
+        }
 
 
 class MawasilianoSerializer(serializers.ModelSerializer):
@@ -394,6 +461,69 @@ class MawasilianoSerializer(serializers.ModelSerializer):
             "jina_la_mzazi_pili",
             "namba_ya_simu_mzazi_pili",
         )
+
+
+class MawasilianoContactWriteSerializer(serializers.Serializer):
+    jina_la_mzazi = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
+    uhusiano_wa_mlezi = serializers.CharField(required=False, allow_blank=True)
+    namba_ya_simu_mzazi = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
+    jina_la_mzazi_pili = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
+    uhusiano_wa_mlezi_pili = serializers.CharField(
+        required=False, allow_blank=True
+    )
+    namba_ya_simu_mzazi_pili = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
+    )
+
+
+class MawasilianoWhatsAppOpenSerializer(serializers.Serializer):
+    mzazi = serializers.IntegerField(required=False, default=1)
+    kigezo = serializers.CharField(required=False, allow_blank=True, default="")
+    ujumbe = serializers.CharField(required=False, allow_blank=True, default="")
+
+
+class RekodiSimuSerializer(serializers.ModelSerializer):
+    mwanafunzi = serializers.IntegerField(source="mwanafunzi_id")
+    sababu_jina = serializers.CharField(source="get_sababu_display", read_only=True)
+    matokeo_jina = serializers.CharField(source="get_matokeo_display", read_only=True)
+    iliyorekodiwa_na = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RekodiSimuMzazi
+        fields = (
+            "id",
+            "mwanafunzi",
+            "namba_iliyopigwa",
+            "sababu",
+            "sababu_jina",
+            "matokeo",
+            "matokeo_jina",
+            "maelezo",
+            "tarehe_ya_simu",
+            "iliyorekodiwa_na",
+        )
+
+    def get_iliyorekodiwa_na(self, obj):
+        if obj.iliyorekodiwa_na_id is None:
+            return None
+        user = obj.iliyorekodiwa_na
+        return user.get_full_name() or user.username
+
+
+class RekodiSimuWriteSerializer(serializers.Serializer):
+    namba_iliyopigwa = serializers.CharField(
+        required=False, allow_blank=True, default=""
+    )
+    sababu = serializers.ChoiceField(choices=RekodiSimuMzazi.SABABU_CHOICES)
+    matokeo = serializers.ChoiceField(choices=RekodiSimuMzazi.MATOKEO_CHOICES)
+    maelezo = serializers.CharField(required=False, allow_blank=True, default="")
+    tarehe_ya_simu = serializers.DateTimeField(required=False, allow_null=True)
 
 
 class UkaguziSerializer(serializers.ModelSerializer):

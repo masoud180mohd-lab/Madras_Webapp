@@ -149,7 +149,11 @@ class Mwanafunzi(models.Model):
     programu_ya_usiku = models.ForeignKey(Somo, on_delete=models.SET_NULL, null=True, blank=True, related_name='wanafunzi_usiku', help_text="Chagua kama anasoma usiku (Acha wazi kama hasomi usiku)")
     juzuu_aliyohifadhi = models.IntegerField(default=1)
     picha = models.ImageField(upload_to='picha_za_wanafunzi/', null=True, blank=True, validators=[validate_picha])
-    tarehe_ya_kujiunga = models.DateField(auto_now_add=True)
+    tarehe_ya_kujiunga = models.DateField(
+        default=date.today,
+        help_text="Tarehe aliyosajiliwa kwenye madrasa.",
+        verbose_name="Tarehe ya kujiunga",
+    )
     amehifadhiwa = models.BooleanField(
         default=False,
         db_index=True,

@@ -189,7 +189,8 @@ class CatalogRepository {
   }
 
   Future<List<CatalogRow>> malipo() async {
-    final list = await _api.get('/api/v1/malipo/') as List<dynamic>;
+    final raw = await _api.get('/api/v1/malipo/') as Map<String, dynamic>;
+    final list = (raw['malipo'] as List<dynamic>? ?? const []);
     return list.whereType<Map<String, dynamic>>().map((row) {
       return CatalogRow(
         title: row['mwanafunzi'] as String? ?? '',
@@ -204,7 +205,8 @@ class CatalogRepository {
   }
 
   Future<List<CatalogRow>> ainaMalipo() async {
-    final list = await _api.get('/api/v1/aina-malipo/') as List<dynamic>;
+    final raw = await _api.get('/api/v1/aina-malipo/') as Map<String, dynamic>;
+    final list = (raw['results'] as List<dynamic>? ?? const []);
     return list.whereType<Map<String, dynamic>>().map((row) {
       return CatalogRow(
         title: row['lebo_kamili'] as String? ?? row['jina'] as String? ?? '',
@@ -218,7 +220,8 @@ class CatalogRepository {
   }
 
   Future<List<CatalogRow>> mwaka() async {
-    final list = await _api.get('/api/v1/mwaka/') as List<dynamic>;
+    final raw = await _api.get('/api/v1/mwaka/') as Map<String, dynamic>;
+    final list = (raw['results'] as List<dynamic>? ?? const []);
     return list.whereType<Map<String, dynamic>>().map((row) {
       final hai = row['ni_hai'] == true;
       final muhula = row['muhula'];
@@ -252,12 +255,13 @@ class CatalogRepository {
   }
 
   Future<List<CatalogRow>> mawasiliano({String? q}) async {
-    final list =
+    final raw =
         await _api.get(
               '/api/v1/mawasiliano/',
               query: q == null || q.isEmpty ? null : {'q': q},
             )
-            as List<dynamic>;
+            as Map<String, dynamic>;
+    final list = (raw['results'] as List<dynamic>? ?? const []);
     return list.whereType<Map<String, dynamic>>().map((row) {
       final id = row['id'] as int?;
       final simu = row['namba_ya_simu_mzazi'] as String?;
@@ -278,7 +282,8 @@ class CatalogRepository {
   }
 
   Future<List<CatalogRow>> ukaguzi() async {
-    final list = await _api.get('/api/v1/ukaguzi/') as List<dynamic>;
+    final raw = await _api.get('/api/v1/ukaguzi/') as Map<String, dynamic>;
+    final list = (raw['results'] as List<dynamic>? ?? const []);
     return list.whereType<Map<String, dynamic>>().map((row) {
       return CatalogRow(
         title: row['kitendo_jina'] as String? ?? row['kitendo'] as String? ?? '',

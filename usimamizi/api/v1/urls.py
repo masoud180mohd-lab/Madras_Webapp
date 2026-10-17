@@ -2,17 +2,40 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from usimamizi.api.v1.catalog import (
+    AinaMalipoDetailView,
     AinaMalipoListView,
     HamishaPreviewView,
     MalipoListView,
-    MawasilianoListView,
+    MalipoRisitiPdfView,
+    MwakaActivateView,
     MwakaListView,
     MwanafunziDetailView,
+    MwanafunziMahudhurioPdfView,
+    MwanafunziMalipoCreateView,
+    MwanafunziProfileTabView,
+    MwanafunziRipotiView,
+    MwanafunziSabaqPdfView,
     MwanzoView,
+    MuhulaActivateView,
+    MuhulaCreateView,
     WanafunziListView,
     WalimuListView,
     WatoroView,
     UkaguziListView,
+)
+from usimamizi.api.v1.contacts import (
+    MawasilianoDetailView,
+    MawasilianoListView,
+    MawasilianoSimuCreateView,
+    MawasilianoWhatsAppCampaignView,
+    MawasilianoWhatsAppOpenView,
+)
+from usimamizi.api.v1.registration import (
+    UsajiliChaguziView,
+    UsajiliDarasaCreateView,
+    UsajiliMwalimuCreateView,
+    UsajiliMwanafunziCreateView,
+    UsajiliSomoCreateView,
 )
 from usimamizi.api.v1.views import (
     DarasaListView,
@@ -41,12 +64,99 @@ urlpatterns = [
         MwanafunziDetailView.as_view(),
         name="api_v1_mwanafunzi_detail",
     ),
+    path(
+        "wanafunzi/<int:mwanafunzi_id>/tab/",
+        MwanafunziProfileTabView.as_view(),
+        name="api_v1_mwanafunzi_tab",
+    ),
+    path(
+        "wanafunzi/<int:mwanafunzi_id>/malipo/",
+        MwanafunziMalipoCreateView.as_view(),
+        name="api_v1_mwanafunzi_malipo",
+    ),
+    path(
+        "wanafunzi/<int:mwanafunzi_id>/pdf/mahudhurio/",
+        MwanafunziMahudhurioPdfView.as_view(),
+        name="api_v1_mwanafunzi_pdf_mahudhurio",
+    ),
+    path(
+        "wanafunzi/<int:mwanafunzi_id>/pdf/sabaq/",
+        MwanafunziSabaqPdfView.as_view(),
+        name="api_v1_mwanafunzi_pdf_sabaq",
+    ),
+    path(
+        "wanafunzi/<int:mwanafunzi_id>/ripoti/",
+        MwanafunziRipotiView.as_view(),
+        name="api_v1_mwanafunzi_ripoti",
+    ),
     path("watoro/", WatoroView.as_view(), name="api_v1_watoro"),
     path("malipo/", MalipoListView.as_view(), name="api_v1_malipo"),
+    path(
+        "malipo/<int:malipo_id>/risiti/",
+        MalipoRisitiPdfView.as_view(),
+        name="api_v1_malipo_risiti",
+    ),
     path("aina-malipo/", AinaMalipoListView.as_view(), name="api_v1_aina_malipo"),
+    path(
+        "aina-malipo/<int:aina_id>/",
+        AinaMalipoDetailView.as_view(),
+        name="api_v1_aina_malipo_detail",
+    ),
     path("mwaka/", MwakaListView.as_view(), name="api_v1_mwaka"),
+    path(
+        "mwaka/<int:mwaka_id>/wezesha/",
+        MwakaActivateView.as_view(),
+        name="api_v1_mwaka_wezesha",
+    ),
+    path("mwaka/muhula/", MuhulaCreateView.as_view(), name="api_v1_muhula"),
+    path(
+        "mwaka/muhula/<int:muhula_id>/wezesha/",
+        MuhulaActivateView.as_view(),
+        name="api_v1_muhula_wezesha",
+    ),
     path("hamisha/", HamishaPreviewView.as_view(), name="api_v1_hamisha"),
+    path("usajili/chaguzi/", UsajiliChaguziView.as_view(), name="api_v1_usajili_chaguzi"),
+    path(
+        "usajili/mwanafunzi/",
+        UsajiliMwanafunziCreateView.as_view(),
+        name="api_v1_usajili_mwanafunzi",
+    ),
+    path(
+        "usajili/mwalimu/",
+        UsajiliMwalimuCreateView.as_view(),
+        name="api_v1_usajili_mwalimu",
+    ),
+    path(
+        "usajili/somo/",
+        UsajiliSomoCreateView.as_view(),
+        name="api_v1_usajili_somo",
+    ),
+    path(
+        "usajili/darasa/",
+        UsajiliDarasaCreateView.as_view(),
+        name="api_v1_usajili_darasa",
+    ),
     path("mawasiliano/", MawasilianoListView.as_view(), name="api_v1_mawasiliano"),
+    path(
+        "mawasiliano/whatsapp/",
+        MawasilianoWhatsAppCampaignView.as_view(),
+        name="api_v1_mawasiliano_whatsapp",
+    ),
+    path(
+        "mawasiliano/<int:mwanafunzi_id>/",
+        MawasilianoDetailView.as_view(),
+        name="api_v1_mawasiliano_detail",
+    ),
+    path(
+        "mawasiliano/<int:mwanafunzi_id>/simu/",
+        MawasilianoSimuCreateView.as_view(),
+        name="api_v1_mawasiliano_simu",
+    ),
+    path(
+        "mawasiliano/<int:mwanafunzi_id>/whatsapp/",
+        MawasilianoWhatsAppOpenView.as_view(),
+        name="api_v1_mawasiliano_fungua_whatsapp",
+    ),
     path("ukaguzi/", UkaguziListView.as_view(), name="api_v1_ukaguzi"),
     path("madarasa/", DarasaListView.as_view(), name="api_v1_madarasa"),
     path(

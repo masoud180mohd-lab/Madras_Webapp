@@ -10,6 +10,7 @@ urlpatterns = [
     # Madarasa na Wanafunzi
     path('wanafunzi/', views.orodha_wanafunzi, name='orodha_wanafunzi'),
     path('wanafunzi/sajili/', views.sajili_mwanafunzi, name='sajili_mwanafunzi'),
+    path('usajili/', views.ukurasa_usajili, name='usajili'),
     path('wanafunzi/hariri/<int:id>/', views.hariri_mwanafunzi, name='hariri_mwanafunzi'),
     path('wanafunzi/hifadhi/<int:mwanafunzi_id>/', views.hifadhi_mwanafunzi, name='hifadhi_mwanafunzi'),
     path('wanafunzi/rudisha/<int:mwanafunzi_id>/', views.rudisha_mwanafunzi, name='rudisha_mwanafunzi'),
@@ -56,6 +57,7 @@ urlpatterns = [
     
     # Masomo Mengine na Watoro
     path('masomo/', views.orodha_masomo, name='orodha_masomo'),
+    path('masomo/ongeza/', views.ongeza_somo, name='ongeza_somo'),
     path('masomo/<int:somo_id>/', views.somo_detail, name='somo_detail'),
     path('somo/<int:somo_id>/nyenzo/pakia/', views.pakia_nyenzo, name='pakia_nyenzo'),
     path('somo/<int:somo_id>/mtihani/ongeza/', views.ongeza_mtihani, name='ongeza_mtihani'),
