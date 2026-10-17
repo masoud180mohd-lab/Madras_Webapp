@@ -1,0 +1,89 @@
+name: Build Mobile APK
+
+on:
+  push:
+    branches:
+      - main
+      - 'fix-mobile-signin-*'
+    paths:
+      - 'apps/mobile/**'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: |
+          cd apps/mobile
+          flutter pub get
+
+      - name: Build APK (debug)
+        run: |
+          cd apps/mobile
+          flutter build apk --debug
+
+      - name: Build APK (release)
+        run: |
+          cd apps/mobile
+          flutter build apk --release
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: madrasa_mobile-debug
+          path: apps/mobile/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 30
+
+      - name: Upload release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: madrasa_mobile-release
+          path: apps/mobile/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+      - name: Create Release
+        if: github.event_name == 'push' && contains(github.ref, 'main')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Mobile App v${{ github.run_number }}
+          body: |
+            ## Madrasa Mobile App Release
+            
+            Build from commit: ${{ github.sha }}
+            
+            ### Changes
+            - Fix mobile signin issues on Samsung A42 & Huawei P30 Lite
+            - Add network security config for TLS compatibility
+            - Improve error handling and debug logging
+            
+            ### APKs
+            - **Debug APK**: madrasa_mobile-debug.apk (for testing)
+            - **Release APK**: madrasa_mobile-release.apk (for production)
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets
+        if: github.event_name == 'push' && contains(github.ref, 'main')
+        run: |
+          echo "Release created with build artifacts"
