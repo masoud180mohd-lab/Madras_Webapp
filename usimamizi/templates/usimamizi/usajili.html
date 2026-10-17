@@ -1,0 +1,37 @@
+{% extends 'usimamizi/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'usimamizi/css/pages/usajili.css' %}?v=20260817usajili">
+{% endblock %}
+
+{% block page_eyebrow %}Usajili{% endblock %}
+{% block title %}Usajili · Madrasatul Rasulillah{% endblock %}
+
+{% block maudhui %}
+<section class="usajili-page">
+    <header class="usajili-hero">
+        <h1 class="usajili-title">Usajili wa madrasa</h1>
+        <p class="usajili-lead">
+            Sajili mwanafunzi, mwalimu, somo, darasa, na weka mwaka wa masomo — sehemu moja.
+        </p>
+    </header>
+
+    {% if kadi %}
+    <div class="usajili-grid">
+        {% for card in kadi %}
+        <a href="{% url card.url_name %}" class="usajili-card">
+            <h2 class="usajili-card-title">{{ card.title }}</h2>
+            <p class="usajili-card-copy">{{ card.copy }}</p>
+            <span class="usajili-card-cta">{{ card.kitufe }} →</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="app-empty-state">
+        <p class="app-empty-state-title">Hakuna usajili unaopatikana</p>
+        <p class="app-empty-state-copy">Huna ruhusa ya kusajili kwenye sehemu hii.</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
