@@ -1,0 +1,68 @@
+.usajili-page {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 8px 4px 40px;
+}
+
+.usajili-hero {
+    margin-bottom: 24px;
+}
+
+.usajili-title {
+    margin: 0 0 8px;
+    font-size: 1.7rem;
+    color: var(--title-color);
+}
+
+.usajili-lead {
+    margin: 0;
+    color: var(--text-muted);
+    max-width: 40rem;
+    line-height: 1.45;
+}
+
+.usajili-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.usajili-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px 18px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    border-left: 6px solid var(--primary);
+    text-decoration: none;
+    color: inherit;
+    min-height: 148px;
+}
+
+.usajili-card:hover,
+.usajili-card:focus-visible {
+    border-color: var(--primary);
+    background: var(--hover-bg);
+}
+
+.usajili-card-title {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--title-color);
+}
+
+.usajili-card-copy {
+    margin: 0;
+    flex: 1;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.usajili-card-cta {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.9rem;
+}
