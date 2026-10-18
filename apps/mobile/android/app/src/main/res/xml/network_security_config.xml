@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Configuration for rasulillahmadras.pythonanywhere.com domain -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">rasulillahmadras.pythonanywhere.com</domain>
+        <!-- Trust system certificates (compatible with older Android versions) -->
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+
+    <!-- Default configuration: enforce HTTPS for all other domains -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">*</domain>
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>
