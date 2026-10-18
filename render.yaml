@@ -11,7 +11,7 @@ services:
     branch: main
     runtime: python
     plan: free
-    region: oregon
+    region: singapore
     buildCommand: "./build.sh"
     startCommand: "gunicorn madrasa_sys.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --max-requests 1000 --max-requests-jitter 50"
     healthCheckPath: /
@@ -19,10 +19,11 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.7
+      # Set manually in the Render dashboard to the database's EXTERNAL URL.
+      # The web service is in singapore while madrasa-db is in oregon, and
+      # Render's internal connectionString only resolves within one region.
       - key: DATABASE_URL
-        fromDatabase:
-          name: madrasa-db
-          property: connectionString
+        sync: false
       - key: DJANGO_ENV
         value: production
       - key: DJANGO_SETTINGS_MODULE
