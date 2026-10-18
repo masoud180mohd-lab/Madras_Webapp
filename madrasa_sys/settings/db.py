@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import socket
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -14,6 +15,22 @@ def _sqlite_default(base_dir: Path) -> Dict[str, Any]:
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": os.environ.get("DB_NAME", str(base_dir / "db.sqlite3")),
     }
+
+
+def _resolve_render_postgres_host(host: str, env: Dict[str, str]) -> str:
+    """
+    Upgrade a bare Render internal Postgres hostname (``dpg-...-a``) to its
+    external FQDN (``dpg-...-a.<region>-postgres.render.com``) when internal
+    DNS resolution fails (e.g. web service in Singapore and DB in Oregon).
+    """
+    if not host or not host.startswith("dpg-") or "." in host:
+        return host
+    try:
+        socket.getaddrinfo(host, None)
+        return host
+    except socket.gaierror:
+        region = (env.get("RENDER_DB_REGION") or "oregon").strip()
+        return f"{host}.{region}-postgres.render.com"
 
 
 def build_databases(
@@ -35,6 +52,8 @@ def build_databases(
     if url:
         # dj-database-url handles postgres://, mysql://, sqlite://, and query params
         config = dj_database_url.parse(url, conn_max_age=conn_max_age, ssl_require=True)
+        if config.get("HOST"):
+            config["HOST"] = _resolve_render_postgres_host(str(config["HOST"]), env)
     else:
         engine = (env.get("DB_ENGINE") or "").strip()
         if not engine or engine.endswith("sqlite3"):
@@ -48,8 +67,8 @@ def build_databases(
                 "ENGINE": engine,
                 "NAME": env.get("DB_NAME", ""),
                 "USER": env.get("DB_USER", ""),
-                "PASSWORD": env.get("DB_PASSWORD", ""),
-                "HOST": env.get("DB_HOST", ""),
+                "PASSWORD": env.get("PASSWORD" if "PASSWORD" in env else "DB_PASSWORD", ""),
+                "HOST": _resolve_render_postgres_host(env.get("DB_HOST", ""), env),
                 "PORT": env.get("DB_PORT", ""),
             }
 
@@ -61,3 +80,4 @@ def build_databases(
             config["OPTIONS"].setdefault("charset", "utf8mb4")
 
     return {"default": config}
+

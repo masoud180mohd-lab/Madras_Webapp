@@ -123,3 +123,16 @@ class DatabaseSettingsBuilderTests(SimpleTestCase):
             self.assertTrue(env_bool("DJANGO_ALLOW_SQLITE", False))
         finally:
             os.environ.pop("DJANGO_ALLOW_SQLITE", None)
+
+    def test_render_internal_host_fallback(self):
+        db = build_databases(
+            self.base,
+            environ={
+                "DATABASE_URL": "postgresql://u:p@dpg-db9u6vu1egvs738l39v0-a/madrasa_db",
+                "RENDER_DB_REGION": "oregon",
+            },
+        )
+        self.assertEqual(
+            db["default"]["HOST"],
+            "dpg-db9u6vu1egvs738l39v0-a.oregon-postgres.render.com",
+        )

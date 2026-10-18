@@ -19,11 +19,12 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.7
-      # Set manually in the Render dashboard to the database's EXTERNAL URL.
-      # The web service is in singapore while madrasa-db is in oregon, and
-      # Render's internal connectionString only resolves within one region.
+      - key: RENDER_DB_REGION
+        value: oregon
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: madrasa-db
+          property: connectionString
       - key: DJANGO_ENV
         value: production
       - key: DJANGO_SETTINGS_MODULE
