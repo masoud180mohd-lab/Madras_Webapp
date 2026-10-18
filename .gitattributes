@@ -4,5 +4,6 @@
 # the repo keeps its existing endings.
 *.sh text eol=lf
 runtime.txt text eol=lf
+.python-version text eol=lf
 render.yaml text eol=lf
 .gitattributes text eol=lf
