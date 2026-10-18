@@ -34,12 +34,9 @@ services:
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DJANGO_ALLOWED_HOSTS
-        fromService:
-          type: web
-          name: madrasa-webapp
-          property: host
+        value: "madrasa-webapp.onrender.com,.onrender.com,localhost,127.0.0.1"
       - key: DJANGO_CSRF_TRUSTED_ORIGINS
-        value: "https://madrasa-webapp.onrender.com"
+        value: "https://madrasa-webapp.onrender.com,https://*.onrender.com"
       - key: DJANGO_SECURE_SSL_REDIRECT
         value: "False"
       - key: CLOUDINARY_CLOUD_NAME

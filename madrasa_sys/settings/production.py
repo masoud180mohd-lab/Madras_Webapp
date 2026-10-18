@@ -3,6 +3,7 @@ Production settings. Requires environment variables; fails closed.
 """
 
 import os
+import socket
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -30,6 +31,41 @@ if not CSRF_TRUSTED_ORIGINS:
         "Set DJANGO_CSRF_TRUSTED_ORIGINS (https://your-domain) for production."
     )
 
+# Render's Blueprint `fromService: property: host` injects the bare internal service
+# name (`madrasa-webapp`) without `.onrender.com`, while public traffic and health
+# checks use `<service>.onrender.com` or internal container IPs. Ensure Render hosts
+# are always trusted when running on Render.
+_render_ext_host = (os.environ.get("RENDER_EXTERNAL_HOSTNAME") or "").strip()
+_is_render = bool(
+    os.environ.get("RENDER")
+    or _render_ext_host
+    or os.environ.get("RENDER_DB_REGION")
+    or any("onrender.com" in h or h == "madrasa-webapp" for h in ALLOWED_HOSTS + CSRF_TRUSTED_ORIGINS)
+)
+if _is_render:
+    for _extra_host in (
+        _render_ext_host,
+        "madrasa-webapp.onrender.com",
+        ".onrender.com",
+        "localhost",
+        "127.0.0.1",
+    ):
+        if _extra_host and _extra_host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(_extra_host)
+    try:
+        for _ip in socket.gethostbyname_ex(socket.gethostname())[2]:
+            if _ip and _ip not in ALLOWED_HOSTS:
+                ALLOWED_HOSTS.append(_ip)
+    except OSError:
+        pass
+    for _extra_origin in (
+        f"https://{_render_ext_host}" if _render_ext_host else "",
+        "https://madrasa-webapp.onrender.com",
+        "https://*.onrender.com",
+    ):
+        if _extra_origin and _extra_origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(_extra_origin)
+
 _db_engine = DATABASES["default"].get("ENGINE", "")  # noqa: F405
 _allow_sqlite = env_bool("DJANGO_ALLOW_SQLITE", False)
 _allowed_engines = {
@@ -50,7 +86,9 @@ elif _db_engine not in _allowed_engines:
     )
 
 # WhiteNoise: serve collected static files from Gunicorn when Nginx is not aliasing them.
+# RenderHealthCheckMiddleware runs before SecurityMiddleware so internal 10.x.x.x probes pass.
 MIDDLEWARE = [
+    "usimamizi.middleware.RenderHealthCheckMiddleware",
     MIDDLEWARE[0],
     "whitenoise.middleware.WhiteNoiseMiddleware",
     *MIDDLEWARE[1:],
