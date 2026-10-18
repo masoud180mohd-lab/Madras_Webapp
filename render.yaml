@@ -3,6 +3,7 @@ databases:
     databaseName: madrasa_db
     user: madrasa_user
     plan: free
+    region: oregon
 
 services:
   - type: web
@@ -10,7 +11,7 @@ services:
     branch: main
     runtime: python
     plan: free
-    region: singapore
+    region: oregon
     buildCommand: "./build.sh"
     startCommand: "gunicorn madrasa_sys.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --max-requests 1000 --max-requests-jitter 50"
     healthCheckPath: /
