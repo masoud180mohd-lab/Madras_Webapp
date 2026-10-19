@@ -80,7 +80,7 @@ def orodha_wanafunzi(request):
     if hali_filter not in ('hai', 'hifadhiwa'):
         hali_filter = 'hai'
 
-    wanafunzi = Mwanafunzi.objects.all().order_by('-id')
+    wanafunzi = Mwanafunzi.objects.select_related('darasa', 'programu_ya_usiku').order_by('-id')
     if hali_filter == 'hifadhiwa':
         wanafunzi = wanafunzi.archived()
     else:
@@ -93,6 +93,11 @@ def orodha_wanafunzi(request):
     if darasa_filter:
         wanafunzi = wanafunzi.filter(darasa_id=darasa_filter)
 
+    counts = wanafunzi.aggregate(
+        jumla=Count('id'),
+        wavulana=Count('id', filter=Q(jinsia='ME')),
+        wasichana=Count('id', filter=Q(jinsia='KE')),
+    )
     page_obj, pagination_query = paginate_items(request, wanafunzi, per_page=20)
     madarasa = Darasa.objects.all().order_by('jina')
 
@@ -101,9 +106,9 @@ def orodha_wanafunzi(request):
         'page_obj': page_obj,
         'pagination_query': pagination_query,
         'madarasa': madarasa,
-        'jumla': wanafunzi.count(),
-        'wavulana': wanafunzi.filter(jinsia='ME').count(),
-        'wasichana': wanafunzi.filter(jinsia='KE').count(),
+        'jumla': counts['jumla'] or 0,
+        'wavulana': counts['wavulana'] or 0,
+        'wasichana': counts['wasichana'] or 0,
         'neno_la_kutafuta': neno_la_kutafuta,
         'jinsia_filter': jinsia_filter,
         'darasa_filter': darasa_filter,
@@ -172,11 +177,11 @@ def orodha_madarasa(request):
 @ruhusa_capability(CAP_VIEW_STUDENTS)
 def wanafunzi_darasa(request, darasa_id):
     darasa = get_object_or_404(Darasa, id=darasa_id)
-    wanafunzi = Mwanafunzi.objects.active().filter(darasa=darasa)
+    wanafunzi = list(Mwanafunzi.objects.active().filter(darasa=darasa).select_related('darasa', 'programu_ya_usiku'))
 
-    jumla = wanafunzi.count()
-    wavulana = wanafunzi.filter(jinsia='ME').count()
-    wasichana = wanafunzi.filter(jinsia='KE').count()
+    jumla = len(wanafunzi)
+    wavulana = sum(1 for m in wanafunzi if m.jinsia == 'ME')
+    wasichana = sum(1 for m in wanafunzi if m.jinsia == 'KE')
 
     return render(request, 'usimamizi/wanafunzi_darasa.html', {
         'darasa': darasa,

@@ -76,23 +76,28 @@ def _build_fee_debt_followup(limit: int = 8) -> dict | None:
             "malipo_url": reverse("malipo"),
         }
 
-    debt_by_student: dict[int, dict] = {}
-    for aina in ainas:
-        paid_rows = (
-            Malipo.objects.filter(aina_ya_malipo=aina)
-            .values("mwanafunzi_id")
-            .annotate(
-                jumla=Coalesce(
-                    Sum("kiasi_kilicholipwa"),
-                    Value(0),
-                    output_field=DecimalField(max_digits=14, decimal_places=2),
-                )
+    paid_rows = (
+        Malipo.objects.filter(aina_ya_malipo__in=ainas)
+        .values("aina_ya_malipo_id", "mwanafunzi_id")
+        .annotate(
+            jumla=Coalesce(
+                Sum("kiasi_kilicholipwa"),
+                Value(0),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
             )
         )
-        paid_map = {row["mwanafunzi_id"]: row["jumla"] or Decimal("0") for row in paid_rows}
+    )
+    paid_by_aina_student: dict[tuple[int, int], Decimal] = {
+        (row["aina_ya_malipo_id"], row["mwanafunzi_id"]): (row["jumla"] or Decimal("0"))
+        for row in paid_rows
+    }
+
+    debt_by_student: dict[int, dict] = {}
+    for aina in ainas:
         kinachotakiwa = aina.kiasi_kinachotakiwa or Decimal("0")
+        label = aina.lebo_kamili
         for m in active:
-            paid = paid_map.get(m.id, Decimal("0"))
+            paid = paid_by_aina_student.get((aina.id, m.id), Decimal("0"))
             deni = kinachotakiwa - paid
             if deni <= 0:
                 continue
@@ -107,7 +112,6 @@ def _build_fee_debt_followup(limit: int = 8) -> dict | None:
                 },
             )
             slot["deni"] += deni
-            label = aina.lebo_kamili
             if label not in slot["aina_fupi"] and len(slot["aina_fupi"]) < 3:
                 slot["aina_fupi"].append(label)
             # Keep link pointed at a fee type they still owe

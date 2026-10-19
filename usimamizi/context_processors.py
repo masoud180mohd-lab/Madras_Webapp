@@ -39,7 +39,13 @@ def academic_period(request):
         return {}
     from .academic import get_active_muhula, get_active_mwaka
 
+    muhula_hai = get_active_muhula()
+    mwaka_hai = (
+        muhula_hai.mwaka
+        if (muhula_hai and muhula_hai.mwaka and muhula_hai.mwaka.ni_hai)
+        else get_active_mwaka()
+    )
     return {
-        "mwaka_hai": get_active_mwaka(),
-        "muhula_hai": get_active_muhula(),
+        "mwaka_hai": mwaka_hai,
+        "muhula_hai": muhula_hai,
     }

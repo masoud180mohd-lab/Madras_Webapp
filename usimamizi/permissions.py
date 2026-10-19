@@ -154,11 +154,21 @@ LEGACY_PERM_TO_CAPS = {
 def get_mwalimu_for_user(user):
     if not getattr(user, "is_authenticated", False):
         return None
-    return (
+    fields_cache = getattr( getattr(user, "_state", None), "fields_cache", None)
+    if fields_cache is not None and "mwalimu" in fields_cache:
+        return fields_cache["mwalimu"]
+    if getattr(user, "_mwalimu_cache_loaded", False):
+        return getattr(user, "_mwalimu_cached", None)
+    mwalimu = (
         Mwalimu.objects.filter(user=user)
         .select_related("user")
         .first()
     )
+    user._mwalimu_cached = mwalimu
+    user._mwalimu_cache_loaded = True
+    if fields_cache is not None and mwalimu is not None:
+        fields_cache["mwalimu"] = mwalimu
+    return mwalimu
 
 
 def get_user_cheo(user):
