@@ -108,6 +108,12 @@ class ProtectedCloudinaryStorage(MediaCloudinaryStorage):
             return name
         return f"{settings.MEDIA_URL}{quote(name, safe='/')}"
 
+    def _get_prefix(self):
+        # Do not prepend django-cloudinary-storage's default "media/" prefix:
+        # url() already prepends settings.MEDIA_URL ("/media/"), and
+        # _FOLDER_RESOURCE_TYPE matches against the model's upload_to folder.
+        return ""
+
     def _get_resource_type(self, name):
         # Folder-based on purpose (NOT extension-based): Nyenzo.faili may hold
         # jpg/png/webp, but it must remain resource_type="raw" to match the field
@@ -117,6 +123,8 @@ class ProtectedCloudinaryStorage(MediaCloudinaryStorage):
         # would sign it as "raw" and 404. Each upload_to folder maps 1:1 to the
         # owning field, so the folder is the reliable signal.
         normalized = (name or "").replace("\\", "/").lstrip("/")
+        if normalized.startswith("media/"):
+            normalized = normalized[len("media/") :]
         for prefix, resource_type in _FOLDER_RESOURCE_TYPE:
             if normalized.startswith(prefix):
                 return resource_type
