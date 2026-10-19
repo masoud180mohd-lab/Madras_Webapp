@@ -54,6 +54,9 @@ class _ClassesViewState extends State<ClassesView> {
                     child: _ClassCard(
                       jina: darasa.jina,
                       maelezo: darasa.maelezo,
+                      idadiWanafunzi: darasa.idadiWanafunzi,
+                      wavulana: darasa.wavulana,
+                      wasichana: darasa.wasichana,
                       onTap: () => context.push(
                         '/madarasa/${darasa.id}',
                         extra: darasa,
@@ -104,47 +107,140 @@ class _ClassCard extends StatelessWidget {
   const _ClassCard({
     required this.jina,
     required this.maelezo,
+    this.idadiWanafunzi,
+    this.wavulana,
+    this.wasichana,
     required this.onTap,
   });
 
   final String jina;
   final String? maelezo;
+  final int? idadiWanafunzi;
+  final int? wavulana;
+  final int? wasichana;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return AccentCard(
       onTap: onTap,
-      padding: const EdgeInsets.fromLTRB(18, 18, 12, 18),
-      child: Row(
+      padding: EdgeInsets.zero,
+      child: Stack(
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  jina,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: MadrasaTheme.primaryHover,
+          if (idadiWanafunzi != null)
+            Positioned(
+              right: 76,
+              bottom: -10,
+              child: IgnorePointer(
+                child: Text(
+                  '$idadiWanafunzi',
+                  style: TextStyle(
+                    fontSize: 52,
+                    fontWeight: FontWeight.w900,
+                    height: 1,
+                    color: MadrasaTheme.primary.withValues(alpha: 0.06),
                   ),
                 ),
-                if (maelezo != null && maelezo!.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    maelezo!,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: MadrasaTheme.muted,
-                    ),
+              ),
+            ),
+          Positioned(
+            right: 24,
+            bottom: -10,
+            child: IgnorePointer(
+              child: Icon(
+                Icons.groups_rounded,
+                size: 64,
+                color: MadrasaTheme.primary.withValues(alpha: 0.09),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 18, 12, 18),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        jina,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: MadrasaTheme.primaryHover,
+                        ),
+                      ),
+                      if (maelezo != null && maelezo!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          maelezo!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: MadrasaTheme.muted,
+                          ),
+                        ),
+                      ],
+                      if (idadiWanafunzi != null ||
+                          wavulana != null ||
+                          wasichana != null) ...[
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          children: [
+                            if (wavulana != null)
+                              _MiniStatBadge(
+                                label: 'Wanaume: $wavulana',
+                                color: const Color(0xFF0288D1),
+                              ),
+                            if (wasichana != null)
+                              _MiniStatBadge(
+                                label: 'Wanawake: $wasichana',
+                                color: const Color(0xFFC2185B),
+                              ),
+                            if (idadiWanafunzi != null)
+                              _MiniStatBadge(
+                                label: 'Jumla: $idadiWanafunzi',
+                                color: MadrasaTheme.primary,
+                              ),
+                          ],
+                        ),
+                      ],
+                    ],
                   ),
-                ],
+                ),
+                const Icon(Icons.chevron_right, color: MadrasaTheme.muted),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: MadrasaTheme.muted),
         ],
+      ),
+    );
+  }
+}
+
+class _MiniStatBadge extends StatelessWidget {
+  const _MiniStatBadge({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
       ),
     );
   }

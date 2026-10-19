@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/copy.dart';
 import '../../../core/theme.dart';
 import '../../../core/widgets/accent_card.dart';
+import '../../../core/widgets/student_stat_cards.dart';
 import '../../auth/view_models/auth_view_model.dart';
 import '../../catalog/view_models/catalog_view_model.dart';
 
@@ -125,30 +126,10 @@ class _HomeViewState extends State<HomeView> {
             ),
             const SizedBox(height: 20),
             if (data != null) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: _CountCard(
-                      label: MadrasaCopy.totalStudents,
-                      value: '${data.idadi.jumla}',
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _CountCard(
-                      label: MadrasaCopy.boys,
-                      value: '${data.idadi.wavulana}',
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _CountCard(
-                      label: MadrasaCopy.girls,
-                      value: '${data.idadi.wasichana}',
-                      accent: MadrasaTheme.female,
-                    ),
-                  ),
-                ],
+              StudentStatCards(
+                wavulana: data.idadi.wavulana,
+                wasichana: data.idadi.wasichana,
+                jumla: data.idadi.jumla,
               ),
               const SizedBox(height: 16),
             ],
@@ -254,49 +235,6 @@ class _HomeViewState extends State<HomeView> {
           ],
         );
       },
-    );
-  }
-}
-
-class _CountCard extends StatelessWidget {
-  const _CountCard({
-    required this.label,
-    required this.value,
-    this.accent = MadrasaTheme.primary,
-  });
-
-  final String label;
-  final String value;
-  final Color accent;
-
-  @override
-  Widget build(BuildContext context) {
-    return AccentCard(
-      accent: accent,
-      accentWidth: 4,
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: MadrasaTheme.muted,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: accent,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -41,7 +41,7 @@ jobs:
 
       - name: Build Release APK (rasulillah.me)
         working-directory: apps/mobile
-        run: flutter build apk --release --dart-define=API_BASE_URL=https://rasulillah.me
+        run: flutter build apk --release --build-name=1.0.${{ github.run_number }} --build-number=${{ github.run_number }} --dart-define=API_BASE_URL=https://rasulillah.me
 
       - name: Upload Release APK Artifact
         uses: actions/upload-artifact@v4

@@ -50,6 +50,8 @@ class MadrasaCopy {
   static const search = 'Tafuta...';
   static const boys = 'Wavulana';
   static const girls = 'Wasichana';
+  static const maleStudents = 'Wanaume';
+  static const femaleStudents = 'Wanawake';
   static const totalStudents = 'Jumla';
   static const promoteHint =
       'Hamisho la mwisho wa mwaka linathibitishwa kwenye wavuti. Hapa unaona idadi ya wanafunzi kwa kila darasa.';

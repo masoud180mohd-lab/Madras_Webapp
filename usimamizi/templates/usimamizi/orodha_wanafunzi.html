@@ -27,9 +27,6 @@
         </div>
 
         <div class="badge-group">
-            <span class="app-badge app-badge-info stat-badge badge-male">Wanaume: {{ wavulana }}</span>
-            <span class="app-badge app-badge-female stat-badge badge-female">Wanawake: {{ wasichana }}</span>
-            <span class="app-badge app-badge-success stat-badge badge-total">Jumla: {{ jumla }}</span>
             {% if hali_filter == 'hifadhiwa' %}
                 <a href="{% url 'orodha_wanafunzi' %}?hali=hai" class="app-btn app-btn-outline">Orodha hai</a>
             {% else %}
@@ -45,6 +42,46 @@
                 </a>
             {% endif %}
         </div>
+    </div>
+
+    <div class="stat-watermark-grid">
+        <a href="?hali={{ hali_filter }}&jinsia=ME{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="stat-watermark-card stat-card-male {% if jinsia_filter == 'ME' %}is-active{% endif %}">
+            <div class="stat-watermark-details">
+                <span class="stat-watermark-label">Wanaume (ME)</span>
+                <strong class="stat-watermark-value">{{ wavulana }}</strong>
+            </div>
+            <svg class="stat-watermark-icon" xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="stat-watermark-number">{{ wavulana }}</span>
+        </a>
+
+        <a href="?hali={{ hali_filter }}&jinsia=KE{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="stat-watermark-card stat-card-female {% if jinsia_filter == 'KE' %}is-active{% endif %}">
+            <div class="stat-watermark-details">
+                <span class="stat-watermark-label">Wanawake (KE)</span>
+                <strong class="stat-watermark-value">{{ wasichana }}</strong>
+            </div>
+            <svg class="stat-watermark-icon" xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="stat-watermark-number">{{ wasichana }}</span>
+        </a>
+
+        <a href="?hali={{ hali_filter }}{% if darasa_filter %}&darasa={{ darasa_filter }}{% endif %}{% if neno_la_kutafuta %}&q={{ neno_la_kutafuta }}{% endif %}" class="stat-watermark-card stat-card-total {% if not jinsia_filter %}is-active{% endif %}">
+            <div class="stat-watermark-details">
+                <span class="stat-watermark-label">Jumla ya Wanafunzi</span>
+                <strong class="stat-watermark-value">{{ jumla }}</strong>
+            </div>
+            <svg class="stat-watermark-icon" xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span class="stat-watermark-number">{{ jumla }}</span>
+        </a>
     </div>
 
     <div class="app-card app-toolbar filter-card">

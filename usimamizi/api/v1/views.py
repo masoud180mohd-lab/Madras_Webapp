@@ -79,7 +79,21 @@ class DarasaListView(APIView):
             idadi_wanafunzi=Count(
                 "mwanafunzi",
                 filter=Q(mwanafunzi__amehifadhiwa=False),
-            )
+            ),
+            wavulana=Count(
+                "mwanafunzi",
+                filter=Q(
+                    mwanafunzi__amehifadhiwa=False,
+                    mwanafunzi__jinsia="ME",
+                ),
+            ),
+            wasichana=Count(
+                "mwanafunzi",
+                filter=Q(
+                    mwanafunzi__amehifadhiwa=False,
+                    mwanafunzi__jinsia="KE",
+                ),
+            ),
         ).order_by("jina")
         return Response(DarasaSerializer(qs, many=True).data)
 

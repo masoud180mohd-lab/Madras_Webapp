@@ -25,12 +25,6 @@
         </div>
 
         <div class="header-actions">
-            <div class="badge-group">
-                <span class="stat-badge badge-male">Wanaume: {{ wavulana }}</span>
-                <span class="stat-badge badge-female">Wanawake: {{ wasichana }}</span>
-                <span class="stat-badge badge-total">Jumla: {{ jumla }}</span>
-            </div>
-            
             <div class="header-btns">
                 <a href="{% url 'mseto_mitihani_darasa' darasa.id %}" class="btn-secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
@@ -41,6 +35,46 @@
                     Chukua Mahudhurio
                 </a>
             </div>
+        </div>
+    </div>
+
+    <div class="stat-watermark-grid">
+        <div class="stat-watermark-card stat-card-male">
+            <div class="stat-watermark-details">
+                <span class="stat-watermark-label">Wanaume (ME)</span>
+                <strong class="stat-watermark-value">{{ wavulana }}</strong>
+            </div>
+            <svg class="stat-watermark-icon" xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="stat-watermark-number">{{ wavulana }}</span>
+        </div>
+
+        <div class="stat-watermark-card stat-card-female">
+            <div class="stat-watermark-details">
+                <span class="stat-watermark-label">Wanawake (KE)</span>
+                <strong class="stat-watermark-value">{{ wasichana }}</strong>
+            </div>
+            <svg class="stat-watermark-icon" xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="stat-watermark-number">{{ wasichana }}</span>
+        </div>
+
+        <div class="stat-watermark-card stat-card-total">
+            <div class="stat-watermark-details">
+                <span class="stat-watermark-label">Jumla ya Darasa</span>
+                <strong class="stat-watermark-value">{{ jumla }}</strong>
+            </div>
+            <svg class="stat-watermark-icon" xmlns="http://www.w3.org/2000/svg" width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span class="stat-watermark-number">{{ jumla }}</span>
         </div>
     </div>
 

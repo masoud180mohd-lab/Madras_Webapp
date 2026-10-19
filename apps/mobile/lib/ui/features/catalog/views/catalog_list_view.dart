@@ -7,6 +7,7 @@ import '../../../core/copy.dart';
 import '../../../core/theme.dart';
 import '../../../core/widgets/accent_card.dart';
 import '../../../core/widgets/authenticated_photo.dart';
+import '../../../core/widgets/student_stat_cards.dart';
 import '../view_models/catalog_view_model.dart';
 
 class CatalogListView extends StatefulWidget {
@@ -15,12 +16,14 @@ class CatalogListView extends StatefulWidget {
     required this.viewModel,
     this.hint,
     this.searchable = false,
+    this.showStudentStats = false,
     this.onSearch,
   });
 
   final CatalogViewModel viewModel;
   final String? hint;
   final bool searchable;
+  final bool showStudentStats;
   final ValueChanged<String>? onSearch;
 
   @override
@@ -29,6 +32,7 @@ class CatalogListView extends StatefulWidget {
 
 class _CatalogListViewState extends State<CatalogListView> {
   final _search = TextEditingController();
+  String? _selectedGender;
 
   @override
   void initState() {
@@ -70,6 +74,18 @@ class _CatalogListViewState extends State<CatalogListView> {
             ),
           );
         }
+
+        final allRows = vm.rows;
+        final wavulanaCount = allRows.where((r) => r.badge == 'ME').length;
+        final wasichanaCount = allRows.where((r) => r.badge == 'KE').length;
+        final jumlaCount = (wavulanaCount + wasichanaCount) > 0
+            ? (wavulanaCount + wasichanaCount)
+            : allRows.where((r) => !r.isHeader).length;
+
+        final filteredRows = _selectedGender == null
+            ? allRows
+            : allRows.where((r) => r.badge == _selectedGender).toList();
+
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           children: [
@@ -79,6 +95,18 @@ class _CatalogListViewState extends State<CatalogListView> {
                 style: const TextStyle(color: MadrasaTheme.muted, fontSize: 14),
               ),
               const SizedBox(height: 12),
+            ],
+            if (widget.showStudentStats) ...[
+              StudentStatCards(
+                wavulana: wavulanaCount,
+                wasichana: wasichanaCount,
+                jumla: jumlaCount,
+                selectedGender: _selectedGender,
+                onSelectGender: (gender) {
+                  setState(() => _selectedGender = gender);
+                },
+              ),
+              const SizedBox(height: 16),
             ],
             if (widget.searchable) ...[
               TextField(
@@ -94,7 +122,7 @@ class _CatalogListViewState extends State<CatalogListView> {
               ),
               const SizedBox(height: 16),
             ],
-            if (vm.rows.isEmpty)
+            if (filteredRows.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 40),
                 child: Text(
@@ -104,7 +132,7 @@ class _CatalogListViewState extends State<CatalogListView> {
                 ),
               )
             else
-              ...vm.rows.map((row) {
+              ...filteredRows.map((row) {
                 if (row.isHeader) {
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(0, 12, 0, 10),
@@ -131,9 +159,32 @@ class _CatalogListViewState extends State<CatalogListView> {
                     ),
                   );
                 }
+                final isFemale = row.badge == 'KE';
+                final isMale = row.badge == 'ME';
+                final badgeBg = isFemale
+                    ? const Color(0x1AC2185B)
+                    : isMale
+                        ? const Color(0x1A0288D1)
+                        : MadrasaTheme.successBg;
+                final badgeBorder = isFemale
+                    ? const Color(0x4DC2185B)
+                    : isMale
+                        ? const Color(0x4D0288D1)
+                        : MadrasaTheme.successBorder;
+                final badgeText = isFemale
+                    ? StudentStatCards.femaleColor
+                    : isMale
+                        ? StudentStatCards.maleColor
+                        : MadrasaTheme.successText;
+
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: AccentCard(
+                    accent: isFemale
+                        ? StudentStatCards.femaleColor
+                        : isMale
+                            ? StudentStatCards.maleColor
+                            : MadrasaTheme.primary,
                     onTap: row.detailPath == null
                         ? null
                         : () => context.push(row.detailPath!),
@@ -181,18 +232,16 @@ class _CatalogListViewState extends State<CatalogListView> {
                                     vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: MadrasaTheme.successBg,
+                                    color: badgeBg,
                                     borderRadius: BorderRadius.circular(999),
-                                    border: Border.all(
-                                      color: MadrasaTheme.successBorder,
-                                    ),
+                                    border: Border.all(color: badgeBorder),
                                   ),
                                   child: Text(
                                     row.badge!,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
-                                      color: MadrasaTheme.successText,
+                                      color: badgeText,
                                     ),
                                   ),
                                 ),

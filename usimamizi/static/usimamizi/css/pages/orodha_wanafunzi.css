@@ -8,7 +8,7 @@
     .header-icon { background-color: rgba(46, 125, 50, 0.1); color: var(--primary); padding: 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
     .page-header h1 { margin: 0; color: var(--text-main); font-size: 24px; font-weight: 700; }
 
-    /* Beji za Takwimu */
+    /* Beji na Kadi za Takwimu zenye Watermark */
     .badge-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .stat-badge {
         padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; border: 1px solid transparent;
@@ -16,6 +16,36 @@
     .badge-male { background-color: rgba(2, 136, 209, 0.1); color: var(--secondary); border-color: rgba(2, 136, 209, 0.2); }
     .badge-female { background-color: rgba(194, 24, 91, 0.1); color: var(--female); border-color: rgba(194, 24, 91, 0.2); }
     .badge-total { background-color: rgba(46, 125, 50, 0.1); color: var(--primary); border-color: rgba(46, 125, 50, 0.2); }
+
+    .stat-watermark-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+    .stat-watermark-card {
+        position: relative;
+        overflow: hidden;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 20px 22px;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: 0 4px 15px var(--shadow-color);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .stat-watermark-card:hover { transform: translateY(-3px); }
+    .stat-card-male { border-top: 5px solid #0288D1; color: #0288D1; }
+    .stat-card-female { border-top: 5px solid #C2185B; color: #C2185B; }
+    .stat-card-total { border-top: 5px solid var(--primary); color: var(--primary); }
+    .stat-watermark-details { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 6px; }
+    .stat-watermark-label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+    .stat-watermark-value { font-size: 30px; font-weight: 800; color: currentColor; line-height: 1.1; }
+    .stat-watermark-icon { position: absolute; right: -8px; bottom: -10px; opacity: 0.11; pointer-events: none; }
+    .stat-watermark-number { position: absolute; right: 56px; bottom: -12px; font-size: 64px; font-weight: 900; opacity: 0.06; color: currentColor; line-height: 1; pointer-events: none; user-select: none; }
 
     /* Kadi ya Utafutaji (Search/Filter) */
     .filter-card {

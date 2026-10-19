@@ -65,12 +65,16 @@ class Darasa {
     required this.jina,
     this.maelezo,
     this.idadiWanafunzi,
+    this.wavulana,
+    this.wasichana,
   });
 
   final int id;
   final String jina;
   final String? maelezo;
   final int? idadiWanafunzi;
+  final int? wavulana;
+  final int? wasichana;
 
   factory Darasa.fromJson(Map<String, dynamic> json) {
     return Darasa(
@@ -78,6 +82,8 @@ class Darasa {
       jina: json['jina'] as String,
       maelezo: json['maelezo'] as String?,
       idadiWanafunzi: json['idadi_wanafunzi'] as int?,
+      wavulana: json['wavulana'] as int?,
+      wasichana: json['wasichana'] as int?,
     );
   }
 }

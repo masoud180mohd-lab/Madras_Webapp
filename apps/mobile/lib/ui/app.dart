@@ -110,7 +110,8 @@ GoRouter createRouter({
             builder: (context, state) {
               final darasa = state.uri.queryParameters['darasa'];
               return CatalogListView(
-                searchable: darasa == null,
+                searchable: true,
+                showStudentStats: true,
                 viewModel: CatalogViewModel(
                   loader: ({q}) => catalog.wanafunzi(q: q, darasa: darasa),
                 ),
@@ -184,6 +185,7 @@ GoRouter createRouter({
                   }
                   return ClassHubView(
                     darasa: darasa,
+                    catalog: catalog,
                     canTakeAttendance:
                         auth.profile?.canTakeAttendance ?? false,
                     canViewStudents: auth.profile?.canViewStudents ?? false,

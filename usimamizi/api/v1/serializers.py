@@ -33,10 +33,19 @@ class MeSerializer(serializers.Serializer):
 
 class DarasaSerializer(serializers.ModelSerializer):
     idadi_wanafunzi = serializers.IntegerField(read_only=True, required=False)
+    wavulana = serializers.IntegerField(read_only=True, required=False)
+    wasichana = serializers.IntegerField(read_only=True, required=False)
 
     class Meta:
         model = Darasa
-        fields = ("id", "jina", "maelezo", "idadi_wanafunzi")
+        fields = (
+            "id",
+            "jina",
+            "maelezo",
+            "idadi_wanafunzi",
+            "wavulana",
+            "wasichana",
+        )
 
 
 class MwanafunziRosterSerializer(serializers.ModelSerializer):
