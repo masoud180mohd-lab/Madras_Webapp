@@ -1,4 +1,4 @@
-"""
+﻿"""
 Production settings. Requires environment variables; fails closed.
 """
 
@@ -90,6 +90,11 @@ elif _db_engine not in _allowed_engines:
         "Use postgresql, mysql, or sqlite with DJANGO_ALLOW_SQLITE=True."
     )
 
+# Keep PostgreSQL/MySQL connections alive across requests to eliminate cross-region TCP/SSL handshake latency
+if not _db_engine.endswith("sqlite3"):
+    DATABASES["default"]["CONN_MAX_AGE"] = int(os.environ.get("DJANGO_DB_CONN_MAX_AGE", "600"))
+    DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+
 # WhiteNoise: serve collected static files from Gunicorn when Nginx is not aliasing them.
 # RenderHealthCheckMiddleware runs before SecurityMiddleware so internal 10.x.x.x probes pass.
 MIDDLEWARE = [
@@ -133,3 +138,4 @@ SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_SECURE_HSTS_SECONDS", "31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
