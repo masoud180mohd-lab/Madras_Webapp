@@ -45,6 +45,9 @@ _is_render = bool(
 if _is_render:
     for _extra_host in (
         _render_ext_host,
+        "rasulillah.me",
+        "www.rasulillah.me",
+        ".rasulillah.me",
         "madrasa-webapp.onrender.com",
         ".onrender.com",
         "localhost",
@@ -60,6 +63,8 @@ if _is_render:
         pass
     for _extra_origin in (
         f"https://{_render_ext_host}" if _render_ext_host else "",
+        "https://rasulillah.me",
+        "https://www.rasulillah.me",
         "https://madrasa-webapp.onrender.com",
         "https://*.onrender.com",
     ):

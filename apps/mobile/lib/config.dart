@@ -4,8 +4,7 @@ class AppConfig {
   final String apiBaseUrl;
 
   static const AppConfig production = AppConfig(
-    // TODO: Replace with the exact Render service URL after first deploy if Render assigns a different hostname.
-    apiBaseUrl: 'https://madrasa-webapp.onrender.com',
+    apiBaseUrl: 'https://rasulillah.me',
   );
 
   factory AppConfig.fromEnvironment() {
