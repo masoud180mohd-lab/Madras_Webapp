@@ -18,7 +18,8 @@ databases:
 #   healthCheckPath: /
 #   autoDeploy: true (branch: main)
 #   env vars: PYTHON_VERSION=3.12.7, RENDER_DB_REGION=oregon,
-#   DATABASE_URL=<external oregon-postgres.render.com URL>,
+#   DATABASE_URL=postgresql://madrasa_user:<password>@dpg-…-a/madrasa_db_njfe (internal host;
+#   Render appends a random suffix to the database name)
 #   DJANGO_ENV=production, DJANGO_SETTINGS_MODULE=madrasa_sys.settings,
 #   PYTHONUNBUFFERED=1, DJANGO_SECRET_KEY=<secret>,
 #   DJANGO_ALLOWED_HOSTS=rasulillah.me,www.rasulillah.me,madrasa-webapp.onrender.com,.onrender.com,localhost,127.0.0.1,

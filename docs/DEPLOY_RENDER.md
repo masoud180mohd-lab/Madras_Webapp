@@ -44,7 +44,7 @@ repo. Orodha inayohitajika:
 ```
 PYTHON_VERSION=3.12.7
 RENDER_DB_REGION=oregon
-DATABASE_URL=postgres://madrasa_user:<password>@dpg-…-a/madrasa_db   # au external URL
+DATABASE_URL=postgresql://madrasa_user:<password>@dpg-…-a/madrasa_db_njfe   # hostname ya ndani; Render huongeza suffix kwenye jina la database
 DJANGO_ENV=production
 DJANGO_SETTINGS_MODULE=madrasa_sys.settings
 PYTHONUNBUFFERED=1
