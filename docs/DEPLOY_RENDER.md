@@ -1,199 +1,95 @@
-# Uhamishaji kwenda Render (Deploy to Render)
+# Render: Uendeshaji (Operations Runbook)
 
-Runbook hii inaeleza hatua za kuhamisha **Madras_Webapp** kutoka PythonAnywhere
-kwenda **Render** (PostgreSQL + Cloudinary media), bila kupoteza data.
+Runbook hii inaeleza jinsi **Madras_Webapp** inavyoendeshwa kwenye Render **sasa**.
+Kwa historia ya uhamishaji kutoka PythonAnywhere, angalia sehemu ya 6 — hatua
+zile za zamani zimepitwa na wakati.
 
-> Kabla ya kuanza, soma pia [DEPLOY_PYTHONANYWHERE.md](DEPLOY_PYTHONANYWHERE.md)
-> kwa muktadha wa mradi na mpango wa zamani.
+## 1. Topolojia ya sasa (tangu 2026-10-20)
 
-## 1. Maandalizi ya ndani (Local preparation)
+| Sehemu | Thamani |
+|---|---|
+| Web service | `madrasa-webapp-oregon` — region **Oregon (US West)**, plan Free, imeundwa **manually** kwenye dashboard (si Blueprint) |
+| Database | `madrasa-db` — region **Oregon**, inamilikiwa na Blueprint (`databases:` kwenye `render.yaml` pekee) |
+| Media | Cloudinary (`CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET`) |
+| Custom domain | `rasulillah.me` → A record `216.24.57.1` (Render anycast); `www.rasulillah.me` → CNAME `madrasa-webapp-oregon.onrender.com` (Namecheap) |
+| Mobile app | `https://rasulillah.me` — hakuna APK rebuild inayohitajika domain ikibaki hii |
 
-- Install Python dependencies:
+Mambo muhimu:
 
-  ```
-  py -m pip install -r requirements.txt
-  ```
+- Web na database ziko **region moja**, kwa hivyo `DATABASE_URL` inaweza kutumia
+  hostname ya ndani `dpg-…-a` (private network). `madrasa_sys/settings/db.py`
+  hurudisha external FQDN (`….oregon-postgres.render.com`) ikiwa DNS ya ndani
+  ishindikane — hivyo hakuna hatari kubwa ikibadilishwa.
+- Render **haiwezi kubadilisha region** wala `*.onrender.com` subdomain ya
+  service iliyopo. Kubadilisha mojawapo kunahitaji kuunda service mpya.
+- `render.yaml` haitangazi web service tena (service ni manual); kama
+  utaitangaza, Blueprint sync inaweza kuunda service ya duplicate.
 
-- Run Django checks:
+## 2. Deploy ya kila siku
 
-  ```
-  py manage.py check
-  ```
+1. Commit na push kwenye `main` — `autoDeploy` ipo ON.
+2. Render inajenga: `./build.sh` → `manage.py check` → `migrate --noinput` →
+   `collectstatic --noinput`.
+3. Kufuatilia: Render → service → **Events** (build/deploy) na **Logs** (runtime).
+4. Uthibitisho wa haraka baada ya deploy:
+   - `https://rasulillah.me/` → `Muunganisho umefanikiwa!` (health ping)
+   - `https://rasulillah.me/madrasa/` → ukurasa wa kuingia (`<html lang="sw">`)
+   - `https://rasulillah.me/api/v1/mwanzo/` → `401` bila token ya JWT (sahihi)
 
-- Run critical tests:
+## 3. Environment variables
 
-  ```
-  py manage.py test usimamizi.tests.test_db_settings
-  py manage.py test usimamizi.tests.test_media_auth
-  ```
+Zinaishi kwenye dashboard (service → Settings → **Environment**) — si kwenye
+repo. Orodha inayohitajika:
 
-- If Flutter SDK is available, run:
+```
+PYTHON_VERSION=3.12.7
+RENDER_DB_REGION=oregon
+DATABASE_URL=postgres://madrasa_user:<password>@dpg-…-a/madrasa_db   # au external URL
+DJANGO_ENV=production
+DJANGO_SETTINGS_MODULE=madrasa_sys.settings
+PYTHONUNBUFFERED=1
+DJANGO_SECRET_KEY=<secret>
+DJANGO_ALLOWED_HOSTS=rasulillah.me,www.rasulillah.me,madrasa-webapp.onrender.com,.onrender.com,localhost,127.0.0.1
+DJANGO_CSRF_TRUSTED_ORIGINS=https://rasulillah.me,https://www.rasulillah.me,https://madrasa-webapp.onrender.com,https://*.onrender.com
+DJANGO_SECURE_SSL_REDIRECT=False
+CLOUDINARY_CLOUD_NAME=<secret>
+CLOUDINARY_API_KEY=<secret>
+CLOUDINARY_API_SECRET=<secret>
+```
 
-  ```
-  flutter analyze
-  flutter test
-  ```
+Kubadilisha env variable kunachochea deploy/restart. `DJANGO_SECRET_KEY`
+ikibadilishwa, watumiaji wote watalazimika kuingia tena.
 
-## 2. Hifadhi nakala za PythonAnywhere (Backup PythonAnywhere)
+## 4. Backup na restore za database
 
-Fanya haya **kabla** ya kugusa chochote kwenye PythonAnywhere:
+Kutoka Render Shell (au popote settings zinapopatikana):
 
-- Download `db.sqlite3` from PythonAnywhere Files.
-- Download or zip the media folder from PythonAnywhere Files.
-- Record the current PythonAnywhere git commit:
+```bash
+python manage.py export_madrasa_data --output madrasa_backup.json
+python manage.py import_madrasa_data --input madrasa_backup.json --migrate
+```
 
-  ```
-  git rev-parse HEAD
-  ```
+Media haihitaji backup ya local — iko Cloudinary. Faili ya `.env`, `db.sqlite3`,
+`media/`, na `staticfiles/` hazipaswi kamwe ku-commit.
 
-- Keep these backups **outside** PythonAnywhere (e.g., on your PC or another drive).
+## 5. Kujenga upya web service (disaster recovery)
 
-## 3. Sukuma code mpya GitHub (Push to GitHub)
+1. Render → **New +** → **Web Service** (SI Blueprint).
+2. Repo `masoud180mohd-lab/Madras_Webapp`, branch `main`, runtime Python 3.
+3. Region **Oregon (US West)** — lazima ilingane na database.
+4. Build: `./build.sh` · Start: `gunicorn madrasa_sys.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --max-requests 1000 --max-requests-jitter 50` · Health check: `/`
+5. Weka environment variables zote za sehemu ya 3.
+6. Baada ya **Live**: Settings → Custom Domains → ongeza `rasulillah.me`,
+   kisha `www.rasulillah.me`. DNS ni tayari (A `216.24.57.1` na CNAME ya
+   `www`), kwa hivyo uthibitisho hufanyika haraka bila kuandika DNS upya.
+7. Usigusa `madrasa-db` — data zote zipo hapo.
 
-- Commit the staged changes.
-- Push to `main`.
+## 6. Historia (imepitwa na wakati)
 
-## 4. Sasisha PythonAnywhere kwa muda (Temporary update)
-
-Hatua hii inatayarisha PythonAnywhere kuendesha command za uhamishaji tu.
-
-- In PythonAnywhere **Bash**, go to the project folder.
-- Pull the latest code from GitHub:
-
-  ```
-  git pull
-  ```
-
-- Install updated requirements:
-
-  ```
-  pip install -r requirements.txt
-  ```
-
-- Reload the PythonAnywhere web app.
-- If the site breaks, restore the previous git commit and reinstall the
-  previous requirements.
-
-## 5. Sanidi Cloudinary kwa muda kwenye Bash (Temporary Cloudinary)
-
-- Create a Cloudinary account if not already created.
-- In the **PythonAnywhere Bash session only**, export:
-
-  ```
-  export CLOUDINARY_CLOUD_NAME="..."
-  export CLOUDINARY_API_KEY="..."
-  export CLOUDINARY_API_SECRET="..."
-  ```
-
-- **Do not** put these values into the public website config yet.
-
-## 6. Hamisha media za zamani kwenda Cloudinary (Migrate media)
-
-- First run dry-run:
-
-  ```
-  python manage.py migrate_media_to_cloudinary --dry-run --verbose
-  ```
-
-- Then run a small test with a limit:
-
-  ```
-  python manage.py migrate_media_to_cloudinary --limit 5 --verbose
-  ```
-
-- Then run the full migration:
-
-  ```
-  python manage.py migrate_media_to_cloudinary --verbose
-  ```
-
-- If some assets already exist and you want to replace them, use:
-
-  ```
-  python manage.py migrate_media_to_cloudinary --overwrite --verbose
-  ```
-
-## 7. Toa backup ya database kutoka PythonAnywhere (Export data)
-
-- Run:
-
-  ```
-  python manage.py export_madrasa_data --output madrasa_backup.json
-  ```
-
-- Download `madrasa_backup.json` from PythonAnywhere Files.
-
-## 8. Unda akaunti ya Render na deploy (Render deploy)
-
-- Create a Render account.
-- Connect GitHub.
-- Create a new Blueprint/Web Service from the repository.
-- Render should detect `render.yaml`.
-- Deploy initially **WITHOUT** Cloudinary environment variables. Leave
-  `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`
-  empty.
-
-## 9. Ingiza data kwenye Render PostgreSQL (Import data)
-
-- Open **Render Shell**.
-- Upload `madrasa_backup.json`.
-- Run:
-
-  ```
-  python manage.py import_madrasa_data --input madrasa_backup.json --migrate
-  ```
-
-- Confirm the command reports successful `loaddata` and the PostgreSQL
-  sequence reset (e.g., "Sequences za PostgreSQL zilizorekebishwa: N, ...").
-
-## 10. Thibitisha Render kabla ya Cloudinary (Verify first)
-
-- Open the Render URL.
-- Test login.
-- Test the student list.
-- Test attendance.
-- Test fees.
-- Test one PDF report.
-- Media may not work fully yet because Cloudinary env vars are not set on
-  Render. **That is expected.**
-
-## 11. Wezesha Cloudinary kwenye Render (Enable Cloudinary)
-
-- In **Render Environment Variables**, set:
-  - `CLOUDINARY_CLOUD_NAME`
-  - `CLOUDINARY_API_KEY`
-  - `CLOUDINARY_API_SECRET`
-- Redeploy or restart the Render service.
-- Verify student/teacher photos and Nyenzo files load through `/media/`.
-- Verify PDF reports that include images.
-
-## 12. Jenga app ya Flutter (Build Flutter app)
-
-- Use the **actual Render URL**.
-- Either update `apps/mobile/lib/config.dart`, or build with:
-
-  ```
-  flutter build apk --dart-define=API_BASE_URL=https://your-real-render-url.onrender.com
-  ```
-
-- Test the APK on mobile data, especially **Halotel**.
-
-## 13. Mpango wa kurudi nyuma (Rollback plan)
-
-- Keep PythonAnywhere running until Render is fully verified.
-- If Render fails, continue using PythonAnywhere on Wi-Fi.
-- If PythonAnywhere breaks after pulling the new code, revert to the recorded
-  previous git commit and reinstall the previous requirements.
-- Do **not** delete the PythonAnywhere backups until Render has been stable
-  for several days.
-
-## 14. Maonyo muhimu (Important warnings)
-
-- Do **not** enable Cloudinary on Render before legacy media has been uploaded
-  to Cloudinary (hatua 6).
-- The Render free tier can sleep after inactivity.
-- Render free PostgreSQL may have expiration/backup limitations; download
-  database backups regularly.
-- Never commit `.env`.
-- Never commit `db.sqlite3`.
-- Never commit `media/` or `staticfiles/`.
+- Uhamishaji kutoka PythonAnywhere kwenda Render umekamilika;
+  `docs/DEPLOY_PYTHONANYWHERE.md` ni kumbukumbu ya kihistoria tu.
+- Hadi **2026-10-20** web service ilikuwa Singapore wakati database iko Oregon
+  (cross-region workaround: external `DATABASE_URL` + `RENDER_DB_REGION`).
+  Sasa zote ziko Oregon; mantiki ya fallback imebaki kwenye `db.py` kama kinga.
+- Service ya zamani ya Singapore (`madrasa-webapp`) ilifutwa baada ya
+  kuhamisha domains kwenda service ya Oregon.
