@@ -144,7 +144,9 @@ List<NavItem> navItemsFor(StaffProfile? profile) {
 
 String titleForPath(String path) {
   if (path.contains('/mahudhurio')) {
-    return MadrasaCopy.rollCall;
+    return path.startsWith('/masomo/')
+        ? MadrasaCopy.rollCallHifdhu
+        : MadrasaCopy.rollCall;
   }
   if (path.startsWith('/madarasa/')) {
     return MadrasaCopy.classes;

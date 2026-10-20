@@ -105,4 +105,68 @@ void main() {
     expect(ok, isTrue);
     expect(vm.alreadyRecorded, isTrue);
   });
+
+  test('hifdhu roll uses the night-subject roster and sends somo', () async {
+    final requests = <http.Request>[];
+    final api = ApiClient(
+      baseUrl: 'https://example.test',
+      tokens: MemoryTokenStore(),
+      httpClient: MockClient((request) async {
+        requests.add(request);
+        final key = '${request.method} ${request.url.path}';
+        if (key == 'GET /api/v1/masomo/7/wanafunzi/') {
+          return http.Response(
+            jsonEncode([
+              {
+                'id': 21,
+                'jina_kamili': 'Fatma',
+                'namba_ya_usajili': 'MR-021',
+                'jinsia': 'KE',
+                'picha': null,
+              },
+            ]),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        if (key == 'GET /api/v1/mahudhurio/') {
+          return http.Response(
+            '[]',
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        if (key == 'POST /api/v1/mahudhurio/') {
+          return http.Response(
+            '{"idadi":1,"aina_ya_rekodi":"Hifdhu"}',
+            201,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('not found', 404);
+      }),
+    );
+    final vm = RollCallViewModel.hifdhu(
+      repository: AttendanceRepository(api: api),
+      somoId: 7,
+      canTakeAttendance: true,
+    );
+    await vm.load();
+    expect(vm.isHifdhu, isTrue);
+    expect(vm.rows.single.mwanafunzi.id, 21);
+    final listed = requests.firstWhere(
+      (r) => r.method == 'GET' && r.url.path == '/api/v1/mahudhurio/',
+    );
+    expect(listed.url.queryParameters['somo'], '7');
+    expect(listed.url.queryParameters['aina_ya_rekodi'], 'Hifdhu');
+    expect(listed.url.queryParameters.containsKey('darasa'), isFalse);
+
+    expect(await vm.save(), isTrue);
+    final posted = requests.lastWhere((r) => r.method == 'POST');
+    final body = jsonDecode(posted.body) as Map<String, dynamic>;
+    expect(body['somo'], 7);
+    expect(body['aina_ya_rekodi'], 'Hifdhu');
+    expect(body.containsKey('darasa'), isFalse);
+    expect(vm.alreadyRecorded, isTrue);
+  });
 }

@@ -50,6 +50,7 @@ from usimamizi.api.v1.views import (
     SomoListView,
     SomoMtihaniCreateView,
     SomoNyenzoCreateView,
+    SomoWanafunziView,
 )
 
 urlpatterns = [
@@ -180,6 +181,11 @@ urlpatterns = [
         "masomo/<int:somo_id>/mitihani/",
         SomoMtihaniCreateView.as_view(),
         name="api_v1_somo_mitihani",
+    ),
+    path(
+        "masomo/<int:somo_id>/wanafunzi/",
+        SomoWanafunziView.as_view(),
+        name="api_v1_somo_wanafunzi",
     ),
     path("sabaq/", SabaqCreateView.as_view(), name="api_v1_sabaq"),
     path("maendeleo/", MaendeleoCreateView.as_view(), name="api_v1_maendeleo"),

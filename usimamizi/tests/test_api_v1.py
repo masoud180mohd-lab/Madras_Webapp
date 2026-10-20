@@ -354,6 +354,56 @@ class ApiV1SabaqExamsTests(TestCase):
         self.assertEqual(progress.status_code, 201, progress.content)
         self.assertEqual(RekodiMaendeleoMchana.objects.count(), 1)
 
+    def _hifdhu_roll(self):
+        return {
+            "somo": self.hifdhu.id,
+            "tarehe": date.today().isoformat(),
+            "aina_ya_rekodi": "Hifdhu",
+            "rekodi": [
+                {"mwanafunzi": self.student.id, "yupo": True, "sababu_kama_hayupo": ""},
+            ],
+        }
+
+    def test_hifdhu_roster_lists_night_students_only(self):
+        self._auth("p3_kawaida")
+        roster = self.client.get(f"/api/v1/masomo/{self.hifdhu.id}/wanafunzi/")
+        self.assertEqual(roster.status_code, 200, roster.content)
+        self.assertEqual([row["id"] for row in roster.data], [self.student.id])
+        self.assertNotIn("namba_ya_simu_mzazi", roster.data[0])
+        not_hifdhu = self.client.get(f"/api/v1/masomo/{self.fiqhi.id}/wanafunzi/")
+        self.assertEqual(not_hifdhu.status_code, 404)
+
+    def test_kawaida_records_hifdhu_attendance(self):
+        self._auth("p3_kawaida")
+        first = self.client.post("/api/v1/mahudhurio/", self._hifdhu_roll(), format="json")
+        self.assertEqual(first.status_code, 201, first.content)
+        self.assertEqual(first.data["aina_ya_rekodi"], "Hifdhu")
+        self.assertEqual(
+            Hudhurio.objects.filter(tarehe=date.today(), aina_ya_rekodi="Hifdhu").count(),
+            1,
+        )
+        second = self.client.post("/api/v1/mahudhurio/", self._hifdhu_roll(), format="json")
+        self.assertEqual(second.status_code, 409)
+        listed = self.client.get(f"/api/v1/mahudhurio/?somo={self.hifdhu.id}")
+        self.assertEqual(listed.status_code, 200)
+        self.assertEqual([row["mwanafunzi"] for row in listed.data], [self.student.id])
+
+    def test_hifdhu_attendance_requires_somo(self):
+        self._auth("p3_kawaida")
+        payload = self._hifdhu_roll()
+        payload.pop("somo")
+        response = self.client.post("/api/v1/mahudhurio/", payload, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("somo", response.data)
+        self.assertEqual(Hudhurio.objects.count(), 0)
+
+    def test_jaji_can_view_hifdhu_roster_not_record(self):
+        self._auth("p3_jaji")
+        roster = self.client.get(f"/api/v1/masomo/{self.hifdhu.id}/wanafunzi/")
+        self.assertEqual(roster.status_code, 200)
+        response = self.client.post("/api/v1/mahudhurio/", self._hifdhu_roll(), format="json")
+        self.assertEqual(response.status_code, 403)
+
     def test_jaji_denied_sabaq_allowed_maksi(self):
         self._auth("p3_jaji")
         self.assertEqual(

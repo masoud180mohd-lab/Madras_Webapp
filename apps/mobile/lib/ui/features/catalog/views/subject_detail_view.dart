@@ -365,6 +365,9 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
     final profile = context.watch<AuthViewModel>().profile;
     final canExams = profile?.canSeeExams ?? false;
     final canMaterials = profile?.canSeeMaterials ?? false;
+    final canAttendance = profile?.canTakeAttendance ?? false;
+    final showRollCall =
+        data.niLaHifdhu && (canAttendance || (profile?.canViewStudents ?? false));
     final subtitle = [
       if (data.niLaHifdhu) 'Hifdhu (usiku)' else 'Somo la darasa',
       if (data.darasaJina != null && data.darasaJina!.isNotEmpty) data.darasaJina!,
@@ -403,6 +406,48 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
               ),
             ),
             const SizedBox(height: 16),
+            if (showRollCall) ...[
+              AccentCard(
+                onTap: () => context.push('/masomo/${data.id}/mahudhurio'),
+                padding: const EdgeInsets.fromLTRB(18, 16, 12, 16),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.fact_check_rounded,
+                      color: MadrasaTheme.primary,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            MadrasaCopy.rollCallHifdhu,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: MadrasaTheme.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            canAttendance
+                                ? 'Rekodi yupo / hayupo kwa wanafunzi wa somo hili'
+                                : MadrasaCopy.viewOnly,
+                            style: const TextStyle(color: MadrasaTheme.muted),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: MadrasaTheme.muted,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             AccentCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

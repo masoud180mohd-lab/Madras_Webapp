@@ -39,7 +39,14 @@ class _RollCallViewState extends State<RollCallView> {
             return Center(child: Text(vm.error!));
           }
           if (vm.rows.isEmpty) {
-            return const Center(child: Text(MadrasaCopy.emptyRoster));
+            return Center(
+              child: Text(
+                vm.isHifdhu
+                    ? MadrasaCopy.emptyRosterHifdhu
+                    : MadrasaCopy.emptyRoster,
+                textAlign: TextAlign.center,
+              ),
+            );
           }
           return Column(
             children: [

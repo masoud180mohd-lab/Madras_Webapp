@@ -62,6 +62,9 @@ class MadrasaCopy {
   static const already = 'Mahudhurio ya leo tayari yameshajulikana.';
   static const emptyClasses = 'Hakuna darasa lililopatikana.';
   static const emptyRoster = 'Hakuna mwanafunzi hai katika darasa hili.';
+  static const emptyRosterHifdhu =
+      'Hakuna mwanafunzi hai aliyesajiliwa kwenye somo hili la usiku.';
+  static const rollCallHifdhu = 'Mahudhurio ya Usiku';
   static const needUsername = 'Weka jina la mtumiaji.';
   static const needPassword = 'Weka nenosiri.';
   static const viewOnly = 'Unaweza kuona orodha, si kurekodi mahudhurio.';

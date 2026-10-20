@@ -117,28 +117,55 @@ class DarasaWanafunziView(APIView):
         return Response(serializer.data)
 
 
+class SomoWanafunziView(APIView):
+    """Active roster of a night (Hifdhu) subject, for the Hifdhu roll call."""
+
+    permission_classes = [IsAuthenticated, HasCapability]
+    required_capability = CAP_VIEW_STUDENTS
+
+    def get(self, request, somo_id):
+        somo = Somo.objects.filter(pk=somo_id, ni_la_hifdhu=True).first()
+        if somo is None:
+            return Response({"detail": "Somo la Hifdhu halipatikani."}, status=404)
+        qs = (
+            Mwanafunzi.objects.active()
+            .filter(programu_ya_usiku=somo)
+            .order_by("jina_kamili")
+        )
+        serializer = MwanafunziRosterSerializer(
+            qs, many=True, context={"request": request}
+        )
+        return Response(serializer.data)
+
+
 class MahudhurioView(APIView):
     permission_classes = [IsAuthenticated, HasCapability]
     required_capability = CAP_ATTENDANCE
 
     def get(self, request):
         darasa_id = request.query_params.get("darasa")
-        if not darasa_id:
-            return Response({"detail": "Parameta darasa inahitajika."}, status=400)
-        aina = request.query_params.get("aina_ya_rekodi") or "Kawaida"
+        somo_id = request.query_params.get("somo")
+        if not darasa_id and not somo_id:
+            return Response(
+                {"detail": "Parameta darasa au somo inahitajika."}, status=400
+            )
+        if not (somo_id or darasa_id).isdigit():
+            return Response({"detail": "Kitambulisho si sahihi."}, status=400)
+        default_aina = "Hifdhu" if somo_id else "Kawaida"
+        aina = request.query_params.get("aina_ya_rekodi") or default_aina
         raw_date = request.query_params.get("tarehe")
         try:
             day = date.fromisoformat(raw_date) if raw_date else date.today()
         except ValueError:
             return Response({"detail": "Tarehe si sahihi (YYYY-MM-DD)."}, status=400)
 
+        qs = Hudhurio.objects.filter(tarehe=day, aina_ya_rekodi=aina)
+        if somo_id:
+            qs = qs.filter(mwanafunzi__programu_ya_usiku_id=somo_id)
+        else:
+            qs = qs.filter(mwanafunzi__darasa_id=darasa_id)
         qs = (
-            Hudhurio.objects.filter(
-                tarehe=day,
-                aina_ya_rekodi=aina,
-                mwanafunzi__darasa_id=darasa_id,
-            )
-            .select_related("mwanafunzi")
+            qs.select_related("mwanafunzi")
             .order_by("mwanafunzi__jina_kamili")
         )
         return Response(HudhurioSerializer(qs, many=True).data)
@@ -149,10 +176,11 @@ class MahudhurioView(APIView):
         data = serializer.validated_data
         result = record_class_attendance(
             user=request.user,
-            darasa_id=data["darasa"],
+            darasa_id=data.get("darasa"),
             tarehe=data.get("tarehe"),
             aina_ya_rekodi=data.get("aina_ya_rekodi") or "Kawaida",
             rekodi=data["rekodi"],
+            somo_id=data.get("somo"),
         )
         return Response(result, status=201)
 

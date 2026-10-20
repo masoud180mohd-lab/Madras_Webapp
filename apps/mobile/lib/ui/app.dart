@@ -163,6 +163,21 @@ GoRouter createRouter({
                       );
                     },
                   ),
+                  GoRoute(
+                    path: 'mahudhurio',
+                    builder: (context, state) {
+                      final id =
+                          int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+                      return RollCallView(
+                        viewModel: RollCallViewModel.hifdhu(
+                          repository: attendance,
+                          somoId: id,
+                          canTakeAttendance:
+                              auth.profile?.canTakeAttendance ?? false,
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ],

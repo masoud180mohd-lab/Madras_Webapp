@@ -8,13 +8,25 @@ import '../../../../data/services/api_exception.dart';
 class RollCallViewModel extends ChangeNotifier {
   RollCallViewModel({
     required AttendanceRepository repository,
-    required this.darasa,
+    required Darasa this.darasa,
     required this.canTakeAttendance,
-  }) : _repository = repository;
+  })  : _repository = repository,
+        somoId = null;
+
+  /// Roll call for a night (Hifdhu / Hifdhu Tashjii) subject's students.
+  RollCallViewModel.hifdhu({
+    required AttendanceRepository repository,
+    required int this.somoId,
+    required this.canTakeAttendance,
+  })  : _repository = repository,
+        darasa = null;
 
   final AttendanceRepository _repository;
-  final Darasa darasa;
+  final Darasa? darasa;
+  final int? somoId;
   final bool canTakeAttendance;
+
+  bool get isHifdhu => somoId != null;
 
   bool _loading = false;
   bool _saving = false;
@@ -38,9 +50,15 @@ class RollCallViewModel extends ChangeNotifier {
     _error = null;
     notifyListeners();
     try {
-      final wanafunzi = await _repository.roster(darasa.id);
+      final wanafunzi = isHifdhu
+          ? await _repository.rosterHifdhu(somoId!)
+          : await _repository.roster(darasa!.id);
       final existing = canTakeAttendance
-          ? await _repository.mahudhurio(darasaId: darasa.id, tarehe: tarehe)
+          ? await _repository.mahudhurio(
+              darasaId: darasa?.id,
+              somoId: somoId,
+              tarehe: tarehe,
+            )
           : const <Hudhurio>[];
       final byId = {for (final row in existing) row.mwanafunziId: row};
       _alreadyRecorded = existing.isNotEmpty;
@@ -93,7 +111,8 @@ class RollCallViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       final created = await _repository.submitMahudhurio(
-        darasaId: darasa.id,
+        darasaId: darasa?.id,
+        somoId: somoId,
         tarehe: tarehe,
         rekodi: _rows,
       );

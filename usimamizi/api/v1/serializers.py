@@ -82,7 +82,8 @@ class HudhurioRowSerializer(serializers.Serializer):
 
 
 class MahudhurioBatchSerializer(serializers.Serializer):
-    darasa = serializers.IntegerField()
+    darasa = serializers.IntegerField(required=False, allow_null=True)
+    somo = serializers.IntegerField(required=False, allow_null=True)
     tarehe = serializers.DateField(required=False)
     aina_ya_rekodi = serializers.ChoiceField(
         choices=["Kawaida", "Hifdhu"],
@@ -97,6 +98,14 @@ class MahudhurioBatchSerializer(serializers.Serializer):
         if len(ids) != len(set(ids)):
             raise serializers.ValidationError("Mwanafunzi amerudiwa kwenye rekodi.")
         return value
+
+    def validate(self, attrs):
+        aina = attrs.get("aina_ya_rekodi") or "Kawaida"
+        if aina == "Hifdhu" and not attrs.get("somo"):
+            raise serializers.ValidationError({"somo": "Somo la Hifdhu linahitajika."})
+        if aina == "Kawaida" and not attrs.get("darasa"):
+            raise serializers.ValidationError({"darasa": "Darasa linahitajika."})
+        return attrs
 
 
 class HudhurioSerializer(serializers.ModelSerializer):

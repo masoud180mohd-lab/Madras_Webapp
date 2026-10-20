@@ -32,12 +32,13 @@ Auth: `Authorization: Bearer <access>`. Access ~15 min, refresh ~7 days (rotated
 | `GET` | `/api/v1/ukaguzi/` | `manage_students` or `fees` |
 | `GET` | `/api/v1/madarasa/` | `view_directory` |
 | `GET` | `/api/v1/madarasa/<id>/wanafunzi/` | `view_students` — hai tu; no parent phones |
-| `GET` | `/api/v1/mahudhurio/?darasa=&tarehe=&aina_ya_rekodi=` | `attendance` |
-| `POST` | `/api/v1/mahudhurio/` | `attendance` — batch, full active roster |
+| `GET` | `/api/v1/mahudhurio/?darasa=&tarehe=&aina_ya_rekodi=` | `attendance` — or `?somo=` for Hifdhu (default `aina_ya_rekodi=Hifdhu`) |
+| `POST` | `/api/v1/mahudhurio/` | `attendance` — batch, full active roster; Hifdhu sends `somo` + `aina_ya_rekodi=Hifdhu` |
 | `GET` | `/api/v1/masomo/?darasa=` | `view_directory` / `exams` / `materials` |
 | `GET` | `/api/v1/masomo/<id>/` | same — somo + `nyenzo` + `mitihani` |
 | `POST` | `/api/v1/masomo/<id>/nyenzo/` | `materials` — multipart `jina_la_faili` + `faili` |
 | `POST` | `/api/v1/masomo/<id>/mitihani/` | `exams` — `jina_la_mtihani`, `tarehe`, optional `mseto` |
+| `GET` | `/api/v1/masomo/<id>/wanafunzi/` | `view_students` — night (Hifdhu) subject roster; hai tu; 404 if not Hifdhu |
 | `POST` | `/api/v1/sabaq/` | `sabaq` — requires linked Mwalimu |
 | `POST` | `/api/v1/maendeleo/` | `sabaq` — maendeleo ya mchana (not hifdhu) |
 | `GET` | `/api/v1/mitihani/?somo=` | `exams` |
