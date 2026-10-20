@@ -4,82 +4,149 @@
 <head>
     <meta charset="UTF-8">
     <title>{% if aina == 'Usiku' %}Ripoti ya Sabaq na Murajaa{% else %}Ripoti ya Sabaq{% endif %}</title>
-    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_sabaq.css' %}?v=20260706a">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_base.css' %}?v=20261020">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_sabaq.css' %}?v=20261020">
 </head>
 <body>
 
-    <div class="header">
-        <div class="title">AL-MADRASATUL RASULILLAH</div>
-        <div>Ripoti Rasmi ya {% if aina == 'Usiku' %}Maendeleo ya Usomaji{% else %}Sabaq{% endif %} ({{ aina }})</div>
+    <!-- Running Footer on Every Page -->
+    <div id="running-footer">
+        <table class="footer-table">
+            <tr>
+                <td style="width: 45%; text-align: left;">
+                    Al-Madrasatul Rasulillah · Mfumo wa Usimamizi
+                </td>
+                <td style="width: 30%; text-align: center;">
+                    {{ wakati_huu|date:"d M Y, H:i" }}
+                </td>
+                <td style="width: 25%; text-align: right;">
+                    Ukurasa <pdf:pagenumber> wa <pdf:pagecount>
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <div class="info">
-        <b>Jina la Mwanafunzi:</b> {{ mwanafunzi.jina_kamili }} <br>
-        <b>Namba ya Usajili:</b> {{ mwanafunzi.namba_ya_usajili }}
-    </div>
+    <!-- Institutional Header -->
+    <table class="inst-header-table">
+        <tr>
+            <td class="inst-logo-cell">
+                <img src="{% static 'usimamizi/images/logo_pdf.png' %}" class="inst-logo" />
+            </td>
+            <td>
+                <div class="inst-title">AL-MADRASATUL RASULILLAH</div>
+                <div class="inst-location">MWERA, ZANZIBAR · KITENGO CHA HIFDHU NA QUR'AN TUKUFU</div>
+            </td>
+        </tr>
+    </table>
 
-    <table>
+    <div class="inst-accent-rule"></div>
+
+    <!-- Document Title Badge -->
+    <table class="doc-badge-table">
+        <tr>
+            <td class="doc-badge-cell">
+                <div class="doc-title">
+                    {% if aina == 'Usiku' %}Ripoti Rasmi ya Maendeleo ya Usomaji (Sabaq na Murajaa)
+                    {% else %}Ripoti Rasmi ya Sabaq (Kipindi cha Darasa){% endif %}
+                </div>
+                <div class="doc-subtitle">Rekodi za masomo ya kuhifadhi na kurudia Qur'ani kwa kipindi husika</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Student Metadata Grid -->
+    <table class="meta-grid-table">
+        <tr>
+            <td class="meta-label">Mwanafunzi:</td>
+            <td class="meta-value-strong" style="width: 40%;">
+                {{ mwanafunzi.jina_kamili }}
+            </td>
+            <td class="meta-label" style="width: 16%;">Namba ya Usajili:</td>
+            <td class="meta-value" style="width: 16%;">
+                <b>{{ mwanafunzi.namba_ya_usajili }}</b>
+            </td>
+        </tr>
+        <tr>
+            <td class="meta-label">Kipindi / Aina:</td>
+            <td class="meta-value" colspan="3">
+                {% if aina == 'Usiku' %}Kipindi cha Usiku (Hifdhu & Murajaa){% else %}Kipindi cha Kawaida cha Darasa{% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Data Table with Repeating Header -->
+    <table class="sabaq-table" repeat="1">
         <thead>
             <tr>
-                <th class="{% if aina == 'Usiku' %}date-col-night{% else %}date-col-day{% endif %}">Tarehe & Mwalimu</th>
-                <th class="{% if aina == 'Usiku' %}sabaq-col-night{% else %}sabaq-col-day{% endif %}">{% if aina == 'Usiku' %}Sabaq (Mpya){% else %}Sabaq{% endif %}</th>
-                
+                <th class="{% if aina == 'Usiku' %}col-date-night{% else %}col-date-day{% endif %}">Tarehe & Mwalimu</th>
+                <th class="{% if aina == 'Usiku' %}col-sabaq-night{% else %}col-sabaq-day{% endif %}">{% if aina == 'Usiku' %}Sabaq (Mpya){% else %}Sabaq ya Siku{% endif %}</th>
                 {% if aina == 'Usiku' %}
-                <th class="murajaa-col">Murajaa / Pande</th>
+                <th class="col-murajaa-night">Murajaa / Mapande</th>
                 {% endif %}
             </tr>
         </thead>
         <tbody>
             {% for s in sabaq %}
-            <tr>
-                <td>
-                    <b>{{ s.tarehe|date:"d M Y" }}</b><br>
+            <tr class="{% cycle 'row-odd' 'row-even' %}">
+                <td class="{% if aina == 'Usiku' %}col-date-night{% else %}col-date-day{% endif %}">
+                    <div class="date-primary">{{ s.tarehe|date:"d M Y" }}</div>
                     {% if s.mwalimu %}
-                        <span class="teacher-name">(Mwl: {{ s.mwalimu.jina_kamili }})</span>
+                        <div class="teacher-meta">Mwl: {{ s.mwalimu.jina_kamili }}</div>
                     {% endif %}
                 </td>
-                <td>
+                <td class="{% if aina == 'Usiku' %}col-sabaq-night{% else %}col-sabaq-day{% endif %}">
                     {% if s.sabaq_sura %}
-                        <b>Sura/Mada:</b> {{ s.sabaq_sura }} <br>
-                        <b>Kuanzia:</b> {{ s.sabaq_aya_kuanzia|default:"-" }} hadi {{ s.sabaq_aya_kuishia|default:"-" }}<br>
-                        <b>Hali:</b> {{ s.sabaq_hali|default:"-" }}
+                        <div class="sura-title">Sura: {{ s.sabaq_sura }}</div>
+                        <div class="aya-range">Aya {{ s.sabaq_aya_kuanzia|default:"1" }} hadi {{ s.sabaq_aya_kuishia|default:"—" }}</div>
+                        {% if s.sabaq_hali == 'Kajua' %}
+                            <span class="pill-sabaq-pass">✓ KAJUA</span>
+                        {% elif s.sabaq_hali == 'Hajajua' %}
+                            <span class="pill-sabaq-fail">✗ HAJAJUA</span>
+                        {% elif s.sabaq_hali %}
+                            <span class="pill-sabaq-wait">⏸ {{ s.sabaq_hali|upper }}</span>
+                        {% endif %}
                     {% else %}
-                        <i>Hakusoma sabaq</i>
+                        <span style="color: #7a8a82; font-style: italic;">Hakusoma sabaq mpya</span>
+                    {% endif %}
+
+                    {% if s.maoni_ya_mwalimu %}
+                    <div class="comment-box">
+                        <span class="comment-label">Maoni:</span> {{ s.maoni_ya_mwalimu }}
+                    </div>
                     {% endif %}
                 </td>
-                
+
                 {% if aina == 'Usiku' %}
-                <td>
+                <td class="col-murajaa-night">
                     {% if s.mapande.all %}
                         {% for pande in s.mapande.all %}
-                            • {{ pande.sura }} ({{ pande.aya_kuanzia|default:"-" }} - {{ pande.aya_kuishia|default:"-" }}) [{{ pande.hali }}]<br>
+                            <div class="pande-item">
+                                <span class="pande-sura">{{ pande.sura }}</span>
+                                <span style="color: #5f6f66;">(Aya {{ pande.aya_kuanzia|default:"1" }}–{{ pande.aya_kuishia|default:"—" }})</span>
+                                {% if pande.hali == 'Pasi' %}
+                                    <span class="pill-sabaq-pass">PASI</span>
+                                {% elif pande.hali == 'Makosa' %}
+                                    <span class="pill-pande-makosa">MAKOSA</span>
+                                {% elif pande.hali %}
+                                    <span class="pill-sabaq-fail">{{ pande.hali|upper }}</span>
+                                {% endif %}
+                            </div>
                         {% endfor %}
                     {% else %}
-                        <i>Hakuna Murajaa</i>
+                        <span style="color: #7a8a82; font-style: italic;">Hakuna Murajaa</span>
                     {% endif %}
                 </td>
                 {% endif %}
             </tr>
-            
-            {% if s.maoni_ya_mwalimu %}
-            <tr>
-                <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" class="comment-row">
-                    <b>Maoni ya Jumla:</b> {{ s.maoni_ya_mwalimu }}
-                </td>
-            </tr>
-            {% endif %}
-            
             {% empty %}
             <tr>
-                <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" class="center">Hakuna rekodi bado.</td>
+                <td colspan="{% if aina == 'Usiku' %}3{% else %}2{% endif %}" class="text-center" style="padding: 16pt 8pt; color: #5f6f66; font-style: italic;">
+                    Hakuna rekodi za usomaji zilizopatikana bado.
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
-    <div class="footer">
-        Imetolewa na Mfumo wa Usimamizi | Tarehe ya Uchapishaji: {{ wakati_huu|date:"d M Y, H:i:s" }}
-    </div>
 
 </body>
 </html>

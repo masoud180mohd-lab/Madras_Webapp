@@ -69,6 +69,37 @@ from .media_protected import signed_media_url_for_path
 # xhtml2pdf versions and independent of pisa's optional remote-fetch support.
 
 _pdf_local = threading.local()
+_fonts_registered = False
+
+
+def ensure_pdf_fonts():
+    """Register custom brand TrueType fonts into ReportLab once."""
+    global _fonts_registered
+    if _fonts_registered:
+        return
+    try:
+        font_dir = finders.find("usimamizi/fonts/SourceSans3-Regular.ttf")
+        if font_dir:
+            base_dir = os.path.dirname(font_dir)
+            pdfmetrics.registerFont(TTFont("SourceSans", os.path.join(base_dir, "SourceSans3-Regular.ttf")))
+            pdfmetrics.registerFont(TTFont("SourceSans-Bold", os.path.join(base_dir, "SourceSans3-Bold.ttf")))
+            pdfmetrics.registerFont(TTFont("SourceSans-Italic", os.path.join(base_dir, "SourceSans3-It.ttf")))
+            pdfmetrics.registerFont(TTFont("SourceSans-Semibold", os.path.join(base_dir, "SourceSans3-Semibold.ttf")))
+
+            addMapping("SourceSans", 0, 0, "SourceSans")
+            addMapping("SourceSans", 1, 0, "SourceSans-Bold")
+            addMapping("SourceSans", 0, 1, "SourceSans-Italic")
+            addMapping("SourceSans", 1, 1, "SourceSans-Bold")
+
+            pdfmetrics.registerFont(TTFont("Amiri", os.path.join(base_dir, "Amiri-Regular.ttf")))
+            pdfmetrics.registerFont(TTFont("Amiri-Bold", os.path.join(base_dir, "Amiri-Bold.ttf")))
+            addMapping("Amiri", 0, 0, "Amiri")
+            addMapping("Amiri", 1, 0, "Amiri-Bold")
+            addMapping("Amiri", 0, 1, "Amiri")
+            addMapping("Amiri", 1, 1, "Amiri-Bold")
+            _fonts_registered = True
+    except Exception:
+        pass
 
 
 @contextmanager
@@ -80,6 +111,7 @@ def pdf_media_tempdir():
     link_callback downloads are removed as soon as the PDF bytes are produced.
     Nesting is safe; the innermost active directory is the one used.
     """
+    ensure_pdf_fonts()
     tmp_dir = tempfile.mkdtemp(prefix="madrasa_pdf_")
     previous = getattr(_pdf_local, "temp_dir", None)
     _pdf_local.temp_dir = tmp_dir

@@ -1,11 +1,91 @@
-body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333; }
-.header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
-.title { color: #2E7D32; font-size: 24px; font-weight: bold; }
-.info { font-size: 14px; margin-bottom: 20px; }
-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-th { background-color: #f2f2f2; color: #2E7D32; padding: 10px; text-align: left; border: 1px solid #ddd; font-weight: bold; }
-td { padding: 10px; border: 1px solid #ddd; }
-.footer { text-align: center; margin-top: 40px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
-.center { text-align: center; }
-.status-present { color: green; }
-.status-absent { color: red; }
+/* ==========================================================================
+   RIPOTI YA MAHUDHURIO (ATTENDANCE REPORT) — ART-DIRECTED STYLESHEET
+   ========================================================================== */
+
+@page {
+    size: a4 portrait;
+    margin: 10mm 14mm 16mm 14mm;
+    @frame footer_frame {
+        -pdf-frame-content: running-footer;
+        bottom: 5mm;
+        margin-left: 14mm;
+        margin-right: 14mm;
+        height: 7mm;
+    }
+}
+
+body {
+    font-family: 'SourceSans', Helvetica, Arial, sans-serif;
+    font-size: 9pt;
+    color: #1c2b24;
+}
+
+/* Attendance Summary Metrics Bar */
+.metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6pt 0 10pt 0;
+}
+
+.metrics-table td {
+    padding: 5pt 8pt;
+    background-color: #f4f7f5;
+    border: 0.5pt solid #d5e0d8;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.metrics-num {
+    font-size: 13pt;
+    font-weight: bold;
+    color: #143d2a;
+    font-family: 'SourceSans', 'Courier New', monospace;
+    line-height: 1.1;
+}
+
+.metrics-label {
+    font-size: 7.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #5f6f66;
+    letter-spacing: 0.3pt;
+    margin-top: 1pt;
+}
+
+/* Attendance Table Columns */
+.col-tarehe {
+    width: 22%;
+}
+
+.col-hali {
+    width: 18%;
+    text-align: center;
+}
+
+.col-sababu {
+    width: 60%;
+}
+
+.pill-yupo {
+    color: #1f6b45;
+    background-color: #eaf3ed;
+    border: 0.5pt solid #badbc4;
+    padding: 1.5pt 6pt;
+    font-size: 7.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3pt;
+    display: inline-block;
+}
+
+.pill-hayupo {
+    color: #99261b;
+    background-color: #fbeeed;
+    border: 0.5pt solid #f3c4c0;
+    padding: 1.5pt 6pt;
+    font-size: 7.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3pt;
+    display: inline-block;
+}

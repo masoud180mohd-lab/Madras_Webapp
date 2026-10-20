@@ -1,47 +1,119 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="sw">
 <head>
     <meta charset="UTF-8">
     <title>Matokeo ya Mtihani</title>
-    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_matokeo.css' %}?v=20260706a">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_base.css' %}?v=20261020">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_matokeo.css' %}?v=20261020">
 </head>
 <body>
 
-    <div class="header">
-        <h1>Al-Madrasatul Rasulillah</h1>
-        <p><b>Ripoti ya Matokeo ya Mtihani</b></p>
-        <p>Somo: <b>{{ somo.jina }}</b> &nbsp;&nbsp;|&nbsp;&nbsp; Mtihani: <b>{{ mtihani.jina_la_mtihani }}</b></p>
-        <p>Tarehe ya Mtihani: {{ mtihani.tarehe|date:"d M Y" }} &nbsp;&nbsp;|&nbsp;&nbsp; Waliofanya: {{ idadi_waliofanya }}</p>
+    <!-- Running Footer on Every Page -->
+    <div id="running-footer">
+        <table class="footer-table">
+            <tr>
+                <td style="width: 45%; text-align: left;">
+                    Al-Madrasatul Rasulillah · Mfumo wa Usimamizi
+                </td>
+                <td style="width: 30%; text-align: center;">
+                    {{ wakati_huu|date:"d M Y, H:i" }}
+                </td>
+                <td style="width: 25%; text-align: right;">
+                    Ukurasa <pdf:pagenumber> wa <pdf:pagecount>
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <table>
+    <!-- Institutional Header -->
+    <table class="inst-header-table">
+        <tr>
+            <td class="inst-logo-cell">
+                <img src="{% static 'usimamizi/images/logo_pdf.png' %}" class="inst-logo" />
+            </td>
+            <td>
+                <div class="inst-title">AL-MADRASATUL RASULILLAH</div>
+                <div class="inst-location">MWERA, ZANZIBAR · IDARA YA TAALUMA NA MITIHANI</div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="inst-accent-rule"></div>
+
+    <!-- Document Title Badge -->
+    <table class="doc-badge-table">
+        <tr>
+            <td class="doc-badge-cell">
+                <div class="doc-title">Ripoti ya Matokeo ya Mtihani</div>
+                <div class="doc-subtitle">Orodha ya maksi na madaraja ya wanafunzi kwa mtihani husika</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Exam Metadata Grid -->
+    <table class="meta-grid-table">
+        <tr>
+            <td class="meta-label">Somo:</td>
+            <td class="meta-value-strong" style="width: 35%;">
+                {{ somo.jina }}
+            </td>
+            <td class="meta-label" style="width: 18%;">Jina la Mtihani:</td>
+            <td class="meta-value" style="width: 27%;">
+                <b>{{ mtihani.jina_la_mtihani }}</b>
+            </td>
+        </tr>
+        <tr>
+            <td class="meta-label">Tarehe ya Mtihani:</td>
+            <td class="meta-value">
+                {{ mtihani.tarehe|date:"d M Y" }}
+            </td>
+            <td class="meta-label">Waliofanya:</td>
+            <td class="meta-value">
+                <b>{{ idadi_waliofanya }}</b> wanafunzi
+            </td>
+        </tr>
+    </table>
+
+    <!-- Results Table with Repeating Header -->
+    <table class="data-table" repeat="1">
         <thead>
             <tr>
-                <th class="center col-position">Nafasi</th>
-                <th class="col-student">Jina la Mwanafunzi</th>
-                <th class="center col-score">Maksi</th>
-                <th class="center col-grade">Daraja</th>
-                <th class="col-notes">Maelezo</th>
+                <th class="col-rank">Naf.</th>
+                <th class="col-student-name">Jina la Mwanafunzi</th>
+                <th class="col-score-cell">Maksi</th>
+                <th class="col-grade-cell">Daraja</th>
+                <th class="col-remarks-cell">Maelezo</th>
             </tr>
         </thead>
         <tbody>
             {% for m in matokeo %}
+            <tr class="{% cycle 'row-odd' 'row-even' %}">
+                <td class="col-rank">
+                    {{ m.nafasi }}
+                </td>
+                <td class="col-student-name">
+                    <b>{{ m.mwanafunzi.jina_kamili }}</b>
+                </td>
+                <td class="col-score-cell">
+                    {{ m.maksi|floatformat:"0" }}%
+                </td>
+                <td class="col-grade-cell">
+                    <span class="grade-badge grade-{{ m.daraja }}">{{ m.daraja }}</span>
+                </td>
+                <td class="col-remarks-cell">
+                    {{ m.maelezo }}
+                </td>
+            </tr>
+            {% empty %}
             <tr>
-                <td class="center"><b>{{ m.nafasi }}</b></td>
-                <td>{{ m.mwanafunzi.jina_kamili }}</td>
-                <td class="center">{{ m.maksi|floatformat:"0" }}%</td>
-                <td class="center"><b>{{ m.daraja }}</b></td>
-                <td>{{ m.maelezo }}</td>
+                <td colspan="5" class="text-center" style="padding: 16pt 8pt; color: #5f6f66; font-style: italic;">
+                    Hakuna matokeo yaliyorekodiwa kwa mtihani huu bado.
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
-    <div class="footer">
-        <p>Imechapishwa Tarehe: {{ wakati_huu|date:"d M Y, H:i" }}</p>
-        <p>Al-Madrasatul Rasulillah Management System</p>
-    </div>
 
 </body>
 </html>

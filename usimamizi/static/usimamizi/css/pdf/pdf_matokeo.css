@@ -1,12 +1,90 @@
-body { font-family: Helvetica, sans-serif; font-size: 12px; color: #333; }
-.header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
-.header h1 { color: #2E7D32; margin: 0 0 5px 0; font-size: 20px; text-transform: uppercase; }
-.header p { margin: 2px 0; font-size: 12px; color: #555; }
-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-th { background-color: #2E7D32; color: white; padding: 8px; text-align: left; font-size: 11px; text-transform: uppercase; }
-td { padding: 8px; border-bottom: 1px solid #ddd; font-size: 12px; }
-.center { text-align: center; }
-.footer { margin-top: 30px; font-size: 10px; color: #777; text-align: center; border-top: 1px solid #ddd; padding-top: 10px; }
-.col-position { width: 10%; }
-.col-student { width: 45%; }
-.col-score, .col-grade, .col-notes { width: 15%; }
+/* ==========================================================================
+   MATOKEO YA MTIHANI (SUBJECT RESULTS) — ART-DIRECTED STYLESHEET
+   ========================================================================== */
+
+@page {
+    size: a4 portrait;
+    margin: 10mm 14mm 16mm 14mm;
+    @frame footer_frame {
+        -pdf-frame-content: running-footer;
+        bottom: 5mm;
+        margin-left: 14mm;
+        margin-right: 14mm;
+        height: 7mm;
+    }
+}
+
+body {
+    font-family: 'SourceSans', Helvetica, Arial, sans-serif;
+    font-size: 9pt;
+    color: #1c2b24;
+}
+
+/* Results Table Columns */
+.col-rank {
+    width: 9%;
+    text-align: center;
+    font-weight: bold;
+}
+
+.col-student-name {
+    width: 44%;
+    text-align: left;
+}
+
+.col-score-cell {
+    width: 15%;
+    text-align: right;
+    font-weight: bold;
+}
+
+.col-grade-cell {
+    width: 14%;
+    text-align: center;
+}
+
+.col-remarks-cell {
+    width: 18%;
+    text-align: left;
+    color: #43544b;
+    font-size: 8.5pt;
+}
+
+/* Grade Badges */
+.grade-badge {
+    display: inline-block;
+    padding: 1.5pt 6pt;
+    font-weight: bold;
+    font-size: 8pt;
+    font-family: 'SourceSans', 'Courier New', monospace;
+}
+
+.grade-A {
+    color: #1f6b45;
+    background-color: #eaf3ed;
+    border: 0.5pt solid #badbc4;
+}
+
+.grade-B {
+    color: #0b6e8f;
+    background-color: #e5f3f8;
+    border: 0.5pt solid #b6dce8;
+}
+
+.grade-C {
+    color: #8a641b;
+    background-color: #fdf6e7;
+    border: 0.5pt solid #edd5a4;
+}
+
+.grade-D {
+    color: #944b11;
+    background-color: #fdf0e7;
+    border: 0.5pt solid #f3cca9;
+}
+
+.grade-F {
+    color: #99261b;
+    background-color: #fbeeed;
+    border: 0.5pt solid #f3c4c0;
+}

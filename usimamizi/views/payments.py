@@ -238,6 +238,7 @@ def pakua_risiti(request, malipo_id):
 
     context = {
         'malipo': malipo,
+        'jumla_yake': jumla_yake,
         'deni_lililobaki': deni_lililobaki,
         'wakati_huu':  localtime(timezone.now())
     }

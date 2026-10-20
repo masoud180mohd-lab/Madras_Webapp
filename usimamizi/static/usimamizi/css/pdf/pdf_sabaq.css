@@ -1,16 +1,155 @@
-body { font-family: Helvetica, Arial, sans-serif; font-size: 13px; color: #333; }
-.header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #2E7D32; padding-bottom: 10px; }
-.title { color: #2E7D32; font-size: 22px; font-weight: bold; }
-.info { font-size: 13px; margin-bottom: 15px; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th { background-color: #e8f5e9; color: #1b5e20; padding: 8px; text-align: left; border: 1px solid #ddd; font-weight: bold; }
-td { padding: 8px; border: 1px solid #ddd; vertical-align: top; }
-.footer { text-align: center; margin-top: 30px; font-size: 11px; color: #888; border-top: 1px solid #eee; padding-top: 10px; }
-.date-col-night { width: 20%; }
-.date-col-day { width: 30%; }
-.sabaq-col-night { width: 40%; }
-.sabaq-col-day { width: 70%; }
-.murajaa-col { width: 40%; }
-.teacher-name { font-size: 11px; color: #555; }
-.comment-row { background-color: #f9f9f9; font-style: italic; font-size: 12px; color: #555; }
-.center { text-align: center; }
+/* ==========================================================================
+   RIPOTI YA SABAQ NA MURAJAA — ART-DIRECTED STYLESHEET
+   ========================================================================== */
+
+@page {
+    size: a4 portrait;
+    margin: 10mm 14mm 16mm 14mm;
+    @frame footer_frame {
+        -pdf-frame-content: running-footer;
+        bottom: 5mm;
+        margin-left: 14mm;
+        margin-right: 14mm;
+        height: 7mm;
+    }
+}
+
+body {
+    font-family: 'SourceSans', Helvetica, Arial, sans-serif;
+    font-size: 9pt;
+    color: #1c2b24;
+}
+
+/* Sabaq Table Layout */
+.sabaq-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6pt;
+    margin-bottom: 12pt;
+}
+
+.sabaq-table th {
+    background-color: #f4f7f5;
+    color: #143d2a;
+    font-size: 8pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3pt;
+    padding: 5pt 6pt;
+    border-top: 1.2pt solid #143d2a;
+    border-bottom: 1.2pt solid #143d2a;
+    text-align: left;
+}
+
+.sabaq-table td {
+    padding: 6pt 6pt;
+    border-bottom: 0.5pt solid #dbe6de;
+    vertical-align: top;
+    font-size: 8.5pt;
+    line-height: 1.35;
+}
+
+.col-date-night { width: 22%; }
+.col-sabaq-night { width: 38%; }
+.col-murajaa-night { width: 40%; }
+
+.col-date-day { width: 26%; }
+.col-sabaq-day { width: 74%; }
+
+/* Date & Teacher Cell */
+.date-primary {
+    font-size: 9pt;
+    font-weight: bold;
+    color: #143d2a;
+}
+
+.teacher-meta {
+    font-size: 7.5pt;
+    color: #5f6f66;
+    margin-top: 2pt;
+}
+
+/* Sura & Sabaq Content */
+.sura-title {
+    font-size: 9.5pt;
+    font-weight: bold;
+    color: #143d2a;
+}
+
+.aya-range {
+    font-size: 8.5pt;
+    color: #43544b;
+    margin-top: 1pt;
+}
+
+/* Mini Status Pills */
+.pill-sabaq-pass {
+    color: #1f6b45;
+    background-color: #eaf3ed;
+    border: 0.5pt solid #badbc4;
+    padding: 1pt 4pt;
+    font-size: 7pt;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 2pt;
+}
+
+.pill-sabaq-fail {
+    color: #99261b;
+    background-color: #fbeeed;
+    border: 0.5pt solid #f3c4c0;
+    padding: 1pt 4pt;
+    font-size: 7pt;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 2pt;
+}
+
+.pill-sabaq-wait {
+    color: #5f6f66;
+    background-color: #f4f7f5;
+    border: 0.5pt solid #d5e0d8;
+    padding: 1pt 4pt;
+    font-size: 7pt;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 2pt;
+}
+
+.pill-pande-makosa {
+    color: #8a641b;
+    background-color: #fdf6e7;
+    border: 0.5pt solid #edd5a4;
+    padding: 1pt 4pt;
+    font-size: 7pt;
+    font-weight: bold;
+    display: inline-block;
+}
+
+/* Murajaa List */
+.pande-item {
+    margin-bottom: 3pt;
+    line-height: 1.3;
+}
+
+.pande-sura {
+    font-weight: bold;
+    color: #1c2b24;
+}
+
+/* Integrated Commentary Subrow */
+.comment-box {
+    background-color: #f6f9f7;
+    border-left: 2pt solid #b8893d;
+    padding: 3pt 6pt;
+    margin-top: 4pt;
+    font-size: 8pt;
+    color: #43544b;
+}
+
+.comment-label {
+    font-weight: bold;
+    color: #143d2a;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+}

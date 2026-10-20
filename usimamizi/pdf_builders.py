@@ -34,6 +34,7 @@ def build_risiti_pdf_response(malipo: Malipo) -> HttpResponse:
     deni_lililobaki = aina.kiasi_kinachotakiwa - jumla_yake
     context = {
         "malipo": malipo,
+        "jumla_yake": jumla_yake,
         "deni_lililobaki": deni_lililobaki,
         "wakati_huu": localtime(timezone.now()),
     }

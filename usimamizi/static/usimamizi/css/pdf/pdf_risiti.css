@@ -1,18 +1,221 @@
-body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; color: #333; }
-.receipt-box { border: 2px dashed #0288D1; padding: 30px; border-radius: 10px; max-width: 800px; margin: auto; }
-.header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0288D1; padding-bottom: 15px; }
-.title { color: #0288D1; font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-.subtitle { font-size: 14px; color: #555; }
-.receipt-title { text-align: center; font-size: 20px; font-weight: bold; margin: 20px 0; background-color: #e1f5fe; padding: 10px; border-radius: 5px; }
-.details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-.details-table td { padding: 8px; border-bottom: 1px solid #eee; }
-.label { font-weight: bold; color: #555; width: 30%; }
-.amount-box { background-color: #e8f5e9; padding: 15px; text-align: center; border-radius: 8px; border: 1px solid #4CAF50; margin-bottom: 20px; }
-.amount-title { color: #2E7D32; font-weight: bold; font-size: 16px; margin-bottom: 5px; }
-.amount-value { color: #1b5e20; font-size: 26px; font-weight: bold; }
-.footer { text-align: center; margin-top: 40px; font-size: 12px; color: #888; border-top: 1px dashed #ccc; padding-top: 15px; }
-.signature { margin-top: 40px; text-align: right; font-style: italic; }
-.payer-cell { font-size: 16px; }
-.balance-table { background-color: #f9f9f9; }
-.danger-text { color: #c62828; }
-.danger-strong { color: #c62828; font-weight: bold; }
+/* ==========================================================================
+   RISITI YA MALIPO (PAYMENT RECEIPT) — ART-DIRECTED STYLESHEET
+   ========================================================================== */
+
+@page {
+    size: a4 portrait;
+    margin: 10mm 15mm 10mm 15mm;
+}
+
+body {
+    font-family: 'SourceSans', Helvetica, Arial, sans-serif;
+    font-size: 9pt;
+    color: #1c2b24;
+}
+
+/* Receipt Container Card */
+.receipt-wrapper {
+    width: 100%;
+}
+
+.receipt-top-bar {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8pt;
+}
+
+.receipt-top-bar td {
+    vertical-align: middle;
+    padding: 0;
+}
+
+.receipt-num-badge {
+    text-align: right;
+    font-size: 9.5pt;
+    font-weight: bold;
+    color: #143d2a;
+    letter-spacing: 0.8pt;
+}
+
+.receipt-num-badge span {
+    background-color: #f4f7f5;
+    border: 0.5pt solid #d5e0d8;
+    padding: 3pt 8pt;
+}
+
+/* Statement Table */
+.statement-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8pt 0 10pt 0;
+    border: 0.5pt solid #d5e0d8;
+}
+
+.statement-table th {
+    background-color: #f4f7f5;
+    color: #143d2a;
+    font-size: 8pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.3pt;
+    padding: 4.5pt 8pt;
+    border-bottom: 1pt solid #143d2a;
+    text-align: left;
+}
+
+.statement-table th.num-col {
+    text-align: right;
+}
+
+.statement-table td {
+    padding: 5pt 8pt;
+    font-size: 9pt;
+    border-bottom: 0.5pt solid #e6eee8;
+    vertical-align: middle;
+}
+
+.statement-table td.num-col {
+    text-align: right;
+    font-weight: bold;
+}
+
+.statement-table tr.hero-paid-row td {
+    background-color: #f0f7f3;
+    border-top: 1pt solid #1f6b45;
+    border-bottom: 1pt solid #1f6b45;
+    color: #143d2a;
+    font-size: 10pt;
+    padding: 5.5pt 8pt;
+}
+
+.statement-table tr.balance-row td {
+    background-color: #fdf6f5;
+    border-top: 0.5pt solid #d5e0d8;
+    font-size: 9.5pt;
+    padding: 5pt 8pt;
+}
+
+.statement-table tr.balance-clear td {
+    background-color: #f0f7f3;
+}
+
+.text-danger {
+    color: #99261b;
+}
+
+.text-success {
+    color: #1f6b45;
+}
+
+/* Hero Amount Banner */
+.hero-box-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8pt 0 10pt 0;
+    background-color: #f4f8f5;
+    border: 1pt solid #c2dfcd;
+}
+
+.hero-box-table td {
+    padding: 7pt 12pt;
+    text-align: center;
+}
+
+.hero-box-label {
+    font-size: 7.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #1f6b45;
+    letter-spacing: 0.8pt;
+    margin-bottom: 2pt;
+}
+
+.hero-box-amount {
+    font-size: 19pt;
+    font-weight: bold;
+    color: #143d2a;
+    line-height: 1.1;
+}
+
+/* Status Stamp and Signatures */
+.auth-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14pt;
+}
+
+.auth-grid-table td {
+    vertical-align: top;
+    padding: 0;
+}
+
+.stamp-box {
+    border: 1.5pt solid #1f6b45;
+    padding: 6pt 10pt;
+    display: inline-block;
+    text-align: center;
+}
+
+.stamp-box-due {
+    border: 1.5pt solid #99261b;
+    padding: 6pt 10pt;
+    display: inline-block;
+    text-align: center;
+}
+
+.stamp-text {
+    font-family: 'Amiri', 'Times New Roman', serif;
+    font-size: 11pt;
+    font-weight: bold;
+    color: #1f6b45;
+    line-height: 1.2;
+}
+
+.stamp-text-due {
+    font-family: 'Amiri', 'Times New Roman', serif;
+    font-size: 11pt;
+    font-weight: bold;
+    color: #99261b;
+    line-height: 1.2;
+}
+
+.stamp-sub {
+    font-size: 7pt;
+    text-transform: uppercase;
+    color: #5f6f66;
+    letter-spacing: 0.5pt;
+    margin-top: 1pt;
+}
+
+.sig-box {
+    text-align: right;
+    font-size: 8.5pt;
+    color: #5f6f66;
+    padding-top: 4pt;
+}
+
+.sig-name {
+    font-size: 9.5pt;
+    font-weight: bold;
+    color: #143d2a;
+    margin-top: 2pt;
+}
+
+.sig-line {
+    border-bottom: 0.5pt dotted #5f6f66;
+    width: 140pt;
+    margin-left: auto;
+    margin-top: 20pt;
+    margin-bottom: 3pt;
+}
+
+/* Receipt Footer */
+.receipt-footer-box {
+    margin-top: 16pt;
+    border-top: 0.5pt solid #d5e0d8;
+    padding-top: 6pt;
+    text-align: center;
+    font-size: 7.5pt;
+    color: #5f6f66;
+    line-height: 1.35;
+}

@@ -4,53 +4,119 @@
 <head>
     <meta charset="UTF-8">
     <title>Ripoti ya Mahudhurio</title>
-    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_mahudhurio.css' %}?v=20260706a">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_base.css' %}?v=20261020">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_mahudhurio.css' %}?v=20261020">
 </head>
 <body>
 
-    <div class="header">
-        <div class="title">AL-MADRASATUL RASULILLAH</div>
-        <div>Ripoti Rasmi ya Mahudhurio ({{ aina }})</div>
+    <!-- Running Footer on Every Page -->
+    <div id="running-footer">
+        <table class="footer-table">
+            <tr>
+                <td style="width: 45%; text-align: left;">
+                    Al-Madrasatul Rasulillah · Mfumo wa Usimamizi
+                </td>
+                <td style="width: 30%; text-align: center;">
+                    {{ wakati_huu|date:"d M Y, H:i" }}
+                </td>
+                <td style="width: 25%; text-align: right;">
+                    Ukurasa <pdf:pagenumber> wa <pdf:pagecount>
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <div class="info">
-        <b>Jina la Mwanafunzi:</b> {{ mwanafunzi.jina_kamili }} <br>
-        <b>Namba ya Usajili:</b> {{ mwanafunzi.namba_ya_usajili }} <br>
-        <b>Kichujio cha Muda:</b> 
-        {% if muda == 'wiki' %}Wiki ya Mwisho
-        {% elif muda == 'mwezi_huu' %}Mwezi Huu
-        {% elif muda == 'mwezi_uliopita' %}Mwezi Uliopita
-        {% else %}Muda Wote{% endif %}
-    </div>
+    <!-- Institutional Header -->
+    <table class="inst-header-table">
+        <tr>
+            <td class="inst-logo-cell">
+                <img src="{% static 'usimamizi/images/logo_pdf.png' %}" class="inst-logo" />
+            </td>
+            <td>
+                <div class="inst-title">AL-MADRASATUL RASULILLAH</div>
+                <div class="inst-location">MWERA, ZANZIBAR · KITENGO CHA USIMAMIZI WA MAHUDHURIO</div>
+            </td>
+        </tr>
+    </table>
 
-    <table>
+    <div class="inst-accent-rule"></div>
+
+    <!-- Document Title Badge -->
+    <table class="doc-badge-table">
+        <tr>
+            <td class="doc-badge-cell">
+                <div class="doc-title">Ripoti Rasmi ya Mahudhurio ({{ aina }})</div>
+                <div class="doc-subtitle">Rekodi za mahudhurio ya mwanafunzi kwa kipindi kilichoteuliwa</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Student Metadata Grid -->
+    <table class="meta-grid-table">
+        <tr>
+            <td class="meta-label">Mwanafunzi:</td>
+            <td class="meta-value-strong" style="width: 38%;">
+                {{ mwanafunzi.jina_kamili }}
+            </td>
+            <td class="meta-label" style="width: 16%;">Namba ya Usajili:</td>
+            <td class="meta-value" style="width: 18%;">
+                <b>{{ mwanafunzi.namba_ya_usajili }}</b>
+            </td>
+        </tr>
+        <tr>
+            <td class="meta-label">Aina ya Hudhurio:</td>
+            <td class="meta-value">
+                Madrasa ya {{ aina }}
+            </td>
+            <td class="meta-label">Kipindi / Muda:</td>
+            <td class="meta-value">
+                {% if muda == 'wiki' %}Wiki Iliyopita
+                {% elif muda == 'mwezi_huu' %}Mwezi Huu
+                {% elif muda == 'mwezi_uliopita' %}Mwezi Uliopita
+                {% else %}Muda Wote{% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Attendance Data Table with Repeating Header -->
+    <table class="data-table" repeat="1">
         <thead>
             <tr>
-                <th>Tarehe</th>
-                <th class="center">Hali</th>
-                <th>Sababu (Kama hayupo)</th>
+                <th class="col-tarehe">Tarehe</th>
+                <th class="col-hali">Hali</th>
+                <th class="col-sababu">Sababu / Maelezo (Kama Hayupo)</th>
             </tr>
         </thead>
         <tbody>
             {% for h in mahudhurio %}
-            <tr>
-                <td>{{ h.tarehe|date:"d M Y" }}</td>
-                <td class="center {% if h.yupo %}status-present{% else %}status-absent{% endif %}">
-                    <b>{% if h.yupo %}Yupo{% else %}Hayupo{% endif %}</b>
+            <tr class="{% cycle 'row-odd' 'row-even' %}">
+                <td class="col-tarehe">
+                    <b>{{ h.tarehe|date:"d M Y" }}</b>
                 </td>
-                <td>{{ h.sababu_kama_hayupo|default:"-" }}</td>
+                <td class="col-hali">
+                    {% if h.yupo %}
+                        <span class="pill-yupo">YUPO</span>
+                    {% else %}
+                        <span class="pill-hayupo">HAYUPO</span>
+                    {% endif %}
+                </td>
+                <td class="col-sababu">
+                    {% if not h.yupo and h.sababu_kama_hayupo %}
+                        {{ h.sababu_kama_hayupo }}
+                    {% else %}
+                        <span style="color: #8c9c93;">—</span>
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="3" class="center">Hakuna rekodi za mahudhurio kwa muda huu.</td>
+                <td colspan="3" class="text-center" style="padding: 16pt 8pt; color: #5f6f66; font-style: italic;">
+                    Hakuna rekodi za mahudhurio zilizopatikana kwa kipindi hiki.
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
-    <div class="footer">
-        Imetolewa na Mfumo wa Usimamizi | Tarehe ya Uchapishaji: {% now "d M Y, H:i" %}
-    </div>
 
 </body>
 </html>

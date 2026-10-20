@@ -1,70 +1,144 @@
-{% load static %}
+{% load static pdf_tags %}
 <!DOCTYPE html>
 <html lang="sw">
 <head>
     <meta charset="UTF-8">
     <title>Risiti ya Malipo</title>
-    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_risiti.css' %}?v=20260706a">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_base.css' %}?v=20261020">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_risiti.css' %}?v=20261020">
 </head>
 <body>
 
-    <div class="receipt-box">
-        <div class="header">
-            <div class="title">AL-MADRASATUL RASULILLAH</div>
-            <div class="subtitle">Risiti Rasmi ya Malipo (Official Receipt)</div>
-        </div>
+    <div class="receipt-wrapper">
+        <!-- Institutional Header -->
+        <table class="inst-header-table">
+            <tr>
+                <td class="inst-logo-cell">
+                    <img src="{% static 'usimamizi/images/logo_pdf.png' %}" class="inst-logo" />
+                </td>
+                <td>
+                    <div class="inst-title">AL-MADRASATUL RASULILLAH</div>
+                    <div class="inst-location">MWERA, ZANZIBAR · HATI RASMI YA MALIPO</div>
+                </td>
+                <td class="text-right" style="vertical-align: bottom;">
+                    <div class="receipt-num-badge">
+                        <span>{{ malipo.id|receipt_num }}</span>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
-        <div class="receipt-title">RISITI NAMBA: #REC-00{{ malipo.id }}</div>
+        <div class="inst-accent-rule"></div>
 
-        <table class="details-table">
+        <!-- Student & Transaction Details -->
+        <table class="meta-grid-table">
             <tr>
-                <td class="label">Tarehe ya Malipo:</td>
-                <td>{{ malipo.tarehe_ya_malipo|date:"d M Y" }}</td>
+                <td class="meta-label">Mwanafunzi:</td>
+                <td class="meta-value-strong" colspan="3">
+                    {{ malipo.mwanafunzi.jina_kamili }}
+                    <span style="font-weight: normal; color: #5f6f66;">({{ malipo.mwanafunzi.namba_ya_usajili }})</span>
+                </td>
             </tr>
             <tr>
-                <td class="label">Imepokelewa Kutoka Kwa:</td>
-                <td class="payer-cell"><b>{{ malipo.mwanafunzi.jina_kamili }}</b> ({{ malipo.mwanafunzi.namba_ya_usajili }})</td>
+                <td class="meta-label">Aina ya Malipo:</td>
+                <td class="meta-value" colspan="3">
+                    <b>{{ malipo.aina_ya_malipo.jina }}</b>
+                </td>
             </tr>
             <tr>
-                <td class="label">Aina ya Malipo:</td>
-                <td><b>{{ malipo.aina_ya_malipo.jina }}</b></td>
-            </tr>
-            <tr>
-                <td class="label">Njia ya Malipo:</td>
-                <td>{{ malipo.njia_ya_malipo }}</td>
+                <td class="meta-label">Tarehe ya Malipo:</td>
+                <td class="meta-value" style="width: 25%;">
+                    {{ malipo.tarehe_ya_malipo|date:"d M Y" }}
+                </td>
+                <td class="meta-label" style="width: 20%;">Njia ya Malipo:</td>
+                <td class="meta-value" style="width: 27%;">
+                    {{ malipo.njia_ya_malipo }}
+                </td>
             </tr>
             {% if malipo.maelezo_ya_ziada %}
             <tr>
-                <td class="label">Maelezo:</td>
-                <td><i>{{ malipo.maelezo_ya_ziada }}</i></td>
+                <td class="meta-label">Maelezo:</td>
+                <td class="meta-value" colspan="3" style="font-style: italic; color: #43544b;">
+                    {{ malipo.maelezo_ya_ziada }}
+                </td>
             </tr>
             {% endif %}
         </table>
 
-        <div class="amount-box">
-            <div class="amount-title">KIASI KILICHOLIPWA (TSH)</div>
-            <div class="amount-value">{{ malipo.kiasi_kilicholipwa }}/=</div>
-        </div>
-
-        <table class="details-table balance-table">
+        <!-- Hero Amount Box -->
+        <table class="hero-box-table">
             <tr>
-                <td class="label">Kiasi Kinachotakiwa:</td>
-                <td>Tsh {{ malipo.aina_ya_malipo.kiasi_kinachotakiwa }}/=</td>
-            </tr>
-            <tr>
-                <td class="label danger-text">Deni Lililobaki (Salio):</td>
-                <td class="danger-strong">Tsh {{ deni_lililobaki }}/=</td>
+                <td>
+                    <div class="hero-box-label">Kiasi Kilicholipwa Sasa (Amount Received)</div>
+                    <div class="hero-box-amount">TSH {{ malipo.kiasi_kilicholipwa|pesa }}</div>
+                </td>
             </tr>
         </table>
 
-        <div class="signature">
-            Imepokelewa na (Mwalimu/Keshia):<br>
-            <b>{{ malipo.mpokeaji.jina_kamili|default:"Utawala" }}</b>
-        </div>
+        <!-- Financial Statement Breakdown -->
+        <table class="statement-table">
+            <thead>
+                <tr>
+                    <th>Mchanganuo wa Malipo (Account Statement)</th>
+                    <th class="num-col">Kiasi (TSH)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Kiasi Kinachotakiwa (Total Fee Required)</td>
+                    <td class="num-col">{{ malipo.aina_ya_malipo.kiasi_kinachotakiwa|pesa }}</td>
+                </tr>
+                {% if jumla_yake %}
+                <tr>
+                    <td>Jumla Iliyolipwa Hadi Sasa (Total Paid to Date)</td>
+                    <td class="num-col">{{ jumla_yake|pesa }}</td>
+                </tr>
+                {% endif %}
+                <tr class="hero-paid-row">
+                    <td><b>Malipo ya Risiti Hii (Paid in this Receipt)</b></td>
+                    <td class="num-col"><b>{{ malipo.kiasi_kilicholipwa|pesa }}</b></td>
+                </tr>
+                <tr class="balance-row {% if deni_lililobaki <= 0 %}balance-clear{% endif %}">
+                    <td>
+                        <b>Deni Lililobaki / Salio (Balance Due)</b>
+                    </td>
+                    <td class="num-col {% if deni_lililobaki > 0 %}text-danger{% else %}text-success{% endif %}">
+                        <b>{{ deni_lililobaki|pesa }}</b>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-        <div class="footer">
-            Hati hii imetengenezwa na Mfumo wa Usimamizi Al-Madrasatul Rasulillah.<br>
-            Muda wa Uchapishaji: {{ wakati_huu|date:"d M Y, H:i:s" }}
+        <!-- Authorization & Status Stamp -->
+        <table class="auth-grid-table">
+            <tr>
+                <td style="width: 50%;">
+                    {% if deni_lililobaki <= 0 %}
+                    <div class="stamp-box">
+                        <div class="stamp-text">✓ IMELIPWA YOTE</div>
+                        <div class="stamp-sub">PAID IN FULL · HAKUNA DENI</div>
+                    </div>
+                    {% else %}
+                    <div class="stamp-box-due">
+                        <div class="stamp-text-due">⚠ SALIO LINATAKIWA</div>
+                        <div class="stamp-sub">BALANCE DUE · TSH {{ deni_lililobaki|pesa }}</div>
+                    </div>
+                    {% endif %}
+                </td>
+                <td style="width: 50%;" class="text-right">
+                    <div class="sig-box">
+                        <div>Imepokelewa na (Mwalimu / Mhasibu):</div>
+                        <div class="sig-line"></div>
+                        <div class="sig-name">{{ malipo.mpokeaji.jina_kamili|default:"Utawala wa Madrasa" }}</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Footer Notice -->
+        <div class="receipt-footer-box">
+            Hati hii imetolewa na Mfumo Rasmi wa Usimamizi wa Al-Madrasatul Rasulillah (Mwera, Zanzibar).<br>
+            Muda wa Uchapishaji: {{ wakati_huu|date:"d M Y, H:i:s" }} · Risiti Halali Bila Marekebisho ya Mkono.
         </div>
     </div>
 

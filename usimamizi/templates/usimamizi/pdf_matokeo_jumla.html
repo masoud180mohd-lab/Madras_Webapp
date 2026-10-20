@@ -1,78 +1,135 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="sw">
 <head>
     <meta charset="UTF-8">
     <title>Matokeo ya Jumla — {{ darasa.jina }}</title>
-    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_matokeo_jumla.css' %}?v=20260706a">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_base.css' %}?v=20261020">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_matokeo.css' %}?v=20261020">
+    <link rel="stylesheet" href="{% static 'usimamizi/css/pdf/pdf_matokeo_jumla.css' %}?v=20261020">
 </head>
 <body>
 
-    <div class="header">
-        <h1 class="school-name">AL-MADRASATUL RASULILLAH</h1>
-        <p class="school-location">MWERA, ZANZIBAR</p>
-        <p class="report-title">Ripoti ya Matokeo ya Jumla</p>
-        <p class="meta">Darasa: <b>{{ darasa.jina }}</b> &nbsp;|&nbsp; Mtihani: <b>{{ mseto.jina }}</b></p>
+    <!-- Running Footer on Every Page -->
+    <div id="running-footer">
+        <table class="footer-table">
+            <tr>
+                <td style="width: 45%; text-align: left;">
+                    Al-Madrasatul Rasulillah · Mfumo wa Usimamizi · {{ darasa.jina }}
+                </td>
+                <td style="width: 30%; text-align: center;">
+                    {{ wakati_huu|date:"d M Y, H:i" }}
+                </td>
+                <td style="width: 25%; text-align: right;">
+                    Ukurasa <pdf:pagenumber> wa <pdf:pagecount>
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <div class="summary-title">Muhtasari wa Grade kwa Jinsia</div>
-    <table class="summary-table">
-        <thead>
-            <tr>
-                <th>Jinsia</th>
-                {% for grade in grade_order %}
-                    <th>{{ grade }}</th>
-                {% endfor %}
-                <th>Jumla</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in grade_summary %}
-                <tr>
-                    <td><b>{{ row.jinsia }}</b></td>
-                    {% for count in row.grade_counts %}
-                        <td>{{ count }}</td>
-                    {% endfor %}
-                    <td><b>{{ row.total }}</b></td>
-                </tr>
-            {% endfor %}
-        </tbody>
+    <!-- Institutional Header -->
+    <table class="inst-header-landscape">
+        <tr>
+            <td class="landscape-logo-cell">
+                <img src="{% static 'usimamizi/images/logo_pdf.png' %}" class="landscape-logo" />
+            </td>
+            <td>
+                <div class="landscape-title">AL-MADRASATUL RASULILLAH</div>
+                <div class="landscape-subtitle">MWERA, ZANZIBAR · RIPOTI RASMI YA MATOKEO YA JUMLA YA DARASA</div>
+            </td>
+        </tr>
     </table>
 
-    <table class="main-table">
+    <div class="inst-accent-rule"></div>
+
+    <!-- Top Info & Gender Grade Summary Side-by-Side -->
+    <table class="top-section-table">
+        <tr>
+            <td style="width: 48%; padding-right: 12pt;">
+                <table class="doc-badge-table" style="margin-bottom: 0;">
+                    <tr>
+                        <td class="doc-badge-cell">
+                            <div class="doc-title">{{ mseto.jina }}</div>
+                            <div class="doc-subtitle">Darasa: <b>{{ darasa.jina }}</b> · Mwaka wa Masomo</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 52%;">
+                <table class="summary-matrix-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; padding-left: 5pt;">Jinsia</th>
+                            {% for grade in grade_order %}
+                                <th>{{ grade }}</th>
+                            {% endfor %}
+                            <th>Jumla</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in grade_summary %}
+                            <tr class="{% if row.jinsia == 'Jumla' %}total-row{% else %}{% cycle 'row-odd' 'row-even' %}{% endif %}">
+                                <td style="text-align: left; padding-left: 5pt; font-weight: bold;">{{ row.jinsia }}</td>
+                                {% for count in row.grade_counts %}
+                                    <td>{{ count }}</td>
+                                {% endfor %}
+                                <td><b>{{ row.total }}</b></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Main Results Broad Matrix with Repeating Header -->
+    <table class="main-results-table" repeat="1">
         <thead>
             <tr>
-                <th class="col-position">Naf.</th>
-                <th class="col-student">Mwanafunzi</th>
+                <th style="width: 4%;">Naf.</th>
+                <th class="col-student" style="width: 22%;">Jina la Mwanafunzi</th>
                 {% for somo in masomo %}
                     <th>{{ somo.jina_pdf }}</th>
                 {% endfor %}
-                <th class="avg">Wast.</th>
-                <th class="avg">Dar.</th>
+                <th class="col-avg" style="width: 6%;">Wast.</th>
+                <th style="width: 5%;">Dar.</th>
             </tr>
         </thead>
         <tbody>
             {% for row in matokeo_wanafunzi %}
-            <tr>
-                <td><b>{{ row.nafasi }}</b></td>
-                <td class="name">{{ row.mwanafunzi.jina_kamili }}</td>
+            <tr class="{% cycle 'row-odd' 'row-even' %}">
+                <td class="col-rank">{{ row.nafasi }}</td>
+                <td class="col-student">{{ row.mwanafunzi.jina_kamili }}</td>
                 {% for somo_data in row.masomo %}
                     <td>
                         {% if somo_data.imejazwa %}
-                            {{ somo_data.maksi|floatformat:"0" }} ({{ somo_data.daraja }})
-                        {% else %}-{% endif %}
+                            <span class="score-num">{{ somo_data.maksi|floatformat:"0" }}</span>
+                            <span class="grade-sub">({{ somo_data.daraja }})</span>
+                        {% else %}
+                            <span style="color: #a4b2aa;">—</span>
+                        {% endif %}
                     </td>
                 {% endfor %}
-                <td class="avg">{% if row.wastani is not None %}{{ row.wastani }}{% else %}-{% endif %}</td>
-                <td class="avg"><b>{{ row.daraja_jumla }}</b></td>
+                <td class="col-avg">
+                    {% if row.wastani is not None %}
+                        {{ row.wastani }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td class="col-grade">
+                    <span class="grade-badge grade-{{ row.daraja_jumla }}">{{ row.daraja_jumla }}</span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="15" class="text-center" style="padding: 16pt; color: #5f6f66; font-style: italic;">
+                    Hakuna matokeo ya wanafunzi yaliyopatikana kwa mtihani huu.
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
-    <div class="footer">
-        <p>Imechapishwa: {{ wakati_huu|date:"d M Y, H:i" }} | Al-Madrasatul Rasulillah Management System</p>
-    </div>
 
 </body>
 </html>
