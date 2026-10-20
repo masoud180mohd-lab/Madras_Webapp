@@ -263,6 +263,176 @@ class StudentDetail {
   }
 }
 
+/// Muhtasari tab of the student profile (`/wanafunzi/<id>/tab/`).
+class StudentOverview {
+  const StudentOverview({
+    required this.mwanafunzi,
+    required this.jumlaMalipo,
+    required this.idadiMalipo,
+    required this.mahudhurioMchana,
+    required this.mahudhurioHifdhu,
+    required this.idadiSabaq,
+    required this.idadiMaendeleo,
+  });
+
+  final StudentDetail mwanafunzi;
+  final String jumlaMalipo;
+  final int idadiMalipo;
+  final int mahudhurioMchana;
+  final int mahudhurioHifdhu;
+  final int idadiSabaq;
+  final int idadiMaendeleo;
+
+  factory StudentOverview.fromJson(Map<String, dynamic> json) {
+    final m = json['muhtasari'] as Map<String, dynamic>? ?? const {};
+    return StudentOverview(
+      mwanafunzi: StudentDetail.fromJson(
+        json['mwanafunzi'] as Map<String, dynamic>,
+      ),
+      jumlaMalipo: '${m['jumla_malipo'] ?? 0}',
+      idadiMalipo: m['idadi_malipo'] as int? ?? 0,
+      mahudhurioMchana: m['mahudhurio_mchana'] as int? ?? 0,
+      mahudhurioHifdhu: m['mahudhurio_hifdhu'] as int? ?? 0,
+      idadiSabaq: m['idadi_sabaq'] as int? ?? 0,
+      idadiMaendeleo: m['idadi_maendeleo'] as int? ?? 0,
+    );
+  }
+}
+
+class StudentPayment {
+  const StudentPayment({
+    required this.tarehe,
+    required this.aina,
+    required this.kiasi,
+    this.njia,
+    this.alirekodi,
+  });
+
+  final String tarehe;
+  final String aina;
+  final String kiasi;
+  final String? njia;
+  final String? alirekodi;
+
+  factory StudentPayment.fromJson(Map<String, dynamic> json) {
+    return StudentPayment(
+      tarehe: json['tarehe'] as String? ?? '',
+      aina: json['aina'] as String? ?? '',
+      kiasi: '${json['kiasi'] ?? 0}',
+      njia: json['njia'] as String?,
+      alirekodi: json['alirekodi'] as String?,
+    );
+  }
+}
+
+class StudentPayments {
+  const StudentPayments({required this.jumla, required this.malipo});
+
+  final String jumla;
+  final List<StudentPayment> malipo;
+
+  factory StudentPayments.fromJson(Map<String, dynamic> json) {
+    final rows = json['malipo'];
+    return StudentPayments(
+      jumla: '${json['jumla_malipo'] ?? 0}',
+      malipo: rows is List
+          ? rows
+                .whereType<Map<String, dynamic>>()
+                .map(StudentPayment.fromJson)
+                .toList(growable: false)
+          : const [],
+    );
+  }
+}
+
+class StudentAttendanceDay {
+  const StudentAttendanceDay({required this.tarehe, required this.yupo});
+
+  final String tarehe;
+  final bool yupo;
+
+  factory StudentAttendanceDay.fromJson(Map<String, dynamic> json) {
+    return StudentAttendanceDay(
+      tarehe: json['tarehe'] as String? ?? '',
+      yupo: json['yupo'] == true,
+    );
+  }
+}
+
+/// Latest attendance rows (up to 12 each) for the Mahudhurio tab.
+class StudentAttendance {
+  const StudentAttendance({required this.kawaida, required this.hifdhu});
+
+  final List<StudentAttendanceDay> kawaida;
+  final List<StudentAttendanceDay> hifdhu;
+
+  factory StudentAttendance.fromJson(Map<String, dynamic> json) {
+    return StudentAttendance(
+      kawaida: _rows(json['kawaida'], StudentAttendanceDay.fromJson),
+      hifdhu: _rows(json['hifdhu'], StudentAttendanceDay.fromJson),
+    );
+  }
+}
+
+/// One Sabaq or daytime-progress row; [kichwa] is the surah or subject.
+class StudentRecord {
+  const StudentRecord({
+    required this.tarehe,
+    required this.kichwa,
+    required this.hali,
+    this.maelezo,
+  });
+
+  final String tarehe;
+  final String kichwa;
+  final String hali;
+  final String? maelezo;
+}
+
+class StudentRecords {
+  const StudentRecords({
+    required this.sabaqDarasa,
+    required this.sabaqUsiku,
+    required this.maendeleo,
+  });
+
+  final List<StudentRecord> sabaqDarasa;
+  final List<StudentRecord> sabaqUsiku;
+  final List<StudentRecord> maendeleo;
+
+  factory StudentRecords.fromJson(Map<String, dynamic> json) {
+    StudentRecord sabaq(Map<String, dynamic> row) => StudentRecord(
+      tarehe: row['tarehe'] as String? ?? '',
+      kichwa: row['sura'] as String? ?? '-',
+      hali: row['hali'] as String? ?? '-',
+      maelezo: row['somo'] as String?,
+    );
+    return StudentRecords(
+      sabaqDarasa: _rows(json['sabaq_darasa'], sabaq),
+      sabaqUsiku: _rows(json['sabaq_usiku'], sabaq),
+      maendeleo: _rows(
+        json['maendeleo_mchana'],
+        (row) => StudentRecord(
+          tarehe: row['tarehe'] as String? ?? '',
+          kichwa: row['somo'] as String? ?? '-',
+          hali: row['hali'] as String? ?? '-',
+          maelezo: row['mada'] as String?,
+        ),
+      ),
+    );
+  }
+}
+
+List<T> _rows<T>(Object? raw, T Function(Map<String, dynamic>) parse) {
+  if (raw is! List) {
+    return const [];
+  }
+  return raw
+      .whereType<Map<String, dynamic>>()
+      .map(parse)
+      .toList(growable: false);
+}
+
 class SubjectMaterial {
   const SubjectMaterial({
     required this.id,

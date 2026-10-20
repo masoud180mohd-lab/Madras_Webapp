@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -6,6 +7,7 @@ from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 
 from usimamizi.models import (
+    AinaMalipo,
     Darasa,
     Hudhurio,
     Matokeo,
@@ -513,3 +515,114 @@ class ApiV1SabaqExamsTests(TestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(RekodiMaendeleoMchana.objects.count(), 0)
+
+
+@HOSTS
+@NO_THROTTLE
+class ApiV1StudentProfileTabTests(TestCase):
+    """Profile tabs used by the mobile student screen."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.darasa = Darasa.objects.create(jina="Darasa la Pili")
+        self.somo = Somo.objects.create(jina="Qur'an", ni_la_hifdhu=True)
+        self.somo_mchana = Somo.objects.create(jina="Fiqhi")
+        self.student = Mwanafunzi.objects.create(
+            jina_kamili="Tab Student",
+            darasa=self.darasa,
+            programu_ya_usiku=self.somo,
+        )
+        self.kawaida = create_user_with_cheo("p4_kawaida", "Mwalimu wa Kawaida")
+
+        aina = AinaMalipo.objects.create(
+            jina="Ada ya mwezi", kiasi_kinachotakiwa=Decimal("5000")
+        )
+        Malipo.objects.create(
+            mwanafunzi=self.student,
+            aina_ya_malipo=aina,
+            kiasi_kilicholipwa=Decimal("3000"),
+            iliyorekodiwa_na=self.kawaida,
+        )
+        self.tarehe = date.today()
+        Hudhurio.objects.create(
+            mwanafunzi=self.student, tarehe=self.tarehe, yupo=True, aina_ya_rekodi="Kawaida"
+        )
+        Hudhurio.objects.create(
+            mwanafunzi=self.student, tarehe=self.tarehe, yupo=False, aina_ya_rekodi="Hifdhu"
+        )
+        RekodiHifdhu.objects.create(
+            mwanafunzi=self.student,
+            aina_ya_rekodi="Darasa",
+            sabaq_sura="Al-Fatiha",
+            sabaq_hali="Kajua",
+        )
+        RekodiMaendeleoMchana.objects.create(
+            mwanafunzi=self.student,
+            somo=self.somo_mchana,
+            mada_iliyosomwa="Mlango wa udhu",
+            hali=RekodiMaendeleoMchana.HALI_AMEELEWA,
+        )
+
+    def _auth(self, username):
+        token = self.client.post(
+            "/api/v1/auth/token/",
+            {"username": username, "password": "pass12345"},
+            format="json",
+        ).data["access"]
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+
+    def _tab(self, tab):
+        return self.client.get(f"/api/v1/wanafunzi/{self.student.id}/tab/?tab={tab}")
+
+    def test_muhtasari_tab_returns_counts_and_total(self):
+        self._auth("p4_kawaida")
+        response = self._tab("muhtasari")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.data["mwanafunzi"]["id"], self.student.id)
+        summary = response.data["muhtasari"]
+        self.assertEqual(summary["idadi_malipo"], 1)
+        self.assertEqual(summary["mahudhurio_mchana"], 1)
+        self.assertEqual(summary["mahudhurio_hifdhu"], 1)
+        self.assertEqual(summary["idadi_sabaq"], 1)
+        self.assertEqual(summary["idadi_maendeleo"], 1)
+        self.assertEqual(Decimal(summary["jumla_malipo"]), Decimal("3000"))
+
+    def test_malipo_tab_lists_payments(self):
+        self._auth("p4_kawaida")
+        response = self._tab("malipo")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(Decimal(response.data["jumla_malipo"]), Decimal("3000"))
+        row = response.data["malipo"][0]
+        self.assertEqual(row["njia"], "Cash")
+        self.assertEqual(Decimal(row["kiasi"]), Decimal("3000"))
+        self.assertEqual(row["alirekodi"], self.kawaida.get_full_name() or "p4_kawaida")
+
+    def test_mahudhurio_tab_splits_day_and_night(self):
+        self._auth("p4_kawaida")
+        response = self._tab("mahudhurio")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertTrue(response.data["kawaida"][0]["yupo"])
+        self.assertEqual(response.data["kawaida"][0]["hali"], "Yupo")
+        self.assertFalse(response.data["hifdhu"][0]["yupo"])
+        self.assertEqual(response.data["hifdhu"][0]["hali"], "Hayupo")
+
+    def test_rekodi_tab_lists_sabaq_and_maendeleo(self):
+        self._auth("p4_kawaida")
+        response = self._tab("rekodi")
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.data["sabaq_darasa"][0]["sura"], "Al-Fatiha")
+        self.assertEqual(response.data["maendeleo_mchana"][0]["somo"], "Fiqhi")
+        self.assertEqual(response.data["maendeleo_mchana"][0]["hali"], "✅ Ameelewa")
+
+    def test_unknown_tab_is_400(self):
+        self._auth("p4_kawaida")
+        response = self._tab("hakuna")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("muhtasari", response.data["tabs"])
+
+    def test_tab_denied_without_student_capability(self):
+        from django.contrib.auth import get_user_model
+
+        get_user_model().objects.create_user("p4_bare", password="pass12345")
+        self._auth("p4_bare")
+        self.assertEqual(self._tab("muhtasari").status_code, 403)

@@ -71,6 +71,26 @@ class CatalogRepository {
     return StudentDetail.fromJson(raw as Map<String, dynamic>);
   }
 
+  Future<Map<String, dynamic>> _mwanafunziTab(int id, String tab) async {
+    final raw = await _api.get(
+      '/api/v1/wanafunzi/$id/tab/',
+      query: {'tab': tab},
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<StudentOverview> mwanafunziMuhtasari(int id) async =>
+      StudentOverview.fromJson(await _mwanafunziTab(id, 'muhtasari'));
+
+  Future<StudentPayments> mwanafunziMalipo(int id) async =>
+      StudentPayments.fromJson(await _mwanafunziTab(id, 'malipo'));
+
+  Future<StudentAttendance> mwanafunziMahudhurio(int id) async =>
+      StudentAttendance.fromJson(await _mwanafunziTab(id, 'mahudhurio'));
+
+  Future<StudentRecords> mwanafunziRekodi(int id) async =>
+      StudentRecords.fromJson(await _mwanafunziTab(id, 'rekodi'));
+
   Future<SubjectDetail> somoDetail(int id) async {
     final raw = await _api.get('/api/v1/masomo/$id/');
     return SubjectDetail.fromJson(raw as Map<String, dynamic>);
