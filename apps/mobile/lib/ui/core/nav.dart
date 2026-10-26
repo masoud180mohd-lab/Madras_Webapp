@@ -179,11 +179,17 @@ String titleForPath(String path) {
     case '/mipangilio':
       return MadrasaCopy.settings;
     default:
+      if (path.endsWith('/sabaq')) {
+        return 'Rekodi Sabaq';
+      }
       if (path.startsWith('/wanafunzi/')) {
         return MadrasaCopy.studentDetail;
       }
       if (path.contains('/mitihani/')) {
         return MadrasaCopy.subjectExams;
+      }
+      if (path.startsWith('/masomo/') && path.endsWith('/wanafunzi')) {
+        return 'Wanafunzi wa Hifdhu';
       }
       if (path.startsWith('/masomo/')) {
         return MadrasaCopy.subjects;

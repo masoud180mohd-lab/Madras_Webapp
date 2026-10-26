@@ -1,7 +1,7 @@
 name: madrasa_mobile
 description: Staff app for Al-Madrasatul Rasulillah (mahudhurio, madarasa).
 publish_to: "none"
-version: 1.0.6+13
+version: 1.0.7+14
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -19,6 +19,7 @@ dependencies:
   shared_preferences: ^2.5.5
   path_provider: ^2.1.5
   file_picker: ^8.3.7
+  open_filex: ^5.0.0
 
 dev_dependencies:
   flutter_lints: ^5.0.0

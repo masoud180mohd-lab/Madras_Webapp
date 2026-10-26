@@ -18,8 +18,17 @@ class ApiClient {
   final http.Client _http;
 
   Uri _uri(String path, [Map<String, String>? query]) {
-    final root = baseUrl.replaceAll(RegExp(r'/$'), '');
-    return Uri.parse('$root$path').replace(queryParameters: query);
+    final full = path.startsWith('http://') || path.startsWith('https://')
+        ? path
+        : (baseUrl.replaceAll(RegExp(r'/$'), '') +
+              (path.startsWith('/') ? path : '/$path'));
+    final parsed = Uri.parse(full);
+    if (query != null && query.isNotEmpty) {
+      final merged = Map<String, String>.from(parsed.queryParameters)
+        ..addAll(query);
+      return parsed.replace(queryParameters: merged);
+    }
+    return parsed;
   }
 
   Future<Map<String, String>> _headers({bool jsonBody = false}) async {
@@ -66,6 +75,15 @@ class ApiClient {
     });
   }
 
+  Future<dynamic> delete(String path) {
+    return _send(() async {
+      return _http.delete(
+        _uri(path),
+        headers: await _headers(),
+      );
+    });
+  }
+
   Future<dynamic> postMultipart(
     String path, {
     required Map<String, String> fields,
@@ -87,15 +105,19 @@ class ApiClient {
   }
 
   Future<http.Response> getBytes(String url) async {
-    final uri = Uri.parse(url);
+    final uri = _uri(url);
     final isMediaRequest = uri.path.startsWith('/media/');
-    final headers = await _headers();
+    var headers = await _headers();
 
     if (isMediaRequest) {
-      // Ask the API for the media. In Cloudinary mode it replies with JSON
-      // holding a signed URL; in development/fallback mode it replies with the
-      // raw file bytes.
-      final apiResponse = await _http.get(uri, headers: headers);
+      var apiResponse = await _http.get(uri, headers: headers);
+      if (apiResponse.statusCode == 401) {
+        final refreshed = await _refresh();
+        if (refreshed) {
+          headers = await _headers();
+          apiResponse = await _http.get(uri, headers: headers);
+        }
+      }
       if (apiResponse.statusCode < 200 || apiResponse.statusCode >= 300) {
         throw ApiException(
           apiResponse.statusCode,
@@ -103,7 +125,6 @@ class ApiClient {
         );
       }
 
-      // Interpret the body as a signed-URL payload when possible.
       String? signedUrl;
       try {
         final data = jsonDecode(apiResponse.body);
@@ -111,20 +132,15 @@ class ApiClient {
           signedUrl = data['url'] as String;
         }
       } catch (_) {
-        // Not JSON -> the API already served the raw bytes (fallback mode).
         signedUrl = null;
       }
 
       if (signedUrl == null) {
-        // Development/fallback mode: the response already contains the bytes.
         return apiResponse;
       }
 
-      // Cloudinary mode: fetch the actual bytes from the signed URL.
       final imageResponse = await http.get(Uri.parse(signedUrl));
       if (imageResponse.statusCode < 200 || imageResponse.statusCode >= 300) {
-        // Do NOT fall back to the /media/ endpoint here: in Cloudinary mode it
-        // returns JSON, which would be handed to the caller as image bytes.
         throw ApiException(
           imageResponse.statusCode,
           'Imeshindikana kupakua faili.',
@@ -133,8 +149,14 @@ class ApiClient {
       return imageResponse;
     }
 
-    // Non-media request: direct download.
-    final response = await _http.get(uri, headers: headers);
+    var response = await _http.get(uri, headers: headers);
+    if (response.statusCode == 401) {
+      final refreshed = await _refresh();
+      if (refreshed) {
+        headers = await _headers();
+        response = await _http.get(uri, headers: headers);
+      }
+    }
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw ApiException(response.statusCode, 'Imeshindikana kupakua faili.');
     }
@@ -206,6 +228,15 @@ class ApiClient {
       final rekodi = decoded['rekodi'];
       if (rekodi is List && rekodi.isNotEmpty) {
         return rekodi.first.toString();
+      }
+      for (final entry in decoded.entries) {
+        final v = entry.value;
+        if (v is List && v.isNotEmpty) {
+          return '${entry.key}: ${v.first}';
+        }
+        if (v is String && v.isNotEmpty) {
+          return '${entry.key}: $v';
+        }
       }
     }
     if (code == 401) {

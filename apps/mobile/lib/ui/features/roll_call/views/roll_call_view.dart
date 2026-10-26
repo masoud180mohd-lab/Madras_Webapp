@@ -63,6 +63,7 @@ class _RollCallViewState extends State<RollCallView> {
                         api: api,
                         row: row,
                         editable: vm.canEdit,
+                        isHifdhu: vm.isHifdhu,
                         onChanged: (yupo) =>
                             vm.setYupo(row.mwanafunzi.id, yupo),
                         onReason: (value) =>
@@ -77,6 +78,11 @@ class _RollCallViewState extends State<RollCallView> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: FilledButton(
+                      style: vm.isHifdhu
+                          ? FilledButton.styleFrom(
+                              backgroundColor: MadrasaTheme.secondary,
+                            )
+                          : null,
                       onPressed: vm.saving ? null : () => vm.save(),
                       child: vm.saving
                           ? const SizedBox(
@@ -113,11 +119,11 @@ class _Banner extends StatelessWidget {
       accent = MadrasaTheme.muted;
     } else if (vm.alreadyRecorded) {
       text = vm.notice ?? MadrasaCopy.already;
-      accent = MadrasaTheme.primary;
+      accent = vm.isHifdhu ? MadrasaTheme.secondary : MadrasaTheme.primary;
     } else {
       text =
           '${MadrasaCopy.rollCall} · ${vm.presentCount}/${vm.rows.length} ${MadrasaCopy.present}';
-      accent = MadrasaTheme.gold;
+      accent = vm.isHifdhu ? MadrasaTheme.secondary : MadrasaTheme.gold;
     }
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -155,6 +161,7 @@ class _RollTile extends StatelessWidget {
     required this.api,
     required this.row,
     required this.editable,
+    required this.isHifdhu,
     required this.onChanged,
     required this.onReason,
   });
@@ -162,13 +169,16 @@ class _RollTile extends StatelessWidget {
   final ApiClient api;
   final RollDraft row;
   final bool editable;
+  final bool isHifdhu;
   final ValueChanged<bool> onChanged;
   final ValueChanged<String> onReason;
 
   @override
   Widget build(BuildContext context) {
     final student = row.mwanafunzi;
-    final accent = row.yupo ? MadrasaTheme.primary : MadrasaTheme.danger;
+    final accent = row.yupo
+        ? (isHifdhu ? MadrasaTheme.secondary : MadrasaTheme.primary)
+        : MadrasaTheme.danger;
     return AccentCard(
       accent: accent,
       padding: const EdgeInsets.fromLTRB(14, 12, 12, 14),
@@ -203,13 +213,14 @@ class _RollTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _StatusBadge(yupo: row.yupo),
+                    _StatusBadge(yupo: row.yupo, isHifdhu: isHifdhu),
                   ],
                 ),
               ),
               Switch.adaptive(
                 value: row.yupo,
-                activeThumbColor: MadrasaTheme.primary,
+                activeThumbColor:
+                    isHifdhu ? MadrasaTheme.secondary : MadrasaTheme.primary,
                 onChanged: editable ? onChanged : null,
               ),
             ],
@@ -231,15 +242,22 @@ class _RollTile extends StatelessWidget {
 }
 
 class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.yupo});
+  const _StatusBadge({required this.yupo, this.isHifdhu = false});
 
   final bool yupo;
+  final bool isHifdhu;
 
   @override
   Widget build(BuildContext context) {
-    final bg = yupo ? MadrasaTheme.successBg : MadrasaTheme.dangerBg;
-    final border = yupo ? MadrasaTheme.successBorder : MadrasaTheme.dangerBorder;
-    final fg = yupo ? MadrasaTheme.successText : MadrasaTheme.dangerText;
+    final bg = yupo
+        ? (isHifdhu ? const Color(0x1A0B6E8F) : MadrasaTheme.successBg)
+        : MadrasaTheme.dangerBg;
+    final border = yupo
+        ? (isHifdhu ? const Color(0x4D0B6E8F) : MadrasaTheme.successBorder)
+        : MadrasaTheme.dangerBorder;
+    final fg = yupo
+        ? (isHifdhu ? MadrasaTheme.secondary : MadrasaTheme.successText)
+        : MadrasaTheme.dangerText;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(

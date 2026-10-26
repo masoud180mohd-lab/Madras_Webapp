@@ -13,7 +13,8 @@ from django.utils import timezone
 from django.utils.timezone import localtime
 from xhtml2pdf import pisa
 
-from usimamizi.models import Hudhurio, Malipo, RekodiHifdhu
+from usimamizi.models import Darasa, Hudhurio, Malipo, Matokeo, MsetoMtihani, Mtihani, RekodiHifdhu
+from usimamizi.utils import hesabu_daraja, jenga_ripoti_jumla
 from usimamizi.views.helpers import link_callback, pdf_media_tempdir
 
 
@@ -114,4 +115,70 @@ def build_sabaq_pdf_response(mwanafunzi, aina: str, muda: str) -> HttpResponse:
     with pdf_media_tempdir():
         if pisa.CreatePDF(html, dest=response, link_callback=link_callback).err:
             return HttpResponse("Hitilafu ilitokea", status=500)
+    return response
+
+
+def build_matokeo_pdf_response(mtihani: Mtihani) -> HttpResponse:
+    somo = mtihani.somo
+    matokeo_yote = (
+        Matokeo.objects.filter(mtihani=mtihani)
+        .select_related("mwanafunzi")
+        .order_by("-maksi")
+    )
+    orodha_iliyopangwa = []
+    nafasi = 1
+    for matokeo in matokeo_yote:
+        daraja, maelezo, _ = hesabu_daraja(matokeo.maksi)
+        orodha_iliyopangwa.append(
+            {
+                "mwanafunzi": matokeo.mwanafunzi,
+                "maksi": matokeo.maksi,
+                "daraja": daraja,
+                "maelezo": maelezo,
+                "nafasi": nafasi,
+            }
+        )
+        nafasi += 1
+
+    context = {
+        "mtihani": mtihani,
+        "somo": somo,
+        "matokeo": orodha_iliyopangwa,
+        "idadi_waliofanya": matokeo_yote.count(),
+        "wakati_huu": localtime(timezone.now()),
+    }
+    html = get_template("usimamizi/pdf_matokeo.html").render(context)
+    response = HttpResponse(content_type="application/pdf")
+    jina = f"Matokeo_{somo.jina}_{mtihani.jina_la_mtihani}.pdf"
+    response["Content-Disposition"] = f'attachment; filename="{jina}"'
+    with pdf_media_tempdir():
+        if pisa.CreatePDF(html, dest=response, link_callback=link_callback).err:
+            return HttpResponse(
+                "Kumetokea hitilafu katika kutengeneza PDF ya matokeo", status=500
+            )
+    return response
+
+
+def build_matokeo_jumla_pdf_response(darasa: Darasa, mseto: MsetoMtihani) -> HttpResponse:
+    ripoti = jenga_ripoti_jumla(mseto)
+    for somo in ripoti["masomo"]:
+        somo.jina_pdf = somo.jina.replace("_", " ")
+
+    context = {
+        "darasa": darasa,
+        "mseto": mseto,
+        "wakati_huu": localtime(timezone.now()),
+        **ripoti,
+    }
+    html = get_template("usimamizi/pdf_matokeo_jumla.html").render(context)
+    response = HttpResponse(content_type="application/pdf")
+    jina_salama = mseto.jina.replace(" ", "_")
+    jina_la_faili = f"Matokeo_Jumla_{darasa.jina}_{jina_salama}.pdf"
+    response["Content-Disposition"] = f'attachment; filename="{jina_la_faili}"'
+    with pdf_media_tempdir():
+        if pisa.CreatePDF(html, dest=response, link_callback=link_callback).err:
+            return HttpResponse(
+                "Kumetokea hitilafu katika kutengeneza PDF ya matokeo ya jumla",
+                status=500,
+            )
     return response

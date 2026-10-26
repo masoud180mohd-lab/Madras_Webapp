@@ -15,6 +15,8 @@ import '../../../../data/services/api_exception.dart';
 import '../../../core/copy.dart';
 import '../../../core/theme.dart';
 import '../../../core/widgets/accent_card.dart';
+import '../../../core/widgets/hub_card.dart';
+import '../../../core/widgets/student_stat_cards.dart';
 import '../../auth/view_models/auth_view_model.dart';
 
 class SubjectDetailView extends StatefulWidget {
@@ -37,6 +39,7 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
   String? _error;
   SubjectDetail? _data;
   int? _openingId;
+  List<Mwanafunzi> _hifdhuStudents = const [];
 
   @override
   void initState() {
@@ -50,7 +53,17 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
       _error = null;
     });
     try {
-      _data = await widget.repository.somoDetail(widget.somoId);
+      final detail = await widget.repository.somoDetail(widget.somoId);
+      _data = detail;
+      if (detail.niLaHifdhu) {
+        try {
+          _hifdhuStudents = await widget.repository.wanafunziHifdhu(
+            widget.somoId,
+          );
+        } catch (_) {
+          _hifdhuStudents = const [];
+        }
+      }
     } on ApiException catch (error) {
       _error = error.message;
     } catch (_) {
@@ -198,6 +211,7 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
     final file = picked;
     final jina = nameController.text.trim();
     nameController.dispose();
+    if (!mounted) return;
     if (ok != true || file == null || file.bytes == null) {
       return;
     }
@@ -243,6 +257,9 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
   Future<void> _createExam() async {
     final nameController = TextEditingController();
     var tarehe = DateTime.now();
+    int? selectedMsetoId;
+    final miseto = _data?.miseto ?? const [];
+
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) {
@@ -250,34 +267,59 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
           builder: (context, setLocal) {
             return AlertDialog(
               title: const Text(MadrasaCopy.newExam),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: MadrasaCopy.examName,
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: MadrasaCopy.examName,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text(MadrasaCopy.examDate),
-                    subtitle: Text(DateFormat('yyyy-MM-dd').format(tarehe)),
-                    trailing: const Icon(Icons.calendar_today),
-                    onTap: () async {
-                      final picked = await showDatePicker(
-                        context: context,
-                        initialDate: tarehe,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2100),
-                      );
-                      if (picked != null) {
-                        setLocal(() => tarehe = picked);
-                      }
-                    },
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text(MadrasaCopy.examDate),
+                      subtitle: Text(DateFormat('yyyy-MM-dd').format(tarehe)),
+                      trailing: const Icon(Icons.calendar_today),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: context,
+                          initialDate: tarehe,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2100),
+                        );
+                        if (picked != null) {
+                          setLocal(() => tarehe = picked);
+                        }
+                      },
+                    ),
+                    if (miseto.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      DropdownButtonFormField<int?>(
+                        initialValue: selectedMsetoId,
+                        isExpanded: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Mseto wa Mitihani (hiari)',
+                        ),
+                        items: [
+                          const DropdownMenuItem<int?>(
+                            value: null,
+                            child: Text('Bila mseto'),
+                          ),
+                          for (final m in miseto)
+                            DropdownMenuItem<int?>(
+                              value: m['id'] as int?,
+                              child: Text('${m['jina'] ?? ''}'),
+                            ),
+                        ],
+                        onChanged: (val) =>
+                            setLocal(() => selectedMsetoId = val),
+                      ),
+                    ],
+                  ],
+                ),
               ),
               actions: [
                 TextButton(
@@ -296,6 +338,7 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
     );
     final jina = nameController.text.trim();
     nameController.dispose();
+    if (!mounted) return;
     if (ok != true) {
       return;
     }
@@ -311,6 +354,7 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
         somoId: widget.somoId,
         jina: jina,
         tarehe: DateFormat('yyyy-MM-dd').format(tarehe),
+        msetoId: selectedMsetoId,
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -337,6 +381,23 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
     }
   }
 
+  Future<void> _openMaendeleoSheet({required bool canSabaq}) async {
+    final data = _data;
+    if (data == null) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => _MaendeleoMchanaSheet(
+        somo: data,
+        repository: widget.repository,
+        canSabaq: canSabaq,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -349,7 +410,10 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_error ?? MadrasaCopy.emptyList, textAlign: TextAlign.center),
+              Text(
+                _error ?? MadrasaCopy.emptyList,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: _load,
@@ -362,15 +426,32 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
     }
 
     final data = _data!;
-    final profile = context.watch<AuthViewModel>().profile;
+    AuthViewModel? auth;
+    try {
+      auth = context.watch<AuthViewModel>();
+    } catch (_) {
+      auth = null;
+    }
+    final profile = auth?.profile;
     final canExams = profile?.canSeeExams ?? false;
     final canMaterials = profile?.canSeeMaterials ?? false;
     final canAttendance = profile?.canTakeAttendance ?? false;
-    final showRollCall =
-        data.niLaHifdhu && (canAttendance || (profile?.canViewStudents ?? false));
+    final canSabaq = profile?.canRecordSabaq ?? false;
+    final canViewStudents = profile?.canViewStudents ?? false;
+
+    if (data.niLaHifdhu) {
+      return _hifdhuView(
+        context,
+        data,
+        canAttendance: canAttendance,
+        canViewStudents: canViewStudents,
+      );
+    }
+
     final subtitle = [
-      if (data.niLaHifdhu) 'Hifdhu (usiku)' else 'Somo la darasa',
-      if (data.darasaJina != null && data.darasaJina!.isNotEmpty) data.darasaJina!,
+      'Somo la darasa',
+      if (data.darasaJina != null && data.darasaJina!.isNotEmpty)
+        data.darasaJina!,
       if (data.mwalimu != null && data.mwalimu!.isNotEmpty)
         'Mwalimu: ${data.mwalimu}',
     ].join(' · ');
@@ -406,47 +487,16 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
               ),
             ),
             const SizedBox(height: 16),
-            if (showRollCall) ...[
-              AccentCard(
-                onTap: () => context.push('/masomo/${data.id}/mahudhurio'),
-                padding: const EdgeInsets.fromLTRB(18, 16, 12, 16),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.fact_check_rounded,
-                      color: MadrasaTheme.primary,
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            MadrasaCopy.rollCallHifdhu,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: MadrasaTheme.primary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            canAttendance
-                                ? 'Rekodi yupo / hayupo kwa wanafunzi wa somo hili'
-                                : MadrasaCopy.viewOnly,
-                            style: const TextStyle(color: MadrasaTheme.muted),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.chevron_right_rounded,
-                      color: MadrasaTheme.muted,
-                    ),
-                  ],
-                ),
+            if (canSabaq || canViewStudents) ...[
+              HubCard(
+                title: 'Maendeleo ya mchana',
+                hint: canSabaq
+                    ? 'Rekodi na tazama maendeleo ya wanafunzi kwenye somo hili'
+                    : 'Tazama maendeleo ya wanafunzi kwenye somo hili',
+                watermarkIcon: Icons.assignment_turned_in_rounded,
+                onTap: () => _openMaendeleoSheet(canSabaq: canSabaq),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 4),
             ],
             AccentCard(
               child: Column(
@@ -492,7 +542,9 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
                             ? const SizedBox(
                                 width: 22,
                                 height: 22,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : TextButton(
                                 onPressed: () => _openMaterial(item),
@@ -549,7 +601,9 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
                           children: [
                             Text(
                               exam.jina,
-                              style: const TextStyle(fontWeight: FontWeight.w700),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -594,6 +648,392 @@ class _SubjectDetailViewState extends State<SubjectDetailView> {
             child: Center(child: CircularProgressIndicator()),
           ),
       ],
+    );
+  }
+
+  Widget _hifdhuView(
+    BuildContext context,
+    SubjectDetail data, {
+    required bool canAttendance,
+    required bool canViewStudents,
+  }) {
+    final wavulana = _hifdhuStudents.where((s) => s.jinsia == 'ME').length;
+    final wasichana = _hifdhuStudents.where((s) => s.jinsia == 'KE').length;
+    final jumla = _hifdhuStudents.length;
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+      children: [
+        Text(
+          data.jina,
+          style: const TextStyle(
+            fontFamily: MadrasaTheme.brandFont,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+            color: MadrasaTheme.title,
+          ),
+        ),
+        if (data.mwalimu != null && data.mwalimu!.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            'Mwalimu: ${data.mwalimu}',
+            style: const TextStyle(color: MadrasaTheme.muted),
+          ),
+        ],
+        const SizedBox(height: 16),
+        StudentStatCards(
+          wavulana: wavulana,
+          wasichana: wasichana,
+          jumla: jumla,
+        ),
+        const SizedBox(height: 20),
+        HubCard(
+          title: MadrasaCopy.rollCall,
+          hint: canAttendance
+              ? 'Rekodi yupo / hayupo'
+              : MadrasaCopy.viewOnly,
+          watermarkIcon: Icons.fact_check_rounded,
+          onTap: () => context.push('/masomo/${data.id}/mahudhurio'),
+        ),
+        HubCard(
+          title: 'Rekodi sabaq na murajaa',
+          hint: '$jumla wanafunzi (Wanaume: $wavulana · Wanawake: $wasichana)',
+          watermarkIcon: Icons.menu_book_rounded,
+          onTap: () => context.push('/masomo/${data.id}/wanafunzi'),
+        ),
+      ],
+    );
+  }
+}
+
+class _MaendeleoMchanaSheet extends StatefulWidget {
+  const _MaendeleoMchanaSheet({
+    required this.somo,
+    required this.repository,
+    required this.canSabaq,
+  });
+
+  final SubjectDetail somo;
+  final CatalogRepository repository;
+  final bool canSabaq;
+
+  @override
+  State<_MaendeleoMchanaSheet> createState() => _MaendeleoMchanaSheetState();
+}
+
+class _MaendeleoMchanaSheetState extends State<_MaendeleoMchanaSheet> {
+  bool _loading = true;
+  String? _error;
+  List<Map<String, dynamic>> _rows = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      _rows = await widget.repository.wanafunziSomoRaw(widget.somo.id);
+    } on ApiException catch (e) {
+      _error = e.message;
+    } catch (_) {
+      _error = 'Imeshindikana kupakia wanafunzi.';
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _recordProgress(Map<String, dynamic> student) async {
+    final madaCtrl = TextEditingController();
+    final ukurasaCtrl = TextEditingController();
+    final maoniCtrl = TextEditingController();
+    String hali = 'Ameelewa';
+
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setLocal) => AlertDialog(
+          title: Text('Rekodi Maendeleo: ${student['jina_kamili']}'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: madaCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Mada iliyosomwa',
+                    hintText: 'Mf. Mlango wa Udhu',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: ukurasaCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Ukurasa au Aya (hiari)',
+                    hintText: 'Mf. Uk. 12 - 15',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Hali ya Uelewa:',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 6),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final opt in const [
+                      ('Ameelewa', 'Ameelewa'),
+                      ('Hajaelewa', 'Hajaelewa'),
+                      ('Hajasikilizwa', 'Hajasikilizwa'),
+                    ])
+                      ChoiceChip(
+                        label: Text(opt.$2),
+                        selected: hali == opt.$1,
+                        onSelected: (v) {
+                          if (v) setLocal(() => hali = opt.$1);
+                        },
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: maoniCtrl,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Maoni ya mwalimu (hiari)',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Ghairi'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Hifadhi'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final mada = madaCtrl.text.trim();
+    final ukurasa = ukurasaCtrl.text.trim();
+    final maoni = maoniCtrl.text.trim();
+    madaCtrl.dispose();
+    ukurasaCtrl.dispose();
+    maoniCtrl.dispose();
+
+    if (!mounted || ok != true) return;
+    if (mada.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Weka mada iliyosomwa.')),
+      );
+      return;
+    }
+
+    try {
+      await widget.repository.rekodiMaendeleo(
+        mwanafunziId: student['id'] as int,
+        somoId: widget.somo.id,
+        mada: mada,
+        ukurasaAuAya: ukurasa.isEmpty ? null : ukurasa,
+        hali: hali,
+        maoni: maoni.isEmpty ? null : maoni,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Maendeleo ya mchana yamehifadhiwa.')),
+      );
+      await _load();
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
+        );
+      }
+    }
+  }
+
+  Future<void> _viewStudentMaendeleo(Map<String, dynamic> student) async {
+    try {
+      final data = await widget.repository.ripotiMaendeleoMchana(
+        widget.somo.id,
+        student['id'] as int,
+      );
+      if (!mounted) return;
+      final rekodi =
+          (data['rekodi'] as List<dynamic>? ?? const [])
+              .whereType<Map<String, dynamic>>()
+              .toList();
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Ripoti: ${student['jina_kamili']}'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: rekodi.isEmpty
+                ? const Text('Hakuna rekodi za maendeleo bado.')
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: rekodi.length,
+                    itemBuilder: (ctx, i) {
+                      final r = rekodi[i];
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('${r['tarehe']} · ${r['mada_iliyosomwa']}'),
+                        subtitle: Text(
+                          [
+                            if ((r['ukurasa_au_aya'] as String?)?.isNotEmpty ==
+                                true)
+                              'Uk/Aya: ${r['ukurasa_au_aya']}',
+                            if ((r['maoni'] as String?)?.isNotEmpty == true)
+                              '${r['maoni']}',
+                          ].join(' · '),
+                        ),
+                        trailing: Text(
+                          '${r['hali_jina'] ?? r['hali']}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: MadrasaTheme.primary,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Funga'),
+            ),
+          ],
+        ),
+      );
+    } on ApiException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message)),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Maendeleo ya mchana · ${widget.somo.jina}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: MadrasaTheme.title,
+                ),
+              ),
+              if (widget.somo.darasaJina != null)
+                Text(
+                  'Darasa: ${widget.somo.darasaJina}',
+                  style: const TextStyle(
+                    color: MadrasaTheme.muted,
+                    fontSize: 13,
+                  ),
+                ),
+              const Divider(height: 20),
+              Expanded(
+                child: _loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _error != null
+                    ? Center(child: Text(_error!))
+                    : _rows.isEmpty
+                    ? const Center(
+                        child: Text('Hakuna wanafunzi katika somo hili.'),
+                      )
+                    : ListView.builder(
+                        controller: scrollController,
+                        itemCount: _rows.length,
+                        itemBuilder: (ctx, i) {
+                          final row = _rows[i];
+                          final mwisho =
+                              row['maendeleo_mwisho'] as Map<String, dynamic>?;
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 10),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${row['jina_kamili']}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${row['namba_ya_usajili'] ?? ''}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: MadrasaTheme.muted,
+                                          ),
+                                        ),
+                                        if (mwisho != null) ...[
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Mwisho (${mwisho['tarehe']}): ${mwisho['mada_iliyosomwa']} · ${mwisho['hali_jina'] ?? mwisho['hali']}',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: MadrasaTheme.primary,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                  if (widget.canSabaq)
+                                    FilledButton.tonal(
+                                      onPressed: () => _recordProgress(row),
+                                      child: const Text('Rekodi'),
+                                    ),
+                                  const SizedBox(width: 6),
+                                  OutlinedButton(
+                                    onPressed: () =>
+                                        _viewStudentMaendeleo(row),
+                                    child: const Text('Ripoti'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

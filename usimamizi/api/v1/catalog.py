@@ -1,4 +1,4 @@
-"""Read-only directory endpoints that mirror the web sidebar."""
+"""Directory & management endpoints that mirror the web sidebar."""
 
 from __future__ import annotations
 
@@ -6,40 +6,44 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.core.paginator import Paginator
-from django.db import IntegrityError
-from django.utils import timezone
+from django.db import IntegrityError, transaction
 from django.db.models import Count, DecimalField, F, Q, Sum, Value
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from usimamizi.api.permissions import HasCapability
-from usimamizi.api.v1.serializers import (
-    AinaMalipoSerializer,
-    AinaMalipoWriteSerializer,
-    MalipoCreateSerializer,
-    MalipoSerializer,
-    MuhulaSerializer,
-    MuhulaWriteSerializer,
-    MwakaSerializer,
-    MwakaWriteSerializer,
-    MwanafunziDetailSerializer,
-    MwanafunziDirectorySerializer,
-    MwalimuSerializer,
-    TangazoSerializer,
-    UkaguziSerializer,
-)
 from usimamizi.academic import (
     get_active_muhula,
     get_active_mwaka,
     set_active_muhula,
     set_active_mwaka,
 )
-from usimamizi.audit import andika_ukaguzi_malipo
+from usimamizi.api.permissions import HasCapability
+from usimamizi.api.v1.registration import _form_data, _form_errors
+from usimamizi.api.v1.serializers import (
+    AinaMalipoSerializer,
+    AinaMalipoWriteSerializer,
+    DarasaSerializer,
+    MalipoCreateSerializer,
+    MalipoSerializer,
+    MuhulaSerializer,
+    MuhulaWriteSerializer,
+    MwakaSerializer,
+    MwakaWriteSerializer,
+    MwalimuSerializer,
+    MwanafunziDetailSerializer,
+    MwanafunziDirectorySerializer,
+    TangazoSerializer,
+    UkaguziSerializer,
+)
+from usimamizi.audit import andika_ukaguzi_hamisha_darasa, andika_ukaguzi_malipo
 from usimamizi.dashboard import build_dashboard_context
+from usimamizi.forms import DarasaForm, MwalimuEditForm, MwanafunziForm
 from usimamizi.models import (
     AinaMalipo,
+    Darasa,
     Hudhurio,
     Malipo,
     Muhula,
@@ -49,6 +53,7 @@ from usimamizi.models import (
     RekodiHifdhu,
     RekodiMaendeleoMchana,
     RekodiUkaguzi,
+    Somo,
 )
 from usimamizi.pdf_builders import (
     build_mahudhurio_pdf_response,
@@ -114,16 +119,127 @@ class WalimuListView(APIView):
         )
 
 
+class MwalimuDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasCapability]
+    required_capabilities = (CAP_VIEW_DIRECTORY, CAP_MANAGE_STUDENTS)
+
+    def get(self, request, mwalimu_id):
+        mwalimu = (
+            Mwalimu.objects.select_related("user").filter(pk=mwalimu_id).first()
+        )
+        if mwalimu is None:
+            return Response({"detail": "Mwalimu hapatikani."}, status=404)
+        data = dict(
+            MwalimuSerializer(mwalimu, context={"request": request}).data
+        )
+        data["first_name"] = mwalimu.user.first_name
+        data["last_name"] = mwalimu.user.last_name
+        data["email"] = mwalimu.user.email
+        data["is_active"] = mwalimu.user.is_active
+        return Response(data)
+
+    def put(self, request, mwalimu_id):
+        if not user_has_capability(request.user, CAP_MANAGE_STUDENTS):
+            return Response(
+                {"detail": "Huna ruhusa ya kuhariri mwalimu."}, status=403
+            )
+        mwalimu = (
+            Mwalimu.objects.select_related("user").filter(pk=mwalimu_id).first()
+        )
+        if mwalimu is None:
+            return Response({"detail": "Mwalimu hapatikani."}, status=404)
+        payload = _form_data(request)
+        if "first_name" not in payload:
+            payload["first_name"] = mwalimu.user.first_name
+        if "last_name" not in payload:
+            payload["last_name"] = mwalimu.user.last_name
+        if "email" not in payload:
+            payload["email"] = mwalimu.user.email
+        if "cheo" not in payload:
+            payload["cheo"] = mwalimu.cheo
+        if "namba_ya_simu" not in payload:
+            payload["namba_ya_simu"] = mwalimu.namba_ya_simu
+        if "is_active" not in payload:
+            payload["is_active"] = mwalimu.user.is_active
+        form = MwalimuEditForm(
+            data=payload, files=request.FILES, instance=mwalimu
+        )
+        if not form.is_valid():
+            return Response(_form_errors(form), status=400)
+        mwalimu = form.save()
+        return Response(
+            MwalimuSerializer(mwalimu, context={"request": request}).data
+        )
+
+
+class DarasaDetailView(APIView):
+    permission_classes = [IsAuthenticated, HasCapability]
+    required_capabilities = (CAP_VIEW_DIRECTORY, CAP_MANAGE_STUDENTS)
+
+    def get(self, request, darasa_id):
+        darasa = Darasa.objects.filter(pk=darasa_id).first()
+        if darasa is None:
+            return Response({"detail": "Darasa halipatikani."}, status=404)
+        return Response(DarasaSerializer(darasa).data)
+
+    def put(self, request, darasa_id):
+        if not user_has_capability(request.user, CAP_MANAGE_STUDENTS):
+            return Response(
+                {"detail": "Huna ruhusa ya kuhariri darasa."}, status=403
+            )
+        darasa = Darasa.objects.filter(pk=darasa_id).first()
+        if darasa is None:
+            return Response({"detail": "Darasa halipatikani."}, status=404)
+        form = DarasaForm(data=_form_data(request), instance=darasa)
+        if not form.is_valid():
+            return Response(_form_errors(form), status=400)
+        darasa = form.save()
+        return Response(DarasaSerializer(darasa).data)
+
+    def delete(self, request, darasa_id):
+        if not user_has_capability(request.user, CAP_MANAGE_STUDENTS):
+            return Response(
+                {"detail": "Huna ruhusa ya kufuta darasa."}, status=403
+            )
+        darasa = Darasa.objects.filter(pk=darasa_id).first()
+        if darasa is None:
+            return Response({"detail": "Darasa halipatikani."}, status=404)
+        if Mwanafunzi.objects.filter(darasa=darasa).exists():
+            return Response(
+                {
+                    "detail": (
+                        f'Huwezi kufuta "{darasa.jina}" — kuna wanafunzi waliohusishwa.'
+                    )
+                },
+                status=400,
+            )
+        if Somo.objects.filter(darasa=darasa).exists():
+            return Response(
+                {
+                    "detail": (
+                        f'Huwezi kufuta "{darasa.jina}" — kuna masomo yaliyohusishwa.'
+                    )
+                },
+                status=400,
+            )
+        darasa.delete()
+        return Response(status=204)
+
+
 class WanafunziListView(APIView):
     permission_classes = [IsAuthenticated, HasCapability]
     required_capability = CAP_VIEW_STUDENTS
 
     def get(self, request):
-        qs = (
-            Mwanafunzi.objects.active()
-            .select_related("darasa")
-            .order_by("jina_kamili")
-        )
+        hali = (request.query_params.get("hali") or "hai").strip().lower()
+        base_qs = Mwanafunzi.objects.select_related("darasa")
+        if hali == "hifadhiwa":
+            qs = base_qs.archived()
+        elif hali == "wote":
+            qs = base_qs.all()
+        else:
+            qs = base_qs.active()
+        qs = qs.order_by("jina_kamili")
         q = (request.query_params.get("q") or "").strip()
         if q:
             for token in q.split():
@@ -159,9 +275,97 @@ class MwanafunziDetailView(APIView):
             MwanafunziDetailSerializer(row, context={"request": request}).data
         )
 
+    def put(self, request, mwanafunzi_id):
+        if not user_has_capability(request.user, CAP_MANAGE_STUDENTS):
+            return Response(
+                {"detail": "Huna ruhusa ya kuhariri mwanafunzi."}, status=403
+            )
+        row = (
+            Mwanafunzi.objects.select_related("darasa", "programu_ya_usiku")
+            .filter(pk=mwanafunzi_id)
+            .first()
+        )
+        if row is None:
+            return Response({"detail": "Mwanafunzi hapatikani."}, status=404)
+        if row.amehifadhiwa:
+            return Response(
+                {
+                    "detail": (
+                        "Mwanafunzi huyu amehifadhiwa. Rudisha kwenye orodha hai kabla ya kuhariri."
+                    )
+                },
+                status=400,
+            )
+        payload = _form_data(request)
+        defaults = {
+            "jina_kamili": row.jina_kamili,
+            "jinsia": row.jinsia,
+            "tarehe_ya_kuzaliwa": (
+                row.tarehe_ya_kuzaliwa.isoformat()
+                if row.tarehe_ya_kuzaliwa
+                else ""
+            ),
+            "mahala_anapoishi": row.mahala_anapoishi or "",
+            "darasa": row.darasa_id or "",
+            "programu_ya_usiku": row.programu_ya_usiku_id or "",
+            "juzuu_aliyohifadhi": row.juzuu_aliyohifadhi or 1,
+            "tarehe_ya_kujiunga": (
+                row.tarehe_ya_kujiunga.isoformat()
+                if row.tarehe_ya_kujiunga
+                else ""
+            ),
+            "jina_la_mzazi": row.jina_la_mzazi or "",
+            "uhusiano_wa_mlezi": row.uhusiano_wa_mlezi or "",
+            "namba_ya_simu_mzazi": row.namba_ya_simu_mzazi or "",
+            "jina_la_mzazi_pili": row.jina_la_mzazi_pili or "",
+            "uhusiano_wa_mlezi_pili": row.uhusiano_wa_mlezi_pili or "",
+            "namba_ya_simu_mzazi_pili": row.namba_ya_simu_mzazi_pili or "",
+        }
+        for k, v in defaults.items():
+            if k not in payload:
+                payload[k] = v
+        form = MwanafunziForm(data=payload, files=request.FILES, instance=row)
+        if not form.is_valid():
+            return Response(_form_errors(form), status=400)
+        row = form.save()
+        return Response(
+            MwanafunziDetailSerializer(row, context={"request": request}).data
+        )
+
+
+class MwanafunziArchiveView(APIView):
+    permission_classes = [IsAuthenticated, HasCapability]
+    required_capability = CAP_MANAGE_STUDENTS
+
+    def post(self, request, mwanafunzi_id):
+        row = Mwanafunzi.objects.filter(pk=mwanafunzi_id).first()
+        if row is None:
+            return Response({"detail": "Mwanafunzi hapatikani."}, status=404)
+        sababu = (request.data.get("sababu") or "").strip()
+        if not row.amehifadhiwa:
+            row.archive(sababu=sababu)
+        return Response(
+            MwanafunziDetailSerializer(row, context={"request": request}).data
+        )
+
+
+class MwanafunziRestoreView(APIView):
+    permission_classes = [IsAuthenticated, HasCapability]
+    required_capability = CAP_MANAGE_STUDENTS
+
+    def post(self, request, mwanafunzi_id):
+        row = Mwanafunzi.objects.filter(pk=mwanafunzi_id).first()
+        if row is None:
+            return Response({"detail": "Mwanafunzi hapatikani."}, status=404)
+        if row.amehifadhiwa:
+            row.restore()
+        return Response(
+            MwanafunziDetailSerializer(row, context={"request": request}).data
+        )
+
 
 class MwanafunziProfileTabView(APIView):
-    """Profile tabs mirroring web (without Simu/call log)."""
+    """Profile tabs mirroring web."""
 
     permission_classes = [IsAuthenticated, HasCapability]
     required_capability = CAP_VIEW_STUDENTS
@@ -289,14 +493,27 @@ class MwanafunziProfileTabView(APIView):
                     mwanafunzi=mwanafunzi, aina_ya_rekodi=aina
                 )
                 .select_related("somo", "mwalimu")
+                .prefetch_related("mapande")
                 .order_by("-tarehe")[:12]
             )
             return [
                 {
                     "tarehe": row.tarehe.isoformat(),
                     "sura": row.sabaq_sura or "-",
+                    "aya_kuanzia": row.sabaq_aya_kuanzia,
+                    "aya_kuishia": row.sabaq_aya_kuishia,
                     "hali": row.sabaq_hali or "-",
                     "somo": row.somo.jina if row.somo_id else None,
+                    "maoni": row.maoni_ya_mwalimu or "",
+                    "mapande": [
+                        {
+                            "sura": p.sura,
+                            "aya_kuanzia": p.aya_kuanzia,
+                            "aya_kuishia": p.aya_kuishia,
+                            "hali": p.hali,
+                        }
+                        for p in row.mapande.all()
+                    ],
                 }
                 for row in qs
             ]
@@ -315,7 +532,9 @@ class MwanafunziProfileTabView(APIView):
                     "tarehe": row.tarehe.isoformat(),
                     "somo": row.somo.jina,
                     "mada": row.mada_iliyosomwa,
+                    "ukurasa_au_aya": row.ukurasa_au_aya or "",
                     "hali": row.get_hali_display(),
+                    "maoni": row.maoni or "",
                 }
                 for row in maendeleo
             ],
@@ -328,7 +547,6 @@ class WatoroView(APIView):
 
     def get(self, request):
         from usimamizi.dashboard import _wiki_kuanzia
-        from django.utils import timezone
 
         kuanzia = _wiki_kuanzia(timezone.now().date())
 
@@ -987,8 +1205,6 @@ class HamishaPreviewView(APIView):
     required_capability = CAP_PROMOTE_CLASS
 
     def get(self, request):
-        from usimamizi.models import Darasa
-
         qs = Darasa.objects.annotate(
             idadi_wanafunzi=Count(
                 "mwanafunzi",
@@ -1004,6 +1220,72 @@ class HamishaPreviewView(APIView):
                 }
                 for row in qs
             ]
+        )
+
+    def post(self, request):
+        kutoka_id = request.data.get("kutoka")
+        kwenda_id = request.data.get("kwenda")
+        raw_ids = request.data.get("wanafunzi") or []
+        maezo = (request.data.get("maezo") or "").strip()
+
+        if not kutoka_id or not kwenda_id:
+            return Response(
+                {"detail": "Chagua darasa la kutoka na darasa la kwenda."},
+                status=400,
+            )
+        if str(kutoka_id) == str(kwenda_id):
+            return Response(
+                {"detail": "Darasa la kwenda haliwezi kuwa sawa na la kutoka."},
+                status=400,
+            )
+        darasa_kutoka = Darasa.objects.filter(pk=kutoka_id).first()
+        darasa_kwenda = Darasa.objects.filter(pk=kwenda_id).first()
+        if darasa_kutoka is None or darasa_kwenda is None:
+            return Response({"detail": "Darasa halipatikani."}, status=404)
+
+        selected_ids = []
+        if isinstance(raw_ids, list):
+            for val in raw_ids:
+                try:
+                    selected_ids.append(int(val))
+                except (TypeError, ValueError):
+                    continue
+        if not selected_ids:
+            return Response(
+                {"detail": "Chagua angalau mwanafunzi mmoja."}, status=400
+            )
+        candidates = list(
+            Mwanafunzi.objects.active().filter(
+                id__in=selected_ids, darasa=darasa_kutoka
+            )
+        )
+        if not candidates:
+            return Response(
+                {
+                    "detail": (
+                        "Hakuna wanafunzi waliochaguliwa wanaolingana na darasa la kutoka."
+                    )
+                },
+                status=400,
+            )
+        with transaction.atomic():
+            updated = Mwanafunzi.objects.active().filter(
+                id__in=[s.id for s in candidates],
+                darasa=darasa_kutoka,
+            ).update(darasa=darasa_kwenda)
+            andika_ukaguzi_hamisha_darasa(
+                user=request.user,
+                darasa_kutoka=darasa_kutoka,
+                darasa_kwenda=darasa_kwenda,
+                idadi=updated,
+                maezo=maezo,
+            )
+        return Response(
+            {
+                "idadi": updated,
+                "kutoka": darasa_kutoka.jina,
+                "kwenda": darasa_kwenda.jina,
+            }
         )
 
 

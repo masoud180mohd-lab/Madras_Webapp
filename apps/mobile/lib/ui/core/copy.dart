@@ -69,4 +69,12 @@ class MadrasaCopy {
   static const needPassword = 'Weka nenosiri.';
   static const viewOnly = 'Unaweza kuona orodha, si kurekodi mahudhurio.';
   static const retry = 'Jaribu tena';
+
+  static String humanizeError(Object error) {
+    final s = error.toString();
+    if (s.startsWith('ApiException: ')) {
+      return s.substring('ApiException: '.length);
+    }
+    return s;
+  }
 }

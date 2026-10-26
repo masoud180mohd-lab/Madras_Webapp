@@ -32,6 +32,7 @@ class StaffProfile {
   bool get canViewDirectory => capabilities.contains('view_directory');
   bool get canViewStudents => capabilities.contains('view_students');
   bool get canTakeAttendance => capabilities.contains('attendance');
+  bool get canRecordSabaq => capabilities.contains('sabaq') || canManageStudents;
   bool get canManageStudents => capabilities.contains('manage_students');
   bool get canSeeFees => capabilities.contains('fees');
   bool get canSeeExams => capabilities.contains('exams');
@@ -208,12 +209,16 @@ class StudentDetail {
     required this.nambaYaUsajili,
     required this.jinsia,
     this.darasa,
+    this.darasaId,
     this.pichaUrl,
     this.tareheKuzaliwa,
     this.mahala,
     this.programuUsiku,
+    this.programuUsikuId,
     this.juzuu,
     this.tareheKujiunga,
+    this.amehifadhiwa = false,
+    this.sababuYaKuhifadhi,
     this.jinaMzazi,
     this.simuMzazi,
     this.uhusiano,
@@ -227,12 +232,16 @@ class StudentDetail {
   final String nambaYaUsajili;
   final String jinsia;
   final String? darasa;
+  final int? darasaId;
   final String? pichaUrl;
   final String? tareheKuzaliwa;
   final String? mahala;
   final String? programuUsiku;
+  final int? programuUsikuId;
   final int? juzuu;
   final String? tareheKujiunga;
+  final bool amehifadhiwa;
+  final String? sababuYaKuhifadhi;
   final String? jinaMzazi;
   final String? simuMzazi;
   final String? uhusiano;
@@ -247,12 +256,18 @@ class StudentDetail {
       nambaYaUsajili: json['namba_ya_usajili'] as String? ?? '',
       jinsia: json['jinsia'] as String? ?? 'ME',
       darasa: json['darasa'] as String?,
+      darasaId: json['darasa_id'] as int?,
       pichaUrl: json['picha'] as String?,
       tareheKuzaliwa: json['tarehe_ya_kuzaliwa'] as String?,
       mahala: json['mahala_anapoishi'] as String?,
       programuUsiku: json['programu_usiku'] as String?,
+      programuUsikuId:
+          json['programu_ya_usiku_id'] as int? ??
+          json['programu_usiku_id'] as int?,
       juzuu: json['juzuu_aliyohifadhi'] as int?,
       tareheKujiunga: json['tarehe_ya_kujiunga'] as String?,
+      amehifadhiwa: json['amehifadhiwa'] == true,
+      sababuYaKuhifadhi: json['sababu_ya_kuhifadhi'] as String?,
       jinaMzazi: json['jina_la_mzazi'] as String?,
       simuMzazi: json['namba_ya_simu_mzazi'] as String?,
       uhusiano: json['uhusiano_wa_mlezi'] as String?,
@@ -301,6 +316,7 @@ class StudentOverview {
 
 class StudentPayment {
   const StudentPayment({
+    this.id,
     required this.tarehe,
     required this.aina,
     required this.kiasi,
@@ -308,6 +324,7 @@ class StudentPayment {
     this.alirekodi,
   });
 
+  final int? id;
   final String tarehe;
   final String aina;
   final String kiasi;
@@ -316,6 +333,7 @@ class StudentPayment {
 
   factory StudentPayment.fromJson(Map<String, dynamic> json) {
     return StudentPayment(
+      id: json['id'] as int?,
       tarehe: json['tarehe'] as String? ?? '',
       aina: json['aina'] as String? ?? '',
       kiasi: '${json['kiasi'] ?? 0}',
@@ -401,23 +419,65 @@ class StudentRecords {
   final List<StudentRecord> maendeleo;
 
   factory StudentRecords.fromJson(Map<String, dynamic> json) {
-    StudentRecord sabaq(Map<String, dynamic> row) => StudentRecord(
-      tarehe: row['tarehe'] as String? ?? '',
-      kichwa: row['sura'] as String? ?? '-',
-      hali: row['hali'] as String? ?? '-',
-      maelezo: row['somo'] as String?,
-    );
+    StudentRecord sabaq(Map<String, dynamic> row) {
+      final sura = row['sura'] as String? ?? '-';
+      final kuanzia = row['aya_kuanzia'];
+      final kuishia = row['aya_kuishia'];
+      final aya = kuanzia != null && kuishia != null
+          ? ' ($kuanzia-$kuishia)'
+          : '';
+      final parts = <String>[
+        if ((row['somo'] as String?)?.isNotEmpty == true)
+          row['somo'] as String,
+        if ((row['maoni'] as String?)?.isNotEmpty == true)
+          row['maoni'] as String,
+      ];
+      final mapande = row['mapande'];
+      if (mapande is List && mapande.isNotEmpty) {
+        final mp = mapande
+            .whereType<Map<String, dynamic>>()
+            .map((p) {
+              final ps = p['sura'] ?? '';
+              final pk = p['aya_kuanzia'];
+              final pe = p['aya_kuishia'];
+              final ph = p['hali'] ?? '';
+              final range = pk != null && pe != null ? ' ($pk-$pe)' : '';
+              return '$ps$range [$ph]';
+            })
+            .join(', ');
+        if (mp.isNotEmpty) {
+          parts.add('Mapande: $mp');
+        }
+      }
+      return StudentRecord(
+        tarehe: row['tarehe'] as String? ?? '',
+        kichwa: '$sura$aya',
+        hali: row['hali'] as String? ?? '-',
+        maelezo: parts.isEmpty ? null : parts.join(' · '),
+      );
+    }
+
     return StudentRecords(
       sabaqDarasa: _rows(json['sabaq_darasa'], sabaq),
       sabaqUsiku: _rows(json['sabaq_usiku'], sabaq),
       maendeleo: _rows(
         json['maendeleo_mchana'],
-        (row) => StudentRecord(
-          tarehe: row['tarehe'] as String? ?? '',
-          kichwa: row['somo'] as String? ?? '-',
-          hali: row['hali'] as String? ?? '-',
-          maelezo: row['mada'] as String?,
-        ),
+        (row) {
+          final parts = <String>[
+            if ((row['mada'] as String?)?.isNotEmpty == true)
+              row['mada'] as String,
+            if ((row['ukurasa_au_aya'] as String?)?.isNotEmpty == true)
+              'Uk/Aya: ${row['ukurasa_au_aya']}',
+            if ((row['maoni'] as String?)?.isNotEmpty == true)
+              row['maoni'] as String,
+          ];
+          return StudentRecord(
+            tarehe: row['tarehe'] as String? ?? '',
+            kichwa: row['somo'] as String? ?? '-',
+            hali: row['hali'] as String? ?? '-',
+            maelezo: parts.isEmpty ? null : parts.join(' · '),
+          );
+        },
       ),
     );
   }
@@ -462,12 +522,14 @@ class SubjectExam {
     required this.jina,
     required this.tarehe,
     required this.somoId,
+    this.msetoId,
   });
 
   final int id;
   final String jina;
   final String tarehe;
   final int somoId;
+  final int? msetoId;
 
   factory SubjectExam.fromJson(Map<String, dynamic> json) {
     return SubjectExam(
@@ -475,6 +537,7 @@ class SubjectExam {
       jina: json['jina_la_mtihani'] as String? ?? '',
       tarehe: json['tarehe'] as String? ?? '',
       somoId: json['somo'] as int? ?? 0,
+      msetoId: json['mseto'] as int?,
     );
   }
 }
@@ -484,27 +547,33 @@ class SubjectDetail {
     required this.id,
     required this.jina,
     required this.niLaHifdhu,
+    this.darasaId,
     this.darasaJina,
     this.mwalimu,
     this.nyenzo = const [],
     this.mitihani = const [],
+    this.miseto = const [],
   });
 
   final int id;
   final String jina;
   final bool niLaHifdhu;
+  final int? darasaId;
   final String? darasaJina;
   final String? mwalimu;
   final List<SubjectMaterial> nyenzo;
   final List<SubjectExam> mitihani;
+  final List<Map<String, dynamic>> miseto;
 
   factory SubjectDetail.fromJson(Map<String, dynamic> json) {
     final nyenzo = json['nyenzo'];
     final mitihani = json['mitihani'];
+    final miseto = json['miseto'];
     return SubjectDetail(
       id: json['id'] as int,
       jina: json['jina'] as String? ?? '',
       niLaHifdhu: json['ni_la_hifdhu'] == true,
+      darasaId: json['darasa'] as int?,
       darasaJina: json['darasa_jina'] as String?,
       mwalimu: json['mwalimu'] as String?,
       nyenzo: nyenzo is List
@@ -518,6 +587,9 @@ class SubjectDetail {
                 .whereType<Map<String, dynamic>>()
                 .map(SubjectExam.fromJson)
                 .toList(growable: false)
+          : const [],
+      miseto: miseto is List
+          ? miseto.whereType<Map<String, dynamic>>().toList(growable: false)
           : const [],
     );
   }

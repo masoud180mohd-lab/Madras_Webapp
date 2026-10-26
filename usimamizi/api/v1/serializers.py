@@ -163,6 +163,16 @@ class NyenzoSerializer(serializers.ModelSerializer):
         return url
 
 
+class PandeItemSerializer(serializers.Serializer):
+    sura = serializers.CharField(max_length=100)
+    aya_kuanzia = serializers.IntegerField(required=False, allow_null=True)
+    aya_kuishia = serializers.IntegerField(required=False, allow_null=True)
+    hali = serializers.ChoiceField(
+        choices=["Pasi", "Makosa", "Feli"],
+        default="Pasi",
+    )
+
+
 class SabaqCreateSerializer(serializers.Serializer):
     mwanafunzi = serializers.IntegerField()
     aina_ya_rekodi = serializers.ChoiceField(choices=["Darasa", "Usiku"])
@@ -177,6 +187,7 @@ class SabaqCreateSerializer(serializers.Serializer):
     maoni_ya_mwalimu = serializers.CharField(
         required=False, allow_blank=True, default=""
     )
+    mapande = PandeItemSerializer(many=True, required=False, default=list)
 
 
 class MaendeleoCreateSerializer(serializers.Serializer):
@@ -209,6 +220,12 @@ class MtihaniCreateSerializer(serializers.Serializer):
     jina_la_mtihani = serializers.CharField(max_length=100)
     tarehe = serializers.DateField()
     mseto = serializers.IntegerField(required=False, allow_null=True)
+
+
+class MsetoCreateSerializer(serializers.Serializer):
+    jina = serializers.CharField(max_length=100)
+    tarehe = serializers.DateField(required=False, allow_null=True)
+    muhula = serializers.IntegerField(required=False, allow_null=True)
 
 
 class MaksiRowSerializer(serializers.Serializer):
@@ -265,6 +282,7 @@ class MwanafunziDirectorySerializer(serializers.ModelSerializer):
             "darasa",
             "darasa_id",
             "picha",
+            "amehifadhiwa",
         )
 
     def get_picha(self, obj):
@@ -283,6 +301,9 @@ class MwanafunziDetailSerializer(serializers.ModelSerializer):
     programu_usiku = serializers.CharField(
         source="programu_ya_usiku.jina", allow_null=True
     )
+    programu_ya_usiku_id = serializers.IntegerField(
+        allow_null=True, required=False, read_only=True
+    )
     picha = serializers.SerializerMethodField()
 
     class Meta:
@@ -297,9 +318,12 @@ class MwanafunziDetailSerializer(serializers.ModelSerializer):
             "darasa",
             "darasa_id",
             "programu_usiku",
+            "programu_ya_usiku_id",
             "juzuu_aliyohifadhi",
             "tarehe_ya_kujiunga",
             "picha",
+            "amehifadhiwa",
+            "sababu_ya_kuhifadhiwa",
             "jina_la_mzazi",
             "namba_ya_simu_mzazi",
             "uhusiano_wa_mlezi",

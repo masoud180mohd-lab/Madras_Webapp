@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../data/repositories/catalog_repository.dart';
 import '../../../core/copy.dart';
 import '../../../core/theme.dart';
 import '../../../core/widgets/accent_card.dart';
@@ -10,9 +11,13 @@ class ClassesView extends StatefulWidget {
   const ClassesView({
     super.key,
     required this.viewModel,
+    this.canManageClasses = false,
+    this.catalog,
   });
 
   final ClassesViewModel viewModel;
+  final bool canManageClasses;
+  final CatalogRepository? catalog;
 
   @override
   State<ClassesView> createState() => _ClassesViewState();
@@ -25,56 +30,126 @@ class _ClassesViewState extends State<ClassesView> {
     widget.viewModel.load();
   }
 
+  Future<void> _addClassDialog() async {
+    final repo = widget.catalog;
+    if (repo == null) return;
+    final jinaCtrl = TextEditingController();
+    final maelezoCtrl = TextEditingController();
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Ongeza Darasa Jipya'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: jinaCtrl,
+              decoration: const InputDecoration(labelText: 'Jina la darasa'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: maelezoCtrl,
+              decoration: const InputDecoration(labelText: 'Maelezo (hiari)'),
+              maxLines: 2,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Ghairi'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Hifadhi'),
+          ),
+        ],
+      ),
+    );
+    if (saved != true || !mounted) return;
+    final jina = jinaCtrl.text.trim();
+    if (jina.isEmpty) return;
+    try {
+      await repo.sajiliDarasa({
+        'jina': jina,
+        'maelezo': maelezoCtrl.text.trim(),
+      });
+      if (!mounted) return;
+      widget.viewModel.load();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Darasa limeongezwa kikamilifu.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(MadrasaCopy.humanizeError(e))),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-        listenable: widget.viewModel,
-        builder: (context, _) {
-          if (widget.viewModel.loading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (widget.viewModel.error != null) {
-            return _Message(
-              text: widget.viewModel.error!,
-              onRetry: widget.viewModel.load,
-            );
-          }
-          final items = widget.viewModel.madarasa;
-          return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            children: [
-              const _SectionHeader(title: MadrasaCopy.classes),
-              const SizedBox(height: 16),
-              if (items.isEmpty)
-                const _EmptyCard(text: MadrasaCopy.emptyClasses)
-              else
-                ...items.map(
-                  (darasa) => Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
-                    child: _ClassCard(
-                      jina: darasa.jina,
-                      maelezo: darasa.maelezo,
-                      idadiWanafunzi: darasa.idadiWanafunzi,
-                      wavulana: darasa.wavulana,
-                      wasichana: darasa.wasichana,
-                      onTap: () => context.push(
-                        '/madarasa/${darasa.id}',
-                        extra: darasa,
+      listenable: widget.viewModel,
+      builder: (context, _) {
+        if (widget.viewModel.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (widget.viewModel.error != null) {
+          return _Message(
+            text: widget.viewModel.error!,
+            onRetry: widget.viewModel.load,
+          );
+        }
+        final items = widget.viewModel.madarasa;
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          children: [
+            _SectionHeader(
+              title: MadrasaCopy.classes,
+              trailing: (widget.canManageClasses && widget.catalog != null)
+                  ? FilledButton.tonalIcon(
+                      onPressed: _addClassDialog,
+                      icon: const Icon(Icons.add_rounded, size: 18),
+                      label: const Text('Ongeza Darasa'),
+                      style: FilledButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
                       ),
+                    )
+                  : null,
+            ),
+            const SizedBox(height: 16),
+            if (items.isEmpty)
+              const _EmptyCard(text: MadrasaCopy.emptyClasses)
+            else
+              ...items.map(
+                (darasa) => Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: _ClassCard(
+                    jina: darasa.jina,
+                    maelezo: darasa.maelezo,
+                    idadiWanafunzi: darasa.idadiWanafunzi,
+                    wavulana: darasa.wavulana,
+                    wasichana: darasa.wasichana,
+                    onTap: () => context.push(
+                      '/madarasa/${darasa.id}',
+                      extra: darasa,
                     ),
                   ),
                 ),
-            ],
-          );
-        },
+              ),
+          ],
+        );
+      },
     );
   }
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
+  const _SectionHeader({required this.title, this.trailing});
 
   final String title;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -89,14 +164,17 @@ class _SectionHeader extends StatelessWidget {
         children: [
           const Icon(Icons.school, color: MadrasaTheme.primary, size: 22),
           const SizedBox(width: 10),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: MadrasaTheme.primary,
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: MadrasaTheme.primary,
+              ),
             ),
           ),
+          if (trailing != null) trailing!,
         ],
       ),
     );

@@ -45,6 +45,8 @@ NO_THROTTLE = override_settings(
 @NO_THROTTLE
 class ApiV1Tests(TestCase):
     def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
         self.client = APIClient()
         self.darasa = Darasa.objects.create(jina="Darasa la Kwanza")
         self.s1 = Mwanafunzi.objects.create(
@@ -285,6 +287,8 @@ class ApiV1Tests(TestCase):
 @NO_THROTTLE
 class ApiV1SabaqExamsTests(TestCase):
     def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
         self.client = APIClient()
         self.darasa = Darasa.objects.create(jina="Darasa API P3")
         self.student = Mwanafunzi.objects.create(
@@ -523,6 +527,8 @@ class ApiV1StudentProfileTabTests(TestCase):
     """Profile tabs used by the mobile student screen."""
 
     def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
         self.client = APIClient()
         self.darasa = Darasa.objects.create(jina="Darasa la Pili")
         self.somo = Somo.objects.create(jina="Qur'an", ni_la_hifdhu=True)

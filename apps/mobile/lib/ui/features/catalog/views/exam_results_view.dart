@@ -5,6 +5,7 @@ import '../../../../data/models/models.dart';
 import '../../../../data/repositories/catalog_repository.dart';
 import '../../../../data/services/api_exception.dart';
 import '../../../core/copy.dart';
+import '../../../core/pdf_downloader.dart';
 import '../../../core/theme.dart';
 import '../../../core/widgets/accent_card.dart';
 
@@ -129,6 +130,27 @@ class _ExamResultsViewState extends State<ExamResultsView> {
     }
   }
 
+  Future<void> _downloadPdf() async {
+    final data = _data;
+    if (data == null) return;
+    final filename = 'Matokeo_${data.jina.replaceAll(RegExp(r"[^\w.\-]+"), "_")}.pdf';
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Inapakua PDF ya Matokeo...'), duration: Duration(seconds: 2)),
+    );
+    try {
+      final bytes = await widget.repository.downloadMatokeoPdf(widget.mtihaniId);
+      if (mounted) {
+        await PdfDownloader.saveAndOpen(context, bytes: bytes, filename: filename);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Imeshindikana kupakua PDF ya matokeo: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -166,19 +188,39 @@ class _ExamResultsViewState extends State<ExamResultsView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      data.jina,
-                      style: const TextStyle(
-                        fontFamily: MadrasaTheme.brandFont,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: MadrasaTheme.title,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Tarehe: ${data.tarehe}',
-                      style: const TextStyle(color: MadrasaTheme.muted),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                data.jina,
+                                style: const TextStyle(
+                                  fontFamily: MadrasaTheme.brandFont,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: MadrasaTheme.title,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Tarehe: ${data.tarehe}',
+                                style: const TextStyle(color: MadrasaTheme.muted),
+                              ),
+                            ],
+                          ),
+                        ),
+                        OutlinedButton.icon(
+                          onPressed: _downloadPdf,
+                          icon: const Icon(Icons.picture_as_pdf_outlined, size: 16),
+                          label: const Text('Pakua PDF'),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                            visualDensity: VisualDensity.compact,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

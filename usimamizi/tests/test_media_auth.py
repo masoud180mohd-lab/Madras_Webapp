@@ -1,6 +1,9 @@
+import os
 import shutil
 import tempfile
+from unittest.mock import patch
 
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -15,16 +18,34 @@ class ProtectedMediaTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls._tmpdir = tempfile.mkdtemp(prefix="madrasa_media_")
-        cls._media_override = override_settings(MEDIA_ROOT=cls._tmpdir)
+        cls._media_override = override_settings(
+            MEDIA_ROOT=cls._tmpdir,
+            STORAGES={
+                "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+                "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+            },
+        )
         cls._media_override.enable()
+        cls._env_patch = patch.dict(
+            os.environ,
+            {
+                "CLOUDINARY_URL": "",
+                "CLOUDINARY_CLOUD_NAME": "",
+                "CLOUDINARY_API_KEY": "",
+                "CLOUDINARY_API_SECRET": "",
+            },
+        )
+        cls._env_patch.start()
 
     @classmethod
     def tearDownClass(cls):
+        cls._env_patch.stop()
         cls._media_override.disable()
         shutil.rmtree(cls._tmpdir, ignore_errors=True)
         super().tearDownClass()
 
     def setUp(self):
+        cache.clear()
         self.user = create_user_with_cheo("media_user", "Mwalimu Mkuu")
         png = (
             b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01"

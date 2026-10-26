@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../data/models/models.dart';
 import '../../../../data/services/api_client.dart';
 import '../../../core/copy.dart';
 import '../../../core/theme.dart';
@@ -18,6 +19,8 @@ class CatalogListView extends StatefulWidget {
     this.searchable = false,
     this.showStudentStats = false,
     this.onSearch,
+    this.topBar,
+    this.onRowTap,
   });
 
   final CatalogViewModel viewModel;
@@ -25,6 +28,12 @@ class CatalogListView extends StatefulWidget {
   final bool searchable;
   final bool showStudentStats;
   final ValueChanged<String>? onSearch;
+  final Widget Function(BuildContext context, VoidCallback reload)? topBar;
+  final Future<void> Function(
+    BuildContext context,
+    CatalogRow row,
+    VoidCallback reload,
+  )? onRowTap;
 
   @override
   State<CatalogListView> createState() => _CatalogListViewState();
@@ -38,6 +47,14 @@ class _CatalogListViewState extends State<CatalogListView> {
   void initState() {
     super.initState();
     widget.viewModel.load();
+  }
+
+  @override
+  void didUpdateWidget(covariant CatalogListView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.viewModel != widget.viewModel) {
+      widget.viewModel.load(q: _search.text.trim().isEmpty ? null : _search.text.trim());
+    }
   }
 
   @override
@@ -89,6 +106,10 @@ class _CatalogListViewState extends State<CatalogListView> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           children: [
+            if (widget.topBar != null) ...[
+              widget.topBar!(context, vm.load),
+              const SizedBox(height: 12),
+            ],
             if (widget.hint != null) ...[
               Text(
                 widget.hint!,
@@ -161,21 +182,31 @@ class _CatalogListViewState extends State<CatalogListView> {
                 }
                 final isFemale = row.badge == 'KE';
                 final isMale = row.badge == 'ME';
+                final isNight = row.badge == 'Usiku';
                 final badgeBg = isFemale
                     ? const Color(0x1AC2185B)
                     : isMale
                         ? const Color(0x1A0288D1)
-                        : MadrasaTheme.successBg;
+                        : isNight
+                            ? const Color(0x1A0B6E8F)
+                            : MadrasaTheme.successBg;
                 final badgeBorder = isFemale
                     ? const Color(0x4DC2185B)
                     : isMale
                         ? const Color(0x4D0288D1)
-                        : MadrasaTheme.successBorder;
+                        : isNight
+                            ? const Color(0x4D0B6E8F)
+                            : MadrasaTheme.successBorder;
                 final badgeText = isFemale
                     ? StudentStatCards.femaleColor
                     : isMale
                         ? StudentStatCards.maleColor
-                        : MadrasaTheme.successText;
+                        : isNight
+                            ? MadrasaTheme.secondary
+                            : MadrasaTheme.successText;
+
+                final hasTap =
+                    widget.onRowTap != null || row.detailPath != null;
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
@@ -184,10 +215,18 @@ class _CatalogListViewState extends State<CatalogListView> {
                         ? StudentStatCards.femaleColor
                         : isMale
                             ? StudentStatCards.maleColor
-                            : MadrasaTheme.primary,
-                    onTap: row.detailPath == null
+                            : isNight
+                                ? MadrasaTheme.secondary
+                                : MadrasaTheme.primary,
+                    onTap: !hasTap
                         ? null
-                        : () => context.push(row.detailPath!),
+                        : () {
+                            if (widget.onRowTap != null) {
+                              widget.onRowTap!(context, row, vm.load);
+                            } else if (row.detailPath != null) {
+                              context.push(row.detailPath!);
+                            }
+                          },
                     padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                     child: Row(
                       children: [
@@ -236,13 +275,26 @@ class _CatalogListViewState extends State<CatalogListView> {
                                     borderRadius: BorderRadius.circular(999),
                                     border: Border.all(color: badgeBorder),
                                   ),
-                                  child: Text(
-                                    row.badge!,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                      color: badgeText,
-                                    ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (isNight) ...[
+                                        Icon(
+                                          Icons.nightlight_round,
+                                          size: 12,
+                                          color: badgeText,
+                                        ),
+                                        const SizedBox(width: 4),
+                                      ],
+                                      Text(
+                                        row.badge!,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: badgeText,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -257,7 +309,7 @@ class _CatalogListViewState extends State<CatalogListView> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                        if (row.detailPath != null)
+                        if (hasTap)
                           const Icon(
                             Icons.chevron_right,
                             color: MadrasaTheme.muted,

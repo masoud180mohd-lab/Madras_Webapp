@@ -51,7 +51,12 @@ def build_databases(
     url = (env.get("DATABASE_URL") or "").strip()
     if url:
         # dj-database-url handles postgres://, mysql://, sqlite://, and query params
-        config = dj_database_url.parse(url, conn_max_age=conn_max_age, ssl_require=True)
+        is_sqlite = url.startswith("sqlite:")
+        config = dj_database_url.parse(
+            url,
+            conn_max_age=0 if is_sqlite else conn_max_age,
+            ssl_require=not is_sqlite,
+        )
         if config.get("HOST"):
             config["HOST"] = _resolve_render_postgres_host(str(config["HOST"]), env)
     else:
@@ -80,4 +85,3 @@ def build_databases(
             config["OPTIONS"].setdefault("charset", "utf8mb4")
 
     return {"default": config}
-

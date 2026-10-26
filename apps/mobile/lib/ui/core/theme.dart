@@ -6,6 +6,8 @@ class MadrasaTheme {
   // Palette ya msingi (light) kutoka base.css :root
   static const Color primary = Color(0xFF1F6B45); // --primary
   static const Color primaryHover = Color(0xFF155536); // --primary-hover
+  static const Color maroon = primary;
+  static const Color outlineSoft = Color(0xFFE8F0EA);
   static const Color secondary = Color(0xFF0B6E8F); // --secondary
   static const Color forest = Color(0xFF143D2A); // --sidebar-bg / --title-color
   static const Color gold = Color(0xFFB8893D); // --accent

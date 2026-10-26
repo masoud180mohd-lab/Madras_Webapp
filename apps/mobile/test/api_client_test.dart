@@ -79,5 +79,20 @@ void main() {
         expect(error.alreadyRecorded, isTrue);
       }
     });
+
+    test('getBytes resolves relative path and query parameters against baseUrl', () async {
+      late Uri seenUri;
+      final client = ApiClient(
+        baseUrl: 'https://example.test',
+        tokens: MemoryTokenStore(),
+        httpClient: MockClient((request) async {
+          seenUri = request.url;
+          return http.Response('PDF_BYTES', 200, headers: {'content-type': 'application/pdf'});
+        }),
+      );
+      final res = await client.getBytes('/api/v1/wanafunzi/203/pdf/mahudhurio/?aina=Darasa&muda=wote');
+      expect(seenUri.toString(), 'https://example.test/api/v1/wanafunzi/203/pdf/mahudhurio/?aina=Darasa&muda=wote');
+      expect(res.body, 'PDF_BYTES');
+    });
   });
 }

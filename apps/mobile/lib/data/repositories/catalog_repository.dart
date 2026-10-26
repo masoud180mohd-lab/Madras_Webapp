@@ -29,13 +29,20 @@ class CatalogRepository {
     }).toList(growable: false);
   }
 
-  Future<List<CatalogRow>> wanafunzi({String? q, String? darasa}) async {
+  Future<List<CatalogRow>> wanafunzi({
+    String? q,
+    String? darasa,
+    String? hali,
+  }) async {
     final query = <String, String>{};
     if (q != null && q.isNotEmpty) {
       query['q'] = q;
     }
     if (darasa != null && darasa.isNotEmpty) {
       query['darasa'] = darasa;
+    }
+    if (hali != null && hali.isNotEmpty) {
+      query['hali'] = hali;
     }
     final list =
         await _api.get(
@@ -64,6 +71,14 @@ class CatalogRepository {
         detailPath: id == null ? null : '/wanafunzi/$id',
       );
     }).toList(growable: false);
+  }
+
+  Future<List<Mwanafunzi>> wanafunziDarasa(int darasaId) async {
+    final raw = await _api.get('/api/v1/madarasa/$darasaId/wanafunzi/');
+    final list = raw as List<dynamic>;
+    return list
+        .map((row) => Mwanafunzi.fromJson(row as Map<String, dynamic>))
+        .toList(growable: false);
   }
 
   Future<StudentDetail> mwanafunziDetail(int id) async {
@@ -128,15 +143,406 @@ class CatalogRepository {
     required int somoId,
     required String jina,
     required String tarehe,
+    int? msetoId,
   }) async {
     final raw = await _api.post(
       '/api/v1/masomo/$somoId/mitihani/',
       body: {
         'jina_la_mtihani': jina,
         'tarehe': tarehe,
+        if (msetoId != null) 'mseto': msetoId,
       },
     );
     return SubjectExam.fromJson(raw as Map<String, dynamic>);
+  }
+
+  Future<List<Mwanafunzi>> wanafunziHifdhu(int somoId) async {
+    final raw = await _api.get('/api/v1/masomo/$somoId/wanafunzi/');
+    final list = raw as List<dynamic>;
+    return list
+        .map((row) => Mwanafunzi.fromJson(row as Map<String, dynamic>))
+        .toList(growable: false);
+  }
+
+  Future<List<Map<String, dynamic>>> wanafunziSomoRaw(int somoId) async {
+    final raw = await _api.get('/api/v1/masomo/$somoId/maendeleo/');
+    final list = raw as List<dynamic>;
+    return list.whereType<Map<String, dynamic>>().toList(growable: false);
+  }
+
+  Future<void> rekodiSabaq({
+    required int mwanafunziId,
+    required String aina,
+    String? sura,
+    int? ayaKuanzia,
+    int? ayaKuishia,
+    String? hali,
+    String? maoni,
+    List<Map<String, dynamic>>? mapande,
+  }) async {
+    await _api.post(
+      '/api/v1/sabaq/',
+      body: {
+        'mwanafunzi': mwanafunziId,
+        'aina_ya_rekodi': aina,
+        if (sura != null && sura.trim().isNotEmpty) 'sabaq_sura': sura.trim(),
+        if (ayaKuanzia != null) 'sabaq_aya_kuanzia': ayaKuanzia,
+        if (ayaKuishia != null) 'sabaq_aya_kuishia': ayaKuishia,
+        if (hali != null && hali.isNotEmpty) 'sabaq_hali': hali,
+        if (maoni != null && maoni.trim().isNotEmpty)
+          'maoni_ya_mwalimu': maoni.trim(),
+        if (mapande != null && mapande.isNotEmpty) 'mapande': mapande,
+      },
+    );
+  }
+
+  Future<void> rekodiMaendeleo({
+    required int mwanafunziId,
+    required int somoId,
+    required String mada,
+    String? ukurasaAuAya,
+    required String hali,
+    String? maoni,
+  }) async {
+    await _api.post(
+      '/api/v1/maendeleo/',
+      body: {
+        'mwanafunzi': mwanafunziId,
+        'somo': somoId,
+        'mada_iliyosomwa': mada.trim(),
+        if (ukurasaAuAya != null && ukurasaAuAya.trim().isNotEmpty)
+          'ukurasa_au_aya': ukurasaAuAya.trim(),
+        'hali': hali,
+        if (maoni != null && maoni.trim().isNotEmpty) 'maoni': maoni.trim(),
+      },
+    );
+  }
+
+  Future<Map<String, dynamic>> ripotiMaendeleoMchana(
+    int somoId,
+    int mwanafunziId, {
+    String muda = 'wote',
+  }) async {
+    final raw = await _api.get(
+      '/api/v1/masomo/$somoId/wanafunzi/$mwanafunziId/maendeleo/',
+      query: {'muda': muda},
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> ripotiMwanafunzi(
+    int mwanafunziId, {
+    required String aina,
+    String muda = 'wote',
+  }) async {
+    final raw = await _api.get(
+      '/api/v1/wanafunzi/$mwanafunziId/ripoti/',
+      query: {'aina': aina, 'muda': muda},
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> darasaMiseto(int darasaId) async {
+    final raw = await _api.get('/api/v1/madarasa/$darasaId/mseto/');
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> undaMseto({
+    required int darasaId,
+    required String jina,
+    String? tarehe,
+    int? muhulaId,
+  }) async {
+    final raw = await _api.post(
+      '/api/v1/madarasa/$darasaId/mseto/',
+      body: {
+        'jina': jina.trim(),
+        if (tarehe != null && tarehe.isNotEmpty) 'tarehe': tarehe,
+        if (muhulaId != null) 'muhula': muhulaId,
+      },
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> ripotiJumla(int darasaId, int msetoId) async {
+    final raw = await _api.get(
+      '/api/v1/madarasa/$darasaId/mseto/$msetoId/ripoti/',
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<List<int>> downloadMatokeoJumlaPdf(int darasaId, int msetoId) async {
+    final res = await _api.getBytes(
+      '/api/v1/madarasa/$darasaId/mseto/$msetoId/ripoti/pdf/',
+    );
+    return res.bodyBytes;
+  }
+
+  Future<Map<String, dynamic>> usajiliChaguzi() async {
+    final raw = await _api.get('/api/v1/usajili/chaguzi/');
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> sajiliMwanafunzi(
+    Map<String, dynamic> body,
+  ) async {
+    final raw = await _api.post('/api/v1/usajili/mwanafunzi/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<StudentDetail> haririMwanafunzi(
+    int id,
+    Map<String, dynamic> body,
+  ) async {
+    final raw = await _api.put('/api/v1/wanafunzi/$id/', body: body);
+    return StudentDetail.fromJson(raw as Map<String, dynamic>);
+  }
+
+  Future<StudentDetail> hifadhiMwanafunzi(int id, {String sababu = ''}) async {
+    final raw = await _api.post(
+      '/api/v1/wanafunzi/$id/hifadhi/',
+      body: {'sababu': sababu},
+    );
+    return StudentDetail.fromJson(raw as Map<String, dynamic>);
+  }
+
+  Future<StudentDetail> rudishaMwanafunzi(int id) async {
+    final raw = await _api.post('/api/v1/wanafunzi/$id/rudisha/');
+    return StudentDetail.fromJson(raw as Map<String, dynamic>);
+  }
+
+  Future<Map<String, dynamic>> sajiliMwalimu(Map<String, dynamic> body) async {
+    final raw = await _api.post('/api/v1/usajili/mwalimu/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> mwalimuDetailRaw(int id) async {
+    final raw = await _api.get('/api/v1/walimu/$id/');
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> haririMwalimu(
+    int id,
+    Map<String, dynamic> body,
+  ) async {
+    final raw = await _api.put('/api/v1/walimu/$id/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> sajiliSomo(Map<String, dynamic> body) async {
+    final raw = await _api.post('/api/v1/usajili/somo/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> sajiliDarasa(Map<String, dynamic> body) async {
+    final raw = await _api.post('/api/v1/usajili/darasa/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> haririDarasa(
+    int id,
+    Map<String, dynamic> body,
+  ) async {
+    final raw = await _api.put('/api/v1/madarasa/$id/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<void> futaDarasa(int id) async {
+    await _api.delete('/api/v1/madarasa/$id/');
+  }
+
+  Future<Map<String, dynamic>> malipoRaw({
+    String? q,
+    String? aina,
+    String? hali,
+  }) async {
+    final query = <String, String>{};
+    if (q != null && q.isNotEmpty) query['q'] = q;
+    if (aina != null && aina.isNotEmpty) query['aina'] = aina;
+    if (hali != null && hali.isNotEmpty) query['hali'] = hali;
+    final raw = await _api.get(
+      '/api/v1/malipo/',
+      query: query.isEmpty ? null : query,
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> wekaMalipo({
+    required int mwanafunziId,
+    required int ainaId,
+    required String kiasi,
+    required String njia,
+    String? maelezo,
+  }) async {
+    final raw = await _api.post(
+      '/api/v1/wanafunzi/$mwanafunziId/malipo/',
+      body: {
+        'aina_ya_malipo': ainaId,
+        'kiasi': kiasi,
+        'njia': njia,
+        if (maelezo != null && maelezo.trim().isNotEmpty)
+          'maelezo': maelezo.trim(),
+      },
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> ainaMalipoRaw() async {
+    final raw = await _api.get('/api/v1/aina-malipo/');
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> undaAinaMalipo(Map<String, dynamic> body) async {
+    final raw = await _api.post('/api/v1/aina-malipo/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> haririAinaMalipo(
+    int id,
+    Map<String, dynamic> body,
+  ) async {
+    final raw = await _api.put('/api/v1/aina-malipo/$id/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<void> futaAinaMalipo(int id) async {
+    await _api.delete('/api/v1/aina-malipo/$id/');
+  }
+
+  Future<Map<String, dynamic>> mwakaRaw() async {
+    final raw = await _api.get('/api/v1/mwaka/');
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> undaMwaka(Map<String, dynamic> body) async {
+    final raw = await _api.post('/api/v1/mwaka/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> wezeshaMwaka(int id) async {
+    final raw = await _api.post('/api/v1/mwaka/$id/wezesha/');
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> undaMuhula(Map<String, dynamic> body) async {
+    final raw = await _api.post('/api/v1/mwaka/muhula/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> wezeshaMuhula(int id) async {
+    final raw = await _api.post('/api/v1/mwaka/muhula/$id/wezesha/');
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> hamishaDarasa({
+    required int kutokaId,
+    required int kwendaId,
+    required List<int> wanafunziIds,
+    String maezo = '',
+  }) async {
+    final raw = await _api.post(
+      '/api/v1/hamisha/',
+      body: {
+        'kutoka': kutokaId,
+        'kwenda': kwendaId,
+        'wanafunzi': wanafunziIds,
+        'maezo': maezo,
+      },
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> mawasilianoDetail(int mwanafunziId) async {
+    final raw = await _api.get('/api/v1/mawasiliano/$mwanafunziId/');
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> haririMawasiliano(
+    int mwanafunziId,
+    Map<String, dynamic> body,
+  ) async {
+    final raw = await _api.put('/api/v1/mawasiliano/$mwanafunziId/', body: body);
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> rekodiSimu(
+    int mwanafunziId,
+    Map<String, dynamic> body,
+  ) async {
+    final raw = await _api.post(
+      '/api/v1/mawasiliano/$mwanafunziId/simu/',
+      body: body,
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<String> funguaWhatsApp(
+    int mwanafunziId, {
+    int mzazi = 1,
+    String kigezo = 'jumla',
+    String ujumbe = '',
+  }) async {
+    final raw =
+        await _api.post(
+              '/api/v1/mawasiliano/$mwanafunziId/whatsapp/',
+              body: {
+                'mzazi': mzazi,
+                'kigezo': kigezo,
+                if (ujumbe.trim().isNotEmpty) 'ujumbe': ujumbe.trim(),
+              },
+            )
+            as Map<String, dynamic>;
+    return raw['wa_url'] as String? ?? '';
+  }
+
+  Future<Map<String, dynamic>> whatsappKampeni({
+    String? q,
+    String? darasa,
+    String? kigezo,
+    String? ujumbe,
+  }) async {
+    final query = <String, String>{};
+    if (q != null && q.isNotEmpty) query['q'] = q;
+    if (darasa != null && darasa.isNotEmpty) query['darasa'] = darasa;
+    if (kigezo != null && kigezo.isNotEmpty) query['kigezo'] = kigezo;
+    if (ujumbe != null && ujumbe.isNotEmpty) query['ujumbe'] = ujumbe;
+    final raw = await _api.get(
+      '/api/v1/mawasiliano/whatsapp/',
+      query: query.isEmpty ? null : query,
+    );
+    return raw as Map<String, dynamic>;
+  }
+
+  Future<List<int>> downloadRisitiPdf(int malipoId) async {
+    final res = await _api.getBytes('/api/v1/malipo/$malipoId/risiti/');
+    return res.bodyBytes;
+  }
+
+  Future<List<int>> downloadMahudhurioPdf(
+    int mwanafunziId, {
+    required String aina,
+    String muda = 'wote',
+  }) async {
+    final res = await _api.getBytes(
+      '/api/v1/wanafunzi/$mwanafunziId/pdf/mahudhurio/?aina=$aina&muda=$muda',
+    );
+    return res.bodyBytes;
+  }
+
+  Future<List<int>> downloadSabaqPdf(
+    int mwanafunziId, {
+    required String aina,
+    String muda = 'wote',
+  }) async {
+    final res = await _api.getBytes(
+      '/api/v1/wanafunzi/$mwanafunziId/pdf/sabaq/?aina=$aina&muda=$muda',
+    );
+    return res.bodyBytes;
+  }
+
+  Future<List<int>> downloadMatokeoPdf(int mtihaniId) async {
+    final res = await _api.getBytes('/api/v1/mitihani/$mtihaniId/pdf/');
+    return res.bodyBytes;
   }
 
   Future<List<CatalogRow>> masomo() async {
@@ -213,6 +619,7 @@ class CatalogRepository {
     final list = (raw['malipo'] as List<dynamic>? ?? const []);
     return list.whereType<Map<String, dynamic>>().map((row) {
       return CatalogRow(
+        id: row['id'] as int?,
         title: row['mwanafunzi'] as String? ?? '',
         subtitle: [
           row['aina'] as String? ?? '',
@@ -229,6 +636,7 @@ class CatalogRepository {
     final list = (raw['results'] as List<dynamic>? ?? const []);
     return list.whereType<Map<String, dynamic>>().map((row) {
       return CatalogRow(
+        id: row['id'] as int?,
         title: row['lebo_kamili'] as String? ?? row['jina'] as String? ?? '',
         subtitle: [
           if (row['mwaka'] != null) row['mwaka'] as String,
@@ -256,6 +664,7 @@ class CatalogRepository {
             .join(', ');
       }
       return CatalogRow(
+        id: row['id'] as int?,
         title: row['jina'] as String? ?? '',
         subtitle: subtitle,
         badge: hai ? 'Hai' : null,
@@ -268,6 +677,7 @@ class CatalogRepository {
     final list = await _api.get('/api/v1/hamisha/') as List<dynamic>;
     return list.whereType<Map<String, dynamic>>().map((row) {
       return CatalogRow(
+        id: row['id'] as int?,
         title: row['jina'] as String? ?? '',
         trailing: '${row['idadi_wanafunzi'] ?? 0} wanafunzi',
       );

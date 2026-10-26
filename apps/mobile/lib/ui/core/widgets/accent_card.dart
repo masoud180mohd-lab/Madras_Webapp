@@ -23,16 +23,20 @@ class AccentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final content = IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(width: accentWidth, color: accent),
-          Expanded(
-            child: Padding(padding: padding, child: child),
-          ),
-        ],
-      ),
+    final content = Stack(
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: accentWidth),
+          child: Padding(padding: padding, child: child),
+        ),
+        Positioned(
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: accentWidth,
+          child: Container(color: accent),
+        ),
+      ],
     );
 
     return DecoratedBox(
@@ -59,12 +63,12 @@ class AccentCard extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: onTap == null
-            ? content
-            : Material(
-                color: Colors.transparent,
-                child: InkWell(onTap: onTap, child: content),
-              ),
+        child: Material(
+          color: Colors.transparent,
+          child: onTap == null
+              ? content
+              : InkWell(onTap: onTap, child: content),
+        ),
       ),
     );
   }

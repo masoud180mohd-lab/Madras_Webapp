@@ -119,10 +119,10 @@ class _LoginCard extends StatelessWidget {
         children: [
           const Center(child: _LoginLogo()),
           const SizedBox(height: 20),
-          Text(
+          const Text(
             MadrasaCopy.brand,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: MadrasaTheme.brandFont,
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -130,20 +130,20 @@ class _LoginCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text(
+          const Text(
             MadrasaCopy.welcome,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 25,
               fontWeight: FontWeight.w800,
               color: MadrasaTheme.ink,
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             MadrasaCopy.subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 15, color: MadrasaTheme.muted),
+            style: TextStyle(fontSize: 15, color: MadrasaTheme.muted),
           ),
           const SizedBox(height: 30),
           if (error != null) ...[
@@ -187,9 +187,9 @@ class _LoginCard extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                : Row(
+                : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
+                    children: [
                       Text(MadrasaCopy.login),
                       SizedBox(width: 10),
                       Icon(Icons.login, size: 18),

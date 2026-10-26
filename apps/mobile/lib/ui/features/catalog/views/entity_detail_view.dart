@@ -14,10 +14,16 @@ class EntityDetailView extends StatefulWidget {
     super.key,
     required this.loader,
     this.heading = 'Maelezo',
+    this.actionBuilder,
   });
 
   final Future<CatalogRow> Function() loader;
   final String heading;
+  final Widget Function(
+    BuildContext context,
+    CatalogRow row,
+    VoidCallback reload,
+  )? actionBuilder;
 
   @override
   State<EntityDetailView> createState() => _EntityDetailViewState();
@@ -64,7 +70,10 @@ class _EntityDetailViewState extends State<EntityDetailView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(_error ?? MadrasaCopy.emptyList, textAlign: TextAlign.center),
+              Text(
+                _error ?? MadrasaCopy.emptyList,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: _load,
@@ -139,6 +148,10 @@ class _EntityDetailViewState extends State<EntityDetailView> {
               ),
             ),
           ),
+        ],
+        if (widget.actionBuilder != null) ...[
+          const SizedBox(height: 16),
+          widget.actionBuilder!(context, row, _load),
         ],
       ],
     );
