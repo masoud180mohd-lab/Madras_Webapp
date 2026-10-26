@@ -275,6 +275,8 @@ class _HifdhuStudentsViewState extends State<HifdhuStudentsView> {
                             style: FilledButton.styleFrom(
                               backgroundColor: MadrasaTheme.primary,
                               foregroundColor: Colors.white,
+                              minimumSize: const Size(0, 34),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 6,
@@ -301,6 +303,8 @@ class _HifdhuStudentsViewState extends State<HifdhuStudentsView> {
                             side: const BorderSide(
                               color: MadrasaTheme.secondary,
                             ),
+                            minimumSize: const Size(0, 34),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
                               vertical: 6,

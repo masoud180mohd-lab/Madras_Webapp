@@ -49,6 +49,7 @@ class _RollCallViewState extends State<RollCallView> {
             );
           }
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _Banner(viewModel: vm),
               Expanded(

@@ -1,7 +1,7 @@
 name: madrasa_mobile
 description: Staff app for Al-Madrasatul Rasulillah (mahudhurio, madarasa).
 publish_to: "none"
-version: 1.0.7+14
+version: 1.0.8+15
 
 environment:
   sdk: ">=3.5.0 <4.0.0"

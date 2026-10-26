@@ -25,31 +25,38 @@ class CatalogActions {
     return Row(
       children: [
         Expanded(
-          child: Wrap(
-            spacing: 6,
-            children: [
-              for (final entry in const [
-                ('hai', 'Wanafunzi Hai'),
-                ('hifadhiwa', 'Waliohifadhiwa'),
-                ('wote', 'Wote'),
-              ])
-                ChoiceChip(
-                  label: Text(entry.$2),
-                  selected: currentHali == entry.$1,
-                  onSelected: (v) {
-                    if (v) onSelectHali(entry.$1);
-                  },
-                ),
-            ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (final entry in const [
+                  ('hai', 'Hai'),
+                  ('hifadhiwa', 'Waliohifadhiwa'),
+                  ('wote', 'Wote'),
+                ])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: ChoiceChip(
+                      label: Text(entry.$2),
+                      selected: currentHali == entry.$1,
+                      onSelected: (v) {
+                        if (v) onSelectHali(entry.$1);
+                      },
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
-        if (canRegister)
+        if (canRegister) ...[
+          const SizedBox(width: 8),
           FilledButton.icon(
             onPressed: () =>
                 showRegisterStudentSheet(context, repo: repo, onSaved: reload),
             icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
             label: const Text('Sajili'),
           ),
+        ],
       ],
     );
   }

@@ -85,6 +85,25 @@ class MadrasaTheme {
           side: const BorderSide(color: border),
         ),
       ),
+      chipTheme: ChipThemeData(
+        backgroundColor: card,
+        selectedColor: successBg,
+        checkmarkColor: primary,
+        side: const BorderSide(color: border),
+        labelStyle: const TextStyle(
+          color: ink,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
+        secondaryLabelStyle: const TextStyle(
+          color: primary,
+          fontWeight: FontWeight.w700,
+          fontSize: 13,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
@@ -108,8 +127,9 @@ class MadrasaTheme {
         style: FilledButton.styleFrom(
           backgroundColor: primary,
           foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(50),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          minimumSize: const Size(64, 42),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -174,6 +194,25 @@ class MadrasaTheme {
           side: const BorderSide(color: darkBorder),
         ),
       ),
+      chipTheme: ChipThemeData(
+        backgroundColor: darkCard,
+        selectedColor: darkSurfaceMuted,
+        checkmarkColor: darkPrimary,
+        side: const BorderSide(color: darkBorder),
+        labelStyle: const TextStyle(
+          color: darkInk,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
+        secondaryLabelStyle: const TextStyle(
+          color: darkPrimary,
+          fontWeight: FontWeight.w700,
+          fontSize: 13,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: darkSurfaceMuted,
@@ -197,8 +236,9 @@ class MadrasaTheme {
         style: FilledButton.styleFrom(
           backgroundColor: darkPrimary,
           foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(50),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          minimumSize: const Size(64, 42),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
